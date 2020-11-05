@@ -1,0 +1,265 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+hr {
+    color: rgba(114, 114, 114, 0.301);
+    margin-top: 70px;
+}
+.home {
+    display: flex;
+
+}
+
+
+
+/* Header - aside left*/
+.left {
+    position: fixed;
+    height: 100vh;
+    background-image: url('./img/bg.jpg');
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+}
+.container-aside{
+    background-color: rgba(0, 0, 0, 0.349);
+    height: 100vh;
+}
+.photo {
+    background-image: url('./img/cat-perfil.png');
+    background-position: center;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 300px;
+    border-radius: 50%;
+    margin-top: 100px;
+}
+.text-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    font-size: 20px;
+    color: rgb(207, 207, 207);
+}
+.text-header p {
+    margin: 5px;
+    padding: 0px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.icons {
+    display: flex;
+    justify-content: center;
+    width: 700px;
+
+}
+.icons img {
+    margin: 20px;
+    cursor: pointer;
+}
+
+/* Content - aside right*/
+
+.right {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-left:42.5%;
+    margin-right: 50px;
+    width: 60% ;
+    height: 100vh;
+
+}
+.title {
+    font-size: 30px;
+    margin-top: 20px;
+    color: rgb(114, 114, 114);
+}
+#title-first{
+    margin-top: 50px;
+}
+.title-2 {
+    font-size: 25px;
+    margin-top: 100px;
+    color: rgb(114, 114, 114);
+}
+.text{
+    font-size: 18px;
+    color: rgb(150, 150, 150);
+    margin-top: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+
+}
+.text p{
+    margin: 2px;
+    padding: 0px;
+}
+.projects-imgs{
+    margin-top: 50px;
+    display: flex;
+}
+.project{
+    width: 200px;
+    height: 200px;
+    background-image: url('./img/bg.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 3%;
+    cursor: pointer;
+    margin: 10px;
+}
+.hide{
+    transition: 0.5s;
+    display: none;
+}
+.show{
+    transition: 0.5s;
+    display: block;
+
+}
+.project:hover .project-name{
+    opacity: 1;
+}
+.project-name{
+    display: flex;   
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.349);
+    padding: 10px;
+    transition: 1s;
+    opacity: 0;
+
+}
+.project-name-opacity{
+    display: flex;   
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.349);
+    padding: 10px;
+    transition: 1s;
+    opacity: 1;
+
+}
+.project-name-opacity span {
+    font-size: 20px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.project-name span{
+    font-size: 20px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    
+}
+.project-content{
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+.container-slider{
+    display: flex;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+.carousel-item{
+    width: 100%;
+    height: 500px;
+}
+
+/* Imgs */
+
+#react {
+    background-image: url('./img/react.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 200%;
+}
+#vue {
+    background-image: url('./img/vue.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 178%;
+}
+#angular {
+    background-image: url('./img/angular.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 178%;
+}
+#node {
+    background-image: url('./img/node.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 200%;
+}
+
+/*Responsiveness*/
+
+@media(max-width: 1500px){
+    .home {
+        display: flex;
+        flex-direction: column;
+    }
+    .left{
+        position: relative;
+        width: 100%;
+        height: 400px;
+    }
+    .text{
+        width: 100%;
+    }
+    p{
+        width: 100%;
+    }
+    .right{
+        margin-left: 0%;
+        width: 100%;
+        padding: 5px;
+        padding-left: 10px;
+    }
+    #title-first{
+        margin-top: 10px;
+        font-size: 25px;
+        text-align: center;
+    }
+    .photo{
+        height: 200px;
+        width: 200px;
+    }
+    .text-header{
+        font-size: 15px;
+        text-align: center;
+        margin: 20px;
+    }
+    .icons {
+        display: flex;
+        justify-content: center;
+        width: 100%;  
+        position: absolute;
+        top: 10px;  
+    }
+    #text-header-2{
+        display:none
+    }
+    .col{
+        display: flex;
+        justify-content: center;
+        margin: 10px;
+
+    }
+    
+}
+
+
+
