@@ -1,0 +1,16 @@
+.project-img {
+  background-color: rgb(236, 246, 255);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: bottom;
+  width: 250px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-img img {
+  width: 150px;
+  height: 150px;
+}
