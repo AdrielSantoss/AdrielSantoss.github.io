@@ -27,37 +27,59 @@
                         <h3 class="h4 portfolio-title">Descrição</h3>
                         <br />
 
-                        <p class="about-text">
-                            Este projeto, trata-se de um aplicativo Mobile para controle de finanças de empresas. <br />
-                            O objetivo desta aplicação é exibir em forma de valores, gráficos e percentuais os
-                            resultados e métricas de uma ou mais empresas em determinados períodos de tempos.<br /><br />
-
-                            Este projeto, foi o primeiro produto Mobile de uma empresa, isto é, fui o desenvolvedor
-                            encarregado de criar a primeira experiência da empresa em uma nova plataforma. A linguagem,
-                            framework e banco de dados também foram tecnologias inovadoras dentro da empresa. A
-                            linguagem é o <strong>Dart</strong>, o framework é o <strong>Flutter</strong> e o banco de
-                            dados é o <strong>Firebase</strong>.<br /><br />
-
-                            Este projeto possui diversos sistemas e funcionalidades, alguns deles são:<br /><br />
-                            1. Fui o responsável por publicar o aplicativo nas duas principais lojas de aplicativos
-                            Mobile atualmente, <strong>App Store</strong> para IOS e <strong>Play Store</strong> para
-                            Android. <br /><br />
-
-                            2. Somente clientes da empresa, podem criar contas e acessaor o aplicativo, a criação de
-                            contas é vinculada a uma <strong>integração</strong> com um sistema web, este sistema
-                            armazena os dados das contas de usuário dos clientes, sendo assim, para um usuário
-                            autenticar no aplicativo, é necessário ter uma conta no sistema web da empresa. <br /><br />
-
-                            <!-- 
-                            migrados de outros bancos de dados, as informações financeiras das empresas utilizados no
-                            Aplicativo, são migradas de um banco relacional chamado
-                            <strong>Firebird</strong>. Já as CONTAS de acesso, são migrados de uma plataforma web, na
-                            qual os usuários criam o seu cadastro, neste caso, os dados dessa plataforma WEB são
-                            migrados de um banco relacional chamado <strong>Sqlite</strong>. <br /><br /> -->
-
-                            <!-- Todos esses dados dos clientes, são migrados para o <strong>Firebase</strong>  -->
-                            <!-- CONTINUAR AQUI -->
-                        </p>
+                        <div class="about-text">
+                            <p>
+                                Este projeto, trata-se de um aplicativo Mobile para controle de finanças de empresas.
+                                <br />
+                                O objetivo desta aplicação é exibir em forma de valores, gráficos e percentuais os
+                                resultados e métricas de uma ou mais empresas em determinados períodos de tempos.
+                            </p>
+                            <p>
+                                Este projeto, foi o primeiro produto Mobile de uma empresa, isto é, fui o desenvolvedor
+                                encarregado de criar a primeira experiência da empresa em uma nova plataforma. A
+                                linguagem, framework e banco de dados também foram tecnologias inovadoras dentro da
+                                empresa. A linguagem é o <strong>Dart</strong>, o framework é o
+                                <strong>Flutter</strong> e o banco de dados é o <strong>Firebase</strong>.
+                            </p>
+                            <p>
+                                Este projeto possui diversos sistemas e integrações que compõem suas funcionalidades,
+                                segue abaixo alguns pontos de caractaristicas técnicas do projeto:
+                            </p>
+                            <p>
+                                1. Fui o responsável por publicar o aplicativo nas duas principais lojas de aplicativos
+                                Mobile atualmente, <strong>App Store</strong> para IOS e
+                                <strong>Play Store</strong> para Android.
+                            </p>
+                            <p>
+                                2. Somente os clientes da empresa, podem criar contas e acessar o aplicativo, a criação
+                                de contas é vinculada a uma <strong>integração</strong> com um sistema web, este sistema
+                                web armazena os dados das contas de usuário dos clientes, sendo assim, para um usuário
+                                autenticar no aplicativo, é necessário criar uma conta no sistema web.
+                            </p>
+                            <p>
+                                3. O banco de dados que é utilizado no Aplicativo, chama-se
+                                <strong>Cloud Firestore</strong> que é um banco <strong>NOSQL</strong> da plataforma
+                                <strong>Firebase.</strong> Para que o Firestore possua os dados de cada cliente, como
+                                valores de vendas, percentuais por empresas, gráficos e etc, é realizado uma migração de
+                                dados, sendo executado uma operação chamada de ETL (Transfom, Extract, Load), essa
+                                operação, consiste em <strong>extrair</strong> dados de uma fonte, e em seguida
+                                <strong>transformar</strong> ou adaptar esses dados, para serem
+                                <strong>inseridos</strong> em uma nova base de dados. Sendo assim, os dados que são
+                                inseridos no Firestore, são extraidos de uma base de dados dos clientes de outros
+                                sistemas que eles já utilizam, através de um script que é encarregado de fazer a
+                                operação ETL.
+                            </p>
+                            <p>
+                                4. O aplicativo possui um sistema de Notificações, este sistema faz parte da plataforma
+                                <strong>Firebase</strong> e chama-se <strong>Firebase Cloud Message (FCM)</strong>. Este
+                                sistema de notificações é <strong>integrado</strong> com uma Web Api, que gerencia e
+                                armazena toda notificação que é disparada. Sendo assim, qualquer sistema que queira
+                                disparar uma notificação no aplicativo Mobile, basta enviar uma requisição HTTP para
+                                esta Web Api (enviando os parametros necessários), e a Web Api por sua vez, se
+                                comunicará com o <strong>FCM</strong> e a notificação será entregue para os dispositivos
+                                corretos.
+                            </p>
+                        </div>
                     </section>
 
                     <section class="portfolio-features">
