@@ -14,3 +14,33 @@
   width: 150px;
   height: 150px;
 }
+
+.tags {
+  margin: 20px 0px 30px 0px;
+  color: white;
+}
+
+.tag {
+  padding: 5px;
+  border-radius: 10px;
+  margin-right: 10px;
+}
+
+.tag-aqua {
+  background-color: aqua;
+  color: black;
+}
+
+.tag-blue {
+  background-color: blue;
+}
+
+.tag-yellow {
+  background-color: yellow;
+  color: black;
+}
+
+.tag-orange {
+  background-color: orange;
+  color: black;
+}
