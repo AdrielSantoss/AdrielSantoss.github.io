@@ -9,14 +9,14 @@ export function loadSideBar() {
                 <figure class="avatar-box">
                     <img
                         src="https://avatars.githubusercontent.com/u/64885646?v=4"
-                        alt="Richard hanrick"
+                        alt="ADRIEL SANTOS"
                         width="80"
                         style="border-radius: 30px"
                     />
                 </figure>
 
                 <div class="info-content">
-                    <h1 class="name" title="Richard hanrick">ADRIEL SANTOS</h1>
+                    <h1 class="name" title="ADRIEL SANTOS">ADRIEL SANTOS</h1>
 
                     <div class="title-content">
                         <p class="title">Web developer</p>
