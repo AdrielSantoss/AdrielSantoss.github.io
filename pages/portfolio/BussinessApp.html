@@ -8,21 +8,21 @@
         <link rel="stylesheet" href="../../assets/css/changes.css" />
     </head>
     <body>
-        <main>
+        <main class="main-body">
             <div class="main-content">
-                <article class="active">
-                    <section style="text-align: center">
+                <article>
+                    <section>
                         <h3 class="h2 portfolio-title">Bussiness App</h3>
-                        <br />
-                    </section>
 
-                    <section class="tags" style="text-align: center">
-                        <small class="tag tag-aqua">Flutter</small>
-                        <small class="tag tag-blue">Dart</small>
-                        <small class="tag tag-yellow">Firebase</small>
-                        <small class="tag tag-orange">Python</small>
-                        <small class="tag tag-green">Android</small>
-                        <small class="tag tag-red">IOS</small>
+                        <div class="tags">
+                            <small class="tag tag-aqua">Flutter</small>
+                            <small class="tag tag-blue">Dart</small>
+                            <small class="tag tag-yellow">Firebase</small>
+                            <small class="tag tag-orange">Python</small>
+                            <small class="tag tag-green">Android</small>
+                            <small class="tag tag-red">IOS</small>
+                        </div>
+                        <br />
                     </section>
 
                     <section class="portfolio-description">
@@ -173,5 +173,15 @@
                 </article>
             </div>
         </main>
+
+        <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+        <script type="module">
+            import { loadNavbar } from '../../assets/js/elements/navbar.js';
+            import { loadSideBar } from '../../assets/js/elements/sidebar.js';
+
+            loadNavbar([]);
+            loadSideBar();
+        </script>
     </body>
 </html>
