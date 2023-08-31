@@ -181,15 +181,6 @@ article {
   --ionicon-stroke-width: 35px;
 }
 
-article {
-  display: none;
-}
-
-article.active {
-  display: block;
-  animation: fade 0.5s ease backwards;
-}
-
 @keyframes fade {
   0% {
     opacity: 0;
@@ -1906,6 +1897,7 @@ textarea.form-input::-webkit-resizer {
 
   article {
     min-height: 100%;
+    color: white;
   }
 
   /**
