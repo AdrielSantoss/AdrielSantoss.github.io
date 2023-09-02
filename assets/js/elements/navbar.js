@@ -1,24 +1,28 @@
-import { loadMainContent } from '../index.js';
+import { getElement } from '../index.js';
 
 export class NavbarItem {
     title = '';
     url = '';
     active = false;
 
-    constructor(_title, _href, _active) {
+    getActive(title) {
+        return window.location.pathname.toUpperCase().includes(title.toUpperCase());
+    }
+
+    constructor(_title, _href) {
         this.title = _title;
         this.url = window.location.origin + _href;
-        this.active = _active;
+        this.active = this.getActive(_href);
     }
 }
 
-export function loadNavbar(actives) {
-    const mainContent = loadMainContent('.main-content');
+export function loadNavbar() {
+    const mainContent = getElement('.main-content');
     const currentItems = [
-        new NavbarItem('About', '/index.html', actives[0]), // MUDAR
-        new NavbarItem('Resume', '/pages/main/resume.html', actives[1]),
-        new NavbarItem('Portfolio', '/pages/main/portfolio.html', actives[2]),
-        new NavbarItem('Blog', '/pages/main/blog.html', actives[3])
+        new NavbarItem('About', '/index.html'),
+        new NavbarItem('Resume', '/pages/main/resume.html'),
+        new NavbarItem('Portfolio', '/pages/main/portfolio.html'),
+        new NavbarItem('Blog', '/pages/main/blog.html')
     ];
 
     const loadNavbarItems = () => {

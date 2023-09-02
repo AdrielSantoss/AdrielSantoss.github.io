@@ -1,7 +1,7 @@
-import { loadMainContent } from '../index.js';
+import { getElement } from '../index.js';
 
 export function loadSideBar() {
-    const mainContent = loadMainContent('.main-body');
+    const mainContent = getElement('.main-body');
 
     mainContent.innerHTML = `
         <aside class="sidebar" data-sidebar>
