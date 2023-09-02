@@ -53,3 +53,8 @@
 .tag-red {
   background-color: red;
 }
+
+.item-diagrama-transformed {
+  transform: scale(1.5);
+  transition: 0.5s;
+}
