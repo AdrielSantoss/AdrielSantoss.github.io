@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+'<!DOCTYPE html>
 <html lang="pt-br">
     <head>
         <meta charset="UTF-8" />
@@ -79,13 +79,14 @@
                                 <strong>inseridos</strong> em uma nova base de dados. Sendo assim, os dados que são
                                 inseridos no Firestore, são extraidos de uma base de dados dos clientes de outros
                                 sistemas que eles já utilizam, através de um script que é encarregado de fazer a
-                                operação ETL.
+                                operação ETL. Para entender melhor este fluxo, veja o diagrmaa seguir:
                             </p>
                             <div class="item item-diagrama">
                                 <img src="../../assets/images/diagramas/Fluxo-de-dados.png" style="width: 100%" />
                             </div>
                             <p>
                                 <br />
+                                <!-- FALAR SOBRE QUANDO UM USUARIO LOGA E O TOKEN DO DISPOSITIVO É ENVIADO PARA NOSSO BANCO DE NOTIFICAÇÕES -->
                                 4. O aplicativo possui um sistema de Notificações, este sistema faz parte da plataforma
                                 <strong>Firebase</strong> e chama-se <strong>Firebase Cloud Message (FCM)</strong>. Este
                                 sistema de notificações é <strong>integrado</strong> com uma Web Api, que gerencia e
@@ -95,6 +96,28 @@
                                 comunicará com o <strong>FCM</strong> e a notificação será entregue para os dispositivos
                                 corretos.
                             </p>
+                            <p>
+                                No FCM, toda vez que um dispositivo realizar uma comunicação com o FCM, será gerado um
+                                <strong>token de registro</strong>, este token serve como um ID para identificar o
+                                dispositivo que receberá notificações pelo FCM. No caso do BussinessApp, quando o
+                                usuário se LOGAR pela primeira vez, uma serie de funções de configurações do Firebase
+                                serão executadas, uma delas é a configuração do FCM de geração de TOKEN para o novo
+                                dispositivo. Sendo assim, o FCM se comunica com os serviços de cada sistema operacional
+                                que gerenciam notificações, no android é a serviço de transporte do Android
+                                <strong>(ATL)</strong> para dispositivos Android com o Google Play Services, e no caso
+                                de dispositivos Apple/IOS o FCM se comunica com o serviço de notificação push da Apple
+                                <strong>(APNs)</strong>. Para entender melhor este fluxo, veja o diagrama fornecido na
+                                documentação do Firebase Cloud Message:
+                            </p>
+
+                            <div class="item item-diagrama">
+                                <img
+                                    src="../../assets/images/diagramas/diagram-FCM.png"
+                                    alt=""
+                                    srcset=""
+                                    style="width: 100%"
+                                />
+                            </div>
                         </div>
                     </section>
 
@@ -172,3 +195,4 @@
         </script>
     </body>
 </html>
+'
