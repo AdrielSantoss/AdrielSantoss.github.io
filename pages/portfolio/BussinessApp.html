@@ -22,12 +22,10 @@
                             <small class="tag tag-green">Android</small>
                             <small class="tag tag-red">IOS</small>
                         </div>
-                        <br />
                     </section>
 
                     <section class="portfolio-description">
                         <h3 class="h4 portfolio-title">Descrição</h3>
-                        <br />
 
                         <div class="about-text">
                             <p>
@@ -44,45 +42,42 @@
                                 <strong>Flutter</strong> e o banco de dados é o <strong>Firebase</strong>.
                             </p>
                             <p>
-                                Este projeto possui diversos sistemas e integrações que compõem suas funcionalidades,
-                                segue abaixo alguns pontos de caractaristicas técnicas do projeto:
-                            </p>
-                            <p>
-                                1. Fui o responsável por publicar o aplicativo nas duas principais lojas de aplicativos
-                                Mobile atualmente, <strong>App Store</strong> para IOS e
+                                Netse projeto, fui o responsável por publicar o aplicativo nas duas principais lojas de
+                                aplicativos Mobile atualmente, são elas: <strong>App Store</strong> para IOS e
                                 <strong>Play Store</strong> para Android.
                             </p>
                             <p>
                                 O Aplicativo possui diversas integrações com sistemas WEB, estes sistemas WEB também são
-                                proprieades da empresa em que trabalho. o Aplicativo se comunica diretamente com duas
-                                aplicações WEB, que chamamos de <strong>WEB Services,</strong> são eles: o Serviço de
-                                autenticação (DW-Auth) e o Serviço de notificações (DW-Notifications).
+                                proprieades da empresa proprietaria do BussinessApp. o Aplicativo se comunica
+                                diretamente com dois sistemas, ambos desenvolvidos em C# (.net), são eles: o Serviço de
+                                autenticação (DW.Auth) e o Serviço de notificações (DW.Notifications). Essas integrações
+                                são realizadas via comunicação <strong>HTTP (Hypertext Transfer Protocol).</strong>
                             </p>
                             <p>
-                                O Serviço de Notificações foi desenvolvido inteiramente por mim em
-                                <strong>C# (.net)</strong>, para saber mais sobre este projeto
-                                <strong>clique aqui,</strong> mas em resumo, este projeto é responsável por
-                                <strong>enviar</strong> e <strong>armazenar</strong> histórico de envio de notificações
-                                para os usuários utilizando diversos canais de envios, tais como: Email, SMS, WhatsApp e
-                                Notificações no App (FCM). O BussinessApp se comunica com este Serviço para receber
-                                notificações via <strong>Firebase Cloud Message</strong> (FCM), este fluxo será descrito
-                                mais abaixo.
+                                o serviço de <strong>Notificações</strong> é responsável por <strong>enviar</strong> e
+                                <strong>armazenar</strong> o histórico de envios de notificações para os usuários,
+                                utilizando diversos canais de envios, tais como: Email, SMS, WhatsApp e Notificações no
+                                App (FCM). O BussinessApp se comunica com este serviço para receber notificações via
+                                <strong>Firebase Cloud Message</strong> (FCM). O serviço de
+                                <strong>Notificações</strong> foi desenvolvido inteiramente por mim em
+                                <strong>C#</strong>, para saber mais sobre este projeto
+                                <strong>clique aqui.</strong>
                             </p>
-                            <!-- AUTENTICAÇÃO -->
-                            <!-- <p>
-                                O Serviço de autenticação foi desenvolvido inteiramente por mim em
-                                <strong>C# (.net)</strong>, para saber mais sobre este projeto
-                                <strong>clique aqui,</strong> mas em resumo, este projeto é responsável por
-                                <strong>enviar</strong> e <strong>armazenar</strong> histórico de envio de notificações
-                                para os usuários utilizando diversos canais de envios, tais como: Email, SMS, WhatsApp e
-                                Notificações no App (FCM). O BussinessApp se comunica com este Serviço para receber
-                                notificações via <strong>Firebase Cloud Message</strong> (FCM), este fluxo será descrito
-                                mais abaixo.
-                            </p> -->
+                            <p>
+                                O sistema de <strong>Autenticação</strong> é um serviço que <strong>armazena</strong> e
+                                <strong>gerencia</strong> todas as contas de usuários dos clientes. É acessando este
+                                sistema que os usuários conseguem <strong>criar</strong> e
+                                <strong>administrar</strong> sua conta de acesso do BussinessApp. Sempre que o usuário
+                                fazer login no aplicativo mobile, é realizado uma <strong>comunicação</strong> entre o
+                                BussinessApp e este sistema. Nesta implementação, fui o responsável por criar e garantir
+                                o funcionamento da comunicação entre ambas aplicações.
+                            </p>
+
+                            <h3 class="h4 portfolio-title">Autenticação</h3>
 
                             <p>
-                                2. Somente os clientes da empresa, podem criar contas e acessar o aplicativo, a criação
-                                de contas é vinculada a uma <strong>integração</strong> com um sistema web, este sistema
+                                Somente os clientes da empresa, podem criar contas e acessar o aplicativo, a criação de
+                                contas é vinculada a uma <strong>integração</strong> com um sistema web, este sistema
                                 web armazena os dados das contas de usuário dos clientes, sendo assim, para um usuário
                                 autenticar no aplicativo, é necessário criar uma conta no sistema web, para entender
                                 melhor esse fluxo, veja o diagrama abaixo:
@@ -95,9 +90,11 @@
                                     style="width: 100%"
                                 />
                             </div>
+
+                            <h3 class="h4 portfolio-title">Banco de dados</h3>
+
                             <p>
-                                <br />
-                                3. O banco de dados que é utilizado no Aplicativo, chama-se
+                                O banco de dados que é utilizado no Aplicativo, chama-se
                                 <strong>Cloud Firestore</strong> que é um banco <strong>NOSQL</strong> da plataforma
                                 <strong>Firebase.</strong> Para que o Firestore possua os dados de cada cliente, como
                                 valores de vendas, percentuais por empresas, gráficos e etc, é realizado uma migração de
@@ -107,15 +104,16 @@
                                 <strong>inseridos</strong> em uma nova base de dados. Sendo assim, os dados que são
                                 inseridos no Firestore, são extraidos de uma base de dados dos clientes de outros
                                 sistemas que eles já utilizam, através de um script que é encarregado de fazer a
-                                operação ETL. Para entender melhor este fluxo, veja o diagrmaa seguir:
+                                operação ETL. Para entender melhor este fluxo, veja o diagrama seguir:
                             </p>
                             <div class="item item-diagrama">
                                 <img src="../../assets/images/diagramas/Fluxo-de-dados.png" style="width: 100%" />
                             </div>
+
+                            <h3 class="h4 portfolio-title">Notificações</h3>
+
                             <p>
-                                <br />
-                                <!-- FALAR SOBRE QUANDO UM USUARIO LOGA E O TOKEN DO DISPOSITIVO É ENVIADO PARA NOSSO BANCO DE NOTIFICAÇÕES -->
-                                4. O aplicativo possui um sistema de Notificações, este sistema faz parte da plataforma
+                                O aplicativo possui um sistema de Notificações, este sistema faz parte da plataforma
                                 <strong>Firebase</strong> e chama-se <strong>Firebase Cloud Message (FCM)</strong>. Este
                                 sistema de notificações é <strong>integrado</strong> com uma Web Api, que gerencia e
                                 armazena toda notificação que é disparada. Sendo assim, qualquer sistema que queira
