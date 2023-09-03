@@ -58,3 +58,8 @@
   transform: scale(1.5);
   transition: 0.5s;
 }
+
+.portfolio-title {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
