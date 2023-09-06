@@ -25,33 +25,7 @@
   border-radius: 10px;
   margin-right: 10px;
   font-size: 11px;
-}
-
-.tag-aqua {
-  background-color: aqua;
-  color: black;
-}
-
-.tag-blue {
-  background-color: blue;
-}
-
-.tag-yellow {
-  background-color: yellow;
-  color: black;
-}
-
-.tag-orange {
-  background-color: orange;
-  color: black;
-}
-
-.tag-green {
-  background-color: green;
-}
-
-.tag-red {
-  background-color: red;
+  background-color: rgba(255, 187, 92, 0.409);
 }
 
 .item-diagrama-transformed {
