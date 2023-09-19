@@ -37,3 +37,13 @@
   margin-top: 15px;
   margin-bottom: 15px;
 }
+
+.page-features {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.item-content-img {
+  max-width: 250px;
+}
