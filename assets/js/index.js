@@ -5,10 +5,6 @@ export function getElement(selector) {
     const currentSelector = selector ? selector : '.main-content';
     const mainContent = document.querySelector(currentSelector);
 
-    if (mainContent === null) {
-        throw new Error(`Elemento ${selector} não foi encontrado.`);
-    }
-
     return mainContent;
 }
 
@@ -32,7 +28,14 @@ export function itemsDiagramaClickListener() {
     }
 }
 
-// LOAD LAYOUT
+export function scroll() {
+    getElement('.scroll-to').addEventListener('click', () => {
+        getElement('.portfolio-features').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+}
+
+// LOAD LAYOUT FUNCS
 loadNavbar();
 loadSideBar();
 itemsDiagramaClickListener();
+scroll();
