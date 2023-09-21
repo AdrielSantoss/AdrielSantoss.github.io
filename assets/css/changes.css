@@ -47,3 +47,18 @@
 .item-content-img {
   max-width: 250px;
 }
+
+.wip {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.wip a {
+  color: wheat;
+}
+
+.wip img {
+  width: 200px;
+}

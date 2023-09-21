@@ -1,5 +1,6 @@
 import { loadNavbar } from './elements/navbar.js';
 import { loadSideBar } from './elements/sidebar.js';
+import { loadWorkingInProgress } from './elements/wip.js';
 
 export function getElement(selector) {
     const currentSelector = selector ? selector : '.main-content';
@@ -37,5 +38,6 @@ export function scroll() {
 // LOAD LAYOUT FUNCS
 loadNavbar();
 loadSideBar();
+loadWorkingInProgress();
 itemsDiagramaClickListener();
 scroll();
