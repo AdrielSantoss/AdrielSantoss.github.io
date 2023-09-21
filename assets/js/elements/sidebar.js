@@ -25,7 +25,9 @@ export function loadSideBar() {
                 </div>
 
                 <button class="info_more-btn" data-sidebar-btn>
-                    <span>Show Contacts</span>
+                    <span class="info_more_label">
+                        Exibir contatos
+                    </span>
 
                     <ion-icon name="chevron-down"></ion-icon>
                 </button>
@@ -111,4 +113,24 @@ export function loadSideBar() {
         </aside>
         ${mainContent.innerHTML}
     `;
+
+    const infoMoreBtn = document.getElementsByClassName('info_more-btn')[0];
+
+    infoMoreBtn.addEventListener('click', (event) => {
+        const sidebar = document.getElementsByClassName('sidebar')[0];
+        const sidebarInfoMore = document.getElementsByClassName('sidebar-info_more')[0];
+        const sidebarInfoMoreLabel = document.getElementsByClassName('info_more_label')[0];
+
+        if (sidebarInfoMore.style.visibility === 'visible') {
+            sidebarInfoMore.style.opacity = 0;
+            sidebarInfoMore.style.visibility = 'hidden';
+            sidebar.style.maxHeight = '180px';
+            sidebarInfoMoreLabel.innerHTML = 'Exibir Contatos';
+        } else {
+            sidebarInfoMore.style.opacity = 1;
+            sidebarInfoMore.style.visibility = 'visible';
+            sidebar.style.maxHeight = '800px';
+            sidebarInfoMoreLabel.innerHTML = 'Fechar Contatos';
+        }
+    });
 }
