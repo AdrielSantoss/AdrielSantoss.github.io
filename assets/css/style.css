@@ -1409,6 +1409,7 @@ textarea.form-input::-webkit-resizer {
 
   .info-content .title {
     padding: 5px 18px;
+    margin: 10px;
   }
 
   .info_more-btn {
