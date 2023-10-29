@@ -47,16 +47,43 @@
                                 e manter contato ativo com o suporte técnico da empresa parceira.
                             </p>
                             <p>
-                                Este aplicativo, juntamente com o dispositivo, serão uma ferramenta para a trabalho de
+                                Este aplicativo, juntamente com o dispositivo, serão uma ferramenta para o trabalho de
                                 <strong>contagem de estoque</strong>, este aplicativo possui integração com o sistema
                                 Desktop que os clientes utilizam para inserir essa contagem. Sendo assim, além de
-                                facilitar a contagem em <strong>LOTE</strong> de inúmeros produtos de forma rápida, os
+                                facilitar a contagem em <strong>lote</strong> de inúmeros produtos de forma rápida, os
                                 dados coletados na contagem serão enviados para o banco de dados do cliente e estarão
                                 disponiveis para visualização e revisão no sistema Desktop que já utilizam em suas
                                 lojas/empresas.
                             </p>
 
                             <h3 class="h4 portfolio-title">Autenticação</h3>
+
+                            <p>
+                                A autenticação deste aplicativo é integrada com o sistema Desktop ERP, que os clientes
+                                já utilizam, isto é, se o funcionário da loja que está encarregado de fazer a contagem,
+                                possui conta no sistema Desktop, logo, ele pode autenticar-se com esta mesma conta no
+                                App Mobile, sem a necesidade de criação de uma nova conta.
+                            </p>
+                            <p>
+                                Sendo assim, para essa integração de contas funcionar, o App mobile deverá acessar o
+                                mesmo banco de dados que o Sistema Desktop acessa para autenticar usuários. O acesso
+                                deste banco é liberado atráves de um <strong>Sistema WEB</strong>, sendo assim, o App
+                                comunica-se via requisição <strong>HTTP</strong> com este sistema web para enviar
+                                informações dos usuarios e receber o token de autenticação. Para enter melhor este
+                                fluxo, veja o diagrama abaixo:
+                            </p>
+                            <div class="item item-diagrama">
+                                <img
+                                    src="../../assets/images/diagramas/Fluxo-de-autenticacao-stocktakingapp.png"
+                                    alt=""
+                                    srcset=""
+                                    style="width: 100%"
+                                />
+                            </div>
+
+                            <h3 class="h4 portfolio-title">Integração com o Hardware</h3>
+
+                            <p></p>
                         </div>
                     </section>
 
