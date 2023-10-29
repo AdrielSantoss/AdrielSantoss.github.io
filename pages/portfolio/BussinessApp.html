@@ -42,7 +42,7 @@
                                 <strong>Flutter</strong> e o banco de dados é o <strong>Firebase</strong>.
                             </p>
                             <p>
-                                Netse projeto, fui o responsável por publicar o aplicativo nas duas principais lojas de
+                                Neste projeto, fui o responsável por publicar o aplicativo nas duas principais lojas de
                                 aplicativos Mobile atualmente, são elas: <strong>App Store</strong> para IOS e
                                 <strong>Play Store</strong> para Android.
                             </p>
@@ -53,16 +53,8 @@
                                 autenticação (DW.Auth) e o Serviço de notificações (DW.Notifications). Essas integrações
                                 são realizadas via comunicação <strong>HTTP (Hypertext Transfer Protocol).</strong>
                             </p>
-                            <p>
-                                o serviço de <strong>Notificações</strong> é responsável por <strong>enviar</strong> e
-                                <strong>armazenar</strong> o histórico de envios de notificações para os usuários,
-                                utilizando diversos canais de envios, tais como: Email, SMS, WhatsApp e Notificações no
-                                App (FCM). O BussinessApp se comunica com este serviço para receber notificações via
-                                <strong>Firebase Cloud Message</strong> (FCM). O serviço de
-                                <strong>Notificações</strong> foi desenvolvido inteiramente por mim em
-                                <strong>C#</strong>, para saber mais sobre este projeto
-                                <strong>clique aqui.</strong>
-                            </p>
+
+                            <h3 class="h4 portfolio-title">Autenticação</h3>
                             <p>
                                 O sistema de <strong>Autenticação</strong> é um serviço que <strong>armazena</strong> e
                                 <strong>gerencia</strong> todas as contas de usuários dos clientes. É acessando este
@@ -72,15 +64,12 @@
                                 BussinessApp e este sistema. Nesta implementação, fui o responsável por criar e garantir
                                 o funcionamento da comunicação entre ambas aplicações.
                             </p>
-
-                            <h3 class="h4 portfolio-title">Autenticação</h3>
-
                             <p>
-                                Somente os clientes da empresa, podem criar contas e acessar o aplicativo, a criação de
-                                contas é vinculada a uma <strong>integração</strong> com um sistema web, este sistema
-                                web armazena os dados das contas de usuário dos clientes, sendo assim, para um usuário
-                                autenticar no aplicativo, é necessário criar uma conta no sistema web, para entender
-                                melhor esse fluxo, veja o diagrama abaixo:
+                                Somente os clientes da empresa (empresa usuária do App), podem criar contas e acessar o
+                                aplicativo, a criação de contas é vinculada a uma <strong>integração</strong> com um
+                                sistema web, este sistema web armazena os dados das contas de usuário dos clientes,
+                                sendo assim, para um usuário autenticar no aplicativo, é necessário criar uma conta no
+                                sistema web, para entender melhor esse fluxo, veja o diagrama abaixo:
                             </p>
                             <div class="item item-diagrama">
                                 <img
@@ -92,25 +81,51 @@
                             </div>
 
                             <h3 class="h4 portfolio-title">Banco de dados</h3>
-
                             <p>
                                 O banco de dados que é utilizado no Aplicativo, chama-se
                                 <strong>Cloud Firestore</strong> que é um banco <strong>NOSQL</strong> da plataforma
-                                <strong>Firebase.</strong> Para que o Firestore possua os dados de cada cliente, como
-                                valores de vendas, percentuais por empresas, gráficos e etc, é realizado uma migração de
-                                dados, sendo executado uma operação chamada de ETL (Transfom, Extract, Load), essa
-                                operação, consiste em <strong>extrair</strong> dados de uma fonte, e em seguida
-                                <strong>transformar</strong> ou adaptar esses dados, para serem
-                                <strong>inseridos</strong> em uma nova base de dados. Sendo assim, os dados que são
-                                inseridos no Firestore, são extraidos de uma base de dados dos clientes de outros
-                                sistemas que eles já utilizam, através de um script que é encarregado de fazer a
-                                operação ETL. Para entender melhor este fluxo, veja o diagrama seguir:
+                                <strong>Firebase.</strong>
+                                A comunicação do App com o banco de dados é <strong>ReadOnly</strong>, ou seja, o App
+                                apenas realiza a leitura e processa a exibição dos dados.
                             </p>
+
+                            <p>
+                                Para que o App, possua dados do usuário para exibir e montar os gráficos, é necessário
+                                carregar os dados no Firesotre. A fonte destes dados são bancos de dados relacionais de
+                                sistemas ERP da empresa proprietária do BussinessApp, sistemas estes que os usuários já
+                                utilizam. Sendo assim, é necessário transferir os dados de um banco relacional para um
+                                Firestore, com um identificador, para que o app localize exatamente o banco correto após
+                                a autenticação.
+                            </p>
+                            <p>
+                                Para realizar a carga destes dados, é realizado uma operação muito conhecida na área de
+                                ciência de dados, cujo a sigla é <strong>ETL</strong> (Extract, Transform, Load). Essa
+                                operação, realiza três tarefas que consistem em <strong>extrair</strong> dados de uma
+                                fonte, e em seguida <strong>transformar</strong> ou adaptar esses dados, para serem
+                                <strong>inseridos</strong> em uma nova base de dados. Essa operação é executada através
+                                de um <strong>script</strong> desenvolvido na linguagem Python, este script conecta no
+                                banco relacional, extrai e transforma os dados e em seguida envia os dados para o
+                                <strong>Firestore</strong>. Essa operação é realizada a cada 1 hora, para que os dados
+                                sejam constantemente atualizados no BussinessApp.
+                            </p>
+
+                            <p>Para entender melhor este fluxo, veja o diagrama a seguir:</p>
+
                             <div class="item item-diagrama">
                                 <img src="../../assets/images/diagramas/Fluxo-de-dados.png" style="width: 100%" />
                             </div>
 
                             <h3 class="h4 portfolio-title">Notificações</h3>
+                            <p>
+                                O serviço de <strong>Notificações</strong> é responsável por <strong>enviar</strong> e
+                                <strong>armazenar</strong> o histórico de envios de notificações para os usuários,
+                                utilizando diversos canais de envios, tais como: Email, SMS, WhatsApp e Notificações no
+                                App (FCM). O BussinessApp se comunica com este serviço para receber notificações via
+                                <strong>Firebase Cloud Message</strong> (FCM). O serviço de
+                                <strong>Notificações</strong> foi desenvolvido inteiramente por mim em
+                                <strong>C#</strong>, para saber mais sobre este projeto
+                                <strong>clique aqui.</strong>
+                            </p>
 
                             <p>
                                 O aplicativo possui um sistema de Notificações, este sistema faz parte da plataforma
@@ -129,7 +144,7 @@
                                 usuário se LOGAR pela primeira vez, uma serie de funções de configurações do Firebase
                                 serão executadas, uma delas é a configuração do FCM de geração de TOKEN para o novo
                                 dispositivo. Sendo assim, o FCM se comunica com os serviços de cada sistema operacional
-                                que gerenciam notificações, no android é a serviço de transporte do Android
+                                que gerenciam notificações, no android é o serviço de transporte do Android
                                 <strong>(ATL)</strong> para dispositivos Android com o Google Play Services, e no caso
                                 de dispositivos Apple/IOS o FCM se comunica com o serviço de notificação push da Apple
                                 <strong>(APNs)</strong>. Para entender melhor este fluxo, veja o diagrama fornecido na
