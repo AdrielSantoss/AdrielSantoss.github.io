@@ -47,7 +47,7 @@
                                 e manter contato ativo com o suporte técnico da empresa parceira.
                             </p>
                             <p>
-                                Este aplicativo, juntamente com o dispositivo, serão uma ferramenta para o trabalho de
+                                Este aplicativo, juntamente com o dispositivo, são uma ferramenta para o trabalho de
                                 <strong>contagem de estoque</strong>, este aplicativo possui integração com o sistema
                                 Desktop que os clientes utilizam para inserir essa contagem. Sendo assim, além de
                                 facilitar a contagem em <strong>lote</strong> de inúmeros produtos de forma rápida, os
@@ -57,7 +57,12 @@
                             </p>
 
                             <h3 class="h4 portfolio-title">Autenticação</h3>
-
+                            <p>
+                                Para utilizar o StockTaking App, é necessário realizar LOGIN. A primeira tela do app,
+                                após a animação de entrada, é a tela de autenticação, onde o usuário pode inserir
+                                informações como <strong>USUÁRIO</strong> e <strong>SENHA</strong>, Essa conta de acesso
+                                o usuário JÁ possui, pois as contas são integradas com o sistem Desktop ERP.
+                            </p>
                             <p>
                                 A autenticação deste aplicativo é integrada com o sistema Desktop ERP, que os clientes
                                 já utilizam, isto é, se o funcionário da loja que está encarregado de fazer a contagem,
@@ -67,11 +72,12 @@
                             <p>
                                 Sendo assim, para essa integração de contas funcionar, o App mobile deverá acessar o
                                 mesmo banco de dados que o Sistema Desktop acessa para autenticar usuários. O acesso
-                                deste banco é liberado atráves de um <strong>Sistema WEB</strong>, sendo assim, o App
+                                deste banco é liberado atráves de um <strong>Sistema WEB</strong>, ou seja, o App
                                 comunica-se via requisição <strong>HTTP</strong> com este sistema web para enviar
-                                informações dos usuarios e receber o token de autenticação. Para enter melhor este
+                                informações dos usuarios e receber o token de autenticação. Para entender melhor este
                                 fluxo, veja o diagrama abaixo:
                             </p>
+
                             <div class="item item-diagrama">
                                 <img
                                     src="../../assets/images/diagramas/Fluxo-de-autenticacao-stocktakingapp.png"
@@ -83,7 +89,81 @@
 
                             <h3 class="h4 portfolio-title">Integração com o Hardware</h3>
 
-                            <p></p>
+                            <p>
+                                Para integrar com o Hardware, isto é, para ligar/desligar o leitor do aparelho a partir
+                                do aplicativo, foi necessário criar funções na linguagem nativa para Android com
+                                <strong>Kotlin</strong>, e essas funções serão executadas atráves de eventos no Flutter,
+                                estes eventos fazem parte do sistema de <strong>METHOD CHANNELS</strong> do Flutter.
+                            </p>
+                            <p>
+                                A partir do <strong>Client</strong> (código dart com Flutter) é possivel executar
+                                chamadas de funções que foram criadas em lianguagens nativas como: Kotlin/Java,
+                                Swift/Objective-C no iOS e etc. Para entender melhor este fluxo, veja o diagrama abaixo
+                                disponibilizado na documentação do Flutter:
+                            </p>
+
+                            <div class="item item-diagrama">
+                                <img
+                                    src="../../assets/images/diagramas/Diagrama-Flutter-Channels.png"
+                                    alt=""
+                                    srcset=""
+                                    style="width: 100%"
+                                />
+                            </div>
+                            <br />
+
+                            <p>
+                                É necessário criar funções em Kotlin, pois, para manipular o leitor do Aparelho, foi
+                                utilizado funções do SDK de integração com o Sistema Operacional do Hardware, ou seja, a
+                                empresa criadora do Hardware, desenvolveu um SDK de integração, porém, esse SDK só
+                                estava disponivel para Kotlin/Java. Sendo assim, foi necessário codificar em linguagem
+                                nativa, para conseguir realizar a importação e utilização do SDK para manipular o
+                                leitor.
+                            </p>
+                            <p>
+                                As duas principais funções utilizadas do SDK foram: a função de
+                                <strong>INICIALIZAÇÃO</strong> e a função de <strong>INTERRUPÇÃO</strong> do leitor,
+                                sendo assim, atráves de eventos emitidos pelos CHANNELS do Flutter os métodos Kotlin
+                                eram executados e o app conseguia controlar quando o leitor deveria ser ativado e
+                                desativado.
+                            </p>
+
+                            <h3 class="h4 portfolio-title">Gráficos, Informações e Conferência</h3>
+
+                            <p>
+                                Toda vez que um codigo de barras ou QR Code de um produto é lido pelo aparelho, é
+                                exibido no aplicativo um <strong>Card</strong> com as informações do produto, como
+                                <strong>Nome</strong> e <strong>Saldo em Estoque</strong> e
+                                <strong>Quantidade (contagem)</strong>. Para cada evento de leitura de código de barras,
+                                é realizado uma requisição <strong>HTTP</strong> para o sistema WEB, esta requisição do
+                                tipo (verbo http) <strong>GET</strong>, envia como parâmetro (query-params) o código de
+                                barras do produto, e recebe como <strong>Response</strong> as informações do produto
+                                como Nome, Saldo em estoque e etc. Tornando assim, a contagem algo dinâmico, enquanto o
+                                usuário realiza o SCAN dos produtos, o App já "consulta" o banco de dados e lhe mostra
+                                as informações do mesmo.
+                            </p>
+                            <p>
+                                Após o Scan, para que as informações do produto esteja correta no App, é necessário que
+                                aquele produto cujo o código de barras é igual ao da leitura, esteja presente no banco
+                                de dados. Se ao realizar a leitura de um produto e o mesmo
+                                <strong>NÃO</strong> ser encontrado no banco de dados, o App sinalizará que o produto
+                                lido não está cadastrado na base de dados, deixando o card em coloração
+                                <strong>VERMELHA</strong>.
+                            </p>
+                            <p>
+                                Em uma operação de contagem de estoque é muito comum alguns produtos que estão sendo
+                                contados não sejam encontrados no banco de dados, seja porque o produto é novo ou o
+                                mesmo nunca foi cadastrado no Sistema Desktop. Também, é muito comum, os valores da
+                                contagem de alguns produtos não serem iguais ao Saldo de Estoque do produto, por
+                                exemplo: um óculos de sol, cujo seu valor de estoque no sistema Desktop é de
+                                <strong>25 unidades</strong>, e na contagem, o valor obtido foi
+                                <strong>24 unidades</strong>. O aplicativo separa essas situações de contagens e exibe
+                                todas elas em uma tela de finalização.
+                            </p>
+                            <p>
+                                A tela de finalização, é chamada de <strong>conferência da contagem</strong>, essa
+                                conferência
+                            </p>
                         </div>
                     </section>
 
