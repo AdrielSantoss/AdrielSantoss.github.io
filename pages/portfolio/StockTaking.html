@@ -128,7 +128,7 @@
                                 desativado.
                             </p>
 
-                            <h3 class="h4 portfolio-title">Gráficos, Informações e Conferência</h3>
+                            <h3 class="h4 portfolio-title">Situações e Conferência da contagem</h3>
 
                             <p>
                                 Toda vez que um codigo de barras ou QR Code de um produto é lido pelo aparelho, é
@@ -161,22 +161,132 @@
                                 todas elas em uma tela de finalização.
                             </p>
                             <p>
-                                A tela de finalização, é chamada de <strong>conferência da contagem</strong>, essa
-                                conferência
+                                A tela de finalização, é chamada de <strong>conferência da contagem</strong>, nessa tela
+                                de conferência, é exibido um resumo de todos os produtos que foram contados até então,
+                                separando os produtos em três situações, são elas: <strong>Inválido</strong> (produtos
+                                que não são encontrados na base de dados), <strong>Divergente</strong> (produtos com
+                                saldo diferente da contagem) e <strong>Válido</strong> (produtos que existem na base de
+                                dados e a contagem é igual ao número do saldo).
+                            </p>
+
+                            <p>
+                                Ao final da tela de conferência, existe um botão para <strong>FINALIZAR </strong> a
+                                contagem, ao finalizar a contagem, um request HTTP do tipo <strong>POST</strong> é
+                                enviado para o Sistema WEB que possui acesso ao banco de dados, o
+                                <strong>body</strong> (envio de dados na requisição) deste request contém todos os
+                                produtos <strong>válidos</strong> e <strong>divergentes</strong> e suas quantidades da
+                                contagem. O saldo dos produtos no banco de dados erão atualizado de acordo com a
+                                contagem.
                             </p>
                         </div>
                     </section>
 
-                    <section class="working-in-progress"></section>
-                    <!-- 
                     <section class="portfolio-features">
                         <h3 class="h4 portfolio-title">Funcionalidades</h3>
+                        <br />
+
+                        <ul class="item-list">
+                            <li class="item">
+                                <div class="item-content-box">
+                                    <h4 class="h4 item-title">Autenticação</h4>
+
+                                    <p class="item-text">
+                                        Sistema de login seguindo o padrão do
+                                        <strong>OAuth 2.0</strong> integrado com um sistema WEB responsável pela
+                                        autenticação e emissão e envio dos tokens JWT.
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="item">
+                                <div class="item-content-box">
+                                    <h4 class="h4 item-title">Gráficos e valores</h4>
+
+                                    <p class="item-text">
+                                        Gráficos de diversas formas exibindo valores e percentuais, podendo fazer
+                                        comparações com diferentes periodos. Para fazer esses gráficos no
+                                        <strong>Flutter</strong> é utilizado a biblioteca
+                                        <strong>syncfusion_charts.</strong>
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="item">
+                                <div class="item-content-box">
+                                    <h4 class="h4 item-title">Notificações</h4>
+
+                                    <p class="item-text">
+                                        Sistema de notificações integrado com um sistema WEB responsável por realizar a
+                                        comunicação com o <strong>Firebase Cloud Message</strong> para envio de
+                                        notifiações no Android e IOS.
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="item">
+                                <div class="item-content-box">
+                                    <h4 class="h4 item-title">Banco de dados</h4>
+
+                                    <p class="item-text">
+                                        O banco de dados dessa aplicação é o <strong>Firestore</strong> da plataforma
+                                        Firebase, o app não insere dados, apenas realiza leituras. O dados são migrados
+                                        de outros bancos para o Firestore via uma operação <strong>ETL.</strong>
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="item">
+                                <div class="item-content-box">
+                                    <h4 class="h4 item-title">Integrações com WEB</h4>
+
+                                    <p class="item-text">
+                                        O sistema de autentição e de notificações, são sistemas WEB escritos em C#, o
+                                        aplicativo realiza comunicação HTTP com estes <strong>Web Services.</strong> Fui
+                                        o responsável pela integração tanto no lado do Server (sistemas web em C#)
+                                        quanto no lado do Client (Aplicativo Flutter).
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                        <br />
                         <br />
                     </section>
 
                     <section class="images-features">
                         <h3 class="h4 images-title">Imagens</h3>
-                    </section> -->
+
+                        <ul class="horizontal-list has-scrollbar">
+                            <li class="list-item">
+                                <img src="../../assets/images/portfolio/bussinessApp/Screenshot_1695086300.png" />
+                            </li>
+
+                            <li class="list-item">
+                                <img src="../../assets/images/portfolio/bussinessApp/Screenshot_1695086357.png" />
+                            </li>
+
+                            <li class="list-item">
+                                <img src="../../assets/images/portfolio/bussinessApp/Screenshot_1695086388.png" />
+                            </li>
+
+                            <li class="list-item">
+                                <a href="#">
+                                    <img src="../../assets/images/portfolio/bussinessApp/Screenshot_1695086413.png" />
+                                </a>
+                            </li>
+
+                            <li class="list-item">
+                                <img src="../../assets/images/portfolio/bussinessApp/Screenshot_1695086428.png" />
+                            </li>
+
+                            <li class="list-item">
+                                <img src="../../assets/images/portfolio/bussinessApp/Screenshot_1695086455.png" />
+                            </li>
+
+                            <li class="list-item">
+                                <img src="../../assets/images/portfolio/bussinessApp/Screenshot_1695086475.png" />
+                            </li>
+
+                            <li class="list-item">
+                                <img src="../../assets/images/portfolio/bussinessApp/Screenshot_1695086511.png" />
+                            </li>
+                        </ul>
+                    </section>
                 </article>
             </div>
         </main>
