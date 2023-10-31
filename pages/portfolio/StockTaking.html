@@ -175,7 +175,7 @@
                                 enviado para o Sistema WEB que possui acesso ao banco de dados, o
                                 <strong>body</strong> (envio de dados na requisição) deste request contém todos os
                                 produtos <strong>válidos</strong> e <strong>divergentes</strong> e suas quantidades da
-                                contagem. O saldo dos produtos no banco de dados erão atualizado de acordo com a
+                                contagem. O saldo dos produtos no banco de dados serão atualizado de acordo com a
                                 contagem.
                             </p>
                         </div>
@@ -191,43 +191,34 @@
                                     <h4 class="h4 item-title">Autenticação</h4>
 
                                     <p class="item-text">
-                                        Sistema de login seguindo o padrão do
-                                        <strong>OAuth 2.0</strong> integrado com um sistema WEB responsável pela
-                                        autenticação e emissão e envio dos tokens JWT.
+                                        Sistema de autenticação seguindo o padrão do protocolo
+                                        <strong>OAuth 2.0</strong>, integrado com um sistema WEB que possui acesso aos
+                                        dados das contas dos usuários, e é responsável pela emissão e envio dos tokens
+                                        JWT.
                                     </p>
                                 </div>
                             </li>
                             <li class="item">
                                 <div class="item-content-box">
-                                    <h4 class="h4 item-title">Gráficos e valores</h4>
+                                    <h4 class="h4 item-title">Conferência da contagem</h4>
 
                                     <p class="item-text">
-                                        Gráficos de diversas formas exibindo valores e percentuais, podendo fazer
-                                        comparações com diferentes periodos. Para fazer esses gráficos no
-                                        <strong>Flutter</strong> é utilizado a biblioteca
-                                        <strong>syncfusion_charts.</strong>
+                                        O aplicativo controla o leitor do Hardware de maneira eficiente, armazenando e
+                                        exibindo as informações dos produtos coletados. Ao final da contagem, um resumo
+                                        de informações e situações da contagem é exibida ao usuário, para que o mesmo
+                                        possar fazer uma checagem geral e gravar os valores das contagens no banco de
+                                        dados.
                                     </p>
                                 </div>
                             </li>
                             <li class="item">
                                 <div class="item-content-box">
-                                    <h4 class="h4 item-title">Notificações</h4>
+                                    <h4 class="h4 item-title">Integrações com Hardware</h4>
 
                                     <p class="item-text">
-                                        Sistema de notificações integrado com um sistema WEB responsável por realizar a
-                                        comunicação com o <strong>Firebase Cloud Message</strong> para envio de
-                                        notifiações no Android e IOS.
-                                    </p>
-                                </div>
-                            </li>
-                            <li class="item">
-                                <div class="item-content-box">
-                                    <h4 class="h4 item-title">Banco de dados</h4>
-
-                                    <p class="item-text">
-                                        O banco de dados dessa aplicação é o <strong>Firestore</strong> da plataforma
-                                        Firebase, o app não insere dados, apenas realiza leituras. O dados são migrados
-                                        de outros bancos para o Firestore via uma operação <strong>ETL.</strong>
+                                        Dentro do Flutter, foi desenvolvido funções em linguagem nativa Android com a
+                                        linguagem <strong>Kotlin/Java</strong>. Esses métodos controlam o leitor de
+                                        código de barras QR code do aparelho, utilizando funções de integração do SDK.
                                     </p>
                                 </div>
                             </li>
@@ -236,10 +227,12 @@
                                     <h4 class="h4 item-title">Integrações com WEB</h4>
 
                                     <p class="item-text">
-                                        O sistema de autentição e de notificações, são sistemas WEB escritos em C#, o
-                                        aplicativo realiza comunicação HTTP com estes <strong>Web Services.</strong> Fui
-                                        o responsável pela integração tanto no lado do Server (sistemas web em C#)
-                                        quanto no lado do Client (Aplicativo Flutter).
+                                        Este aplicativo não possui um banco de dados próprio, para ler dados de produtos
+                                        e gravar dados de contagem, é realizado uma comunicação com um sistema WEB que
+                                        possui acesso ao banco de dados dos usuários e contém
+                                        <strong>Api's</strong> internas no padrão <strong>REST</strong> para receber
+                                        requisições HTTP. Nessa comunicação que os dados são obtidos e enviados pelo App
+                                        mobile.
                                     </p>
                                 </div>
                             </li>
