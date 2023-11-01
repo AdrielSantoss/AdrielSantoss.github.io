@@ -32,9 +32,16 @@
   background-color: rgba(255, 187, 92, 0.409);
 }
 
-.item-diagrama-transformed {
+.img-expanded {
+  transition: 0.5s;
+  cursor: pointer;
+}
+
+.img-expanded-transformed {
   transform: scale(1.5);
   transition: 0.5s;
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .portfolio-title {

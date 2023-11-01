@@ -9,21 +9,16 @@ export function getElement(selector) {
     return mainContent;
 }
 
-export function itemsDiagramaClickListener() {
-    const items = document.getElementsByClassName('item-diagrama');
+export function imgExpandedClickListener() {
+    const items = document.getElementsByClassName('img-expanded');
 
     for (const item of items) {
         item.addEventListener('click', (event) => {
-            let currentTarget = event.target;
-
-            if (event.target.localName === 'img') {
-                currentTarget = event.target.offsetParent;
-            }
-
-            if (currentTarget.className.includes('item-diagrama-transformed')) {
-                currentTarget.className = 'item item-diagrama';
+            const currentTarget = event.target;
+            if (currentTarget.className.includes('img-expanded-transformed')) {
+                currentTarget.className = 'img-expanded';
             } else {
-                currentTarget.className = 'item item-diagrama item-diagrama-transformed';
+                currentTarget.className = 'img-expanded-transformed';
             }
         });
     }
@@ -39,5 +34,5 @@ export function scroll() {
 loadNavbar();
 loadSideBar();
 loadWorkingInProgress();
-itemsDiagramaClickListener();
+imgExpandedClickListener();
 scroll();

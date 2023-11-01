@@ -745,11 +745,12 @@ main {
 .horizontal-list {
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
   gap: 15px;
   margin: 0 -15px;
   padding: 25px;
   padding-bottom: 25px;
+  overflow-y: visible !important;
   overflow-x: auto;
   scroll-behavior: smooth;
   overscroll-behavior-inline: contain;
@@ -1474,7 +1475,8 @@ textarea.form-input::-webkit-resizer {
   .item {
     display: flex;
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: center;
+    flex-direction: column;
     gap: 18px;
     padding: 30px;
   }
