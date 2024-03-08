@@ -3,9 +3,8 @@ import { getElement } from '../index.js';
 export function loadSideBar() {
     const href = window.location.href;
 
-    if (href.includes('index.html')) {
-        const mainContent = getElement('.main-body');
-        mainContent.innerHTML = `
+    const mainContent = getElement('.main-body');
+    mainContent.innerHTML = `
         <aside class="sidebar" data-sidebar>
             <div class="sidebar-info">
                 <figure class="avatar-box">
@@ -116,24 +115,23 @@ export function loadSideBar() {
         ${mainContent.innerHTML}
     `;
 
-        const infoMoreBtn = document.getElementsByClassName('info_more-btn')[0];
+    const infoMoreBtn = document.getElementsByClassName('info_more-btn')[0];
 
-        infoMoreBtn.addEventListener('click', (event) => {
-            const sidebar = document.getElementsByClassName('sidebar')[0];
-            const sidebarInfoMore = document.getElementsByClassName('sidebar-info_more')[0];
-            const sidebarInfoMoreLabel = document.getElementsByClassName('info_more_label')[0];
+    infoMoreBtn.addEventListener('click', (event) => {
+        const sidebar = document.getElementsByClassName('sidebar')[0];
+        const sidebarInfoMore = document.getElementsByClassName('sidebar-info_more')[0];
+        const sidebarInfoMoreLabel = document.getElementsByClassName('info_more_label')[0];
 
-            if (sidebarInfoMore.style.visibility === 'visible') {
-                sidebarInfoMore.style.opacity = 0;
-                sidebarInfoMore.style.visibility = 'hidden';
-                sidebar.style.maxHeight = '180px';
-                sidebarInfoMoreLabel.innerHTML = 'Exibir Contatos';
-            } else {
-                sidebarInfoMore.style.opacity = 1;
-                sidebarInfoMore.style.visibility = 'visible';
-                sidebar.style.maxHeight = '800px';
-                sidebarInfoMoreLabel.innerHTML = 'Fechar Contatos';
-            }
-        });
-    }
+        if (sidebarInfoMore.style.visibility === 'visible') {
+            sidebarInfoMore.style.opacity = 0;
+            sidebarInfoMore.style.visibility = 'hidden';
+            sidebar.style.maxHeight = '180px';
+            sidebarInfoMoreLabel.innerHTML = 'Exibir Contatos';
+        } else {
+            sidebarInfoMore.style.opacity = 1;
+            sidebarInfoMore.style.visibility = 'visible';
+            sidebar.style.maxHeight = '800px';
+            sidebarInfoMoreLabel.innerHTML = 'Fechar Contatos';
+        }
+    });
 }
