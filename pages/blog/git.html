@@ -12,18 +12,66 @@
             <div class="main-content">
                 <article>
                     <section>
-                        <h1 class="h4 portfolio-title">Criando o meu próprio git</h12>
+                        <h1 class="h4 portfolio-title">Criando o meu próprio git</h1>
                     </section>
                     <br />
 
-                    <section class="portfolio-description">                
+                    <section class="portfolio-description">
                         <div class="about-text">
                             <p>
-                                
+                                Há algum tempo, me deparei com o artigo "Write Yourself a Git". Ao lê-lo, despertou em
+                                mim um desejo que se somou a uma vontade antiga que eu já possuía: implementar uma
+                                versão simplificada do Git, com o objetivo de exercitar, de maneira prática, tudo aquilo
+                                que eu já havia estudado em "Git Internals".
+                            </p>
+                            <p>
+                                No dia em que escrevo este artigo, o Git já completou 20 anos de existência, e acredito
+                                que, há mais de 15 anos, vem se tornando uma ferramenta <strong>obrigatória</strong> no
+                                dia a dia de qualquer pessoa que se diz programadora. Entender como essa ferramenta
+                                funciona é tão importante quanto compreender algoritmos e estruturas de dados.
+                            </p>
+                            <p>
+                                Obviamente, <strong>entender</strong> como algo funciona não é a mesma coisa que saber
+                                <strong>usar</strong>. Qualquer pessoa aprende, em uma tarde, os comandos básicos, e em
+                                uma semana já consegue incorporar o Git por completo em seu fluxo de trabalho. No
+                                entanto, poucos realmente sabem o que está acontecendo com seus arquivos, e muito menos
+                                compreendem o motivo de estarem usando o Git.
+                            </p>
+                            <p>
+                                Obtive uma experiencia muito interessante, que durou aproximadamente 3 semanas, eu
+                                implementei 14 comandos do git (talvez, com o passar do tempo, implemente ainda mais), e
+                                cada comando constrói e manipula os tres princiapis objetos do git: Blob, Tree e Commit.
+                                Dito isso, o meu objetivo nesse artigo, é descrever como foi essa experiencia, o que eu
+                                aprendi nesse periodo.
+                            </p>
+
+                            <h1 class="h4 portfolio-title">Estudar o passado é conhecer o presente</h1>
+                            <p>
+                                Prometo não me alongar muito, portanto, tente não dormir… Se você quer realmente
+                                entender o Git, conhecer um pouco do passado nebuloso do período pré-Git é extremamente
+                                importante. Somente assim você vai compreender o real motivo de estar usando o Git hoje.
+                            </p>
+                            <p>
+                                Antes do Git, os sistemas de controle de versão mais utilizados eram: SVN, BitKeeper e
+                                CVS. Pesquisando mais a fundo, encontramos nomes como Visual SourceSafe, Mercurial,
+                                Bazaar, e, ainda mais antigos, SCCS e RCS. Todos, sem exceção, apresentavam soluções
+                                complexas e problemáticas demais para lidar com um problema ainda mais desafiador:
+                                gerenciar versões de arquivos.
+                            </p>
+                            <p>
+                                Cada uma dessas ferramentas surgiu com o objetivo de corrigir problemas de seus
+                                concorrentes, mas, ao fazer isso, gerava ou ignorava outros problemas. Um exemplo
+                                clássico é a "evolução" entre o SVN (SubVersion) e o CVS (Concurrent Versions System),
+                                ambos gratuitos e de código aberto.
+                            </p>
+                            <p>
+                                Em resumo, CVS e SVN apresentavam um sistema centralizado, ou seja, tudo era gerenciado
+                                e monitorado por um servidor central. Por exemplo, para fazer commits (o famoso
+                                "comitar"), era necessário solicitar permissão ao servidor.
                             </p>
                         </div>
                     </section>
-        
+                    <section class="working-in-progress"></section>
                 </article>
             </div>
         </main>
