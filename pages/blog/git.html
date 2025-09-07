@@ -16,6 +16,17 @@
                     </section>
                     <br />
 
+                    <section>
+                        <div class="tags">
+                            <small class="tag">Git</small>
+                            <small class="tag">C#</small>
+                            <small class="tag">Estrutura de dados</small>
+                            <small class="tag">.NET</small>
+                            <small class="tag">CVS</small>
+                            <small class="tag">SVN</small>
+                        </div>
+                    </section>
+
                     <section class="portfolio-description">
                         <div class="about-text">
                             <p>
@@ -61,7 +72,7 @@
                             <p>
                                 Cada uma dessas ferramentas surgiu com o objetivo de corrigir problemas de seus
                                 concorrentes, mas, ao fazer isso, gerava ou ignorava outros problemas. Um exemplo
-                                clássico é a "evolução" entre o SVN (SubVersion) e o CVS (Concurrent Versions System),
+                                clássico é a "evolução" entre o SVN (Subversion) e o CVS (Concurrent Versions System),
                                 ambos gratuitos e de código aberto.
                             </p>
                             <p>
@@ -69,7 +80,56 @@
                                 e monitorado por um servidor central. Por exemplo, para fazer commits (o famoso
                                 "comitar"), era necessário solicitar permissão ao servidor.
                             </p>
+                            <p>
+                                O CVS era considerado o “inferno na terra” quando se tratava de sistemas de
+                                versionamento. Alguns dos seus principais problemas/limitações eram: apenas arquivos
+                                eram versionados, diretórios não; arquivos se perdiam no histórico quando eram movidos
+                                ou renomeados; e commits não eram operações atômicas — portanto, se um commit falhasse
+                                no meio, havia o risco de corromper todo o repositório.
+                            </p>
+                            <p>
+                                Quando surgiu, o SVN corrigiu todos esses problemas, mas isso não o tornou
+                                necessariamente “melhor”. O SVN ainda possuía várias limitações, e um de seus principais
+                                problemas não estava na parte técnica, mas sim no marketing, que utilizava o slogan:
+                                “SVN is CVS done right”.
+                            </p>
+                            <p>
+                                Uma das críticas mais notórias ao SVN e à sua campanha de marketing veio de ninguém
+                                menos que Linus Torvalds, durante sua famosa palestra sobre o Git no Google:
+                                https://www.youtube.com/watch?v=idLyobOhtO4m. Recomendo fortemente assistir a essa
+                                palestra para compreender as complicações que esses sistemas geravam no dia a dia dos
+                                programadores no fim dos anos 90 e início dos anos 2000.
+                            </p>
+                            <p>
+                                Em resumo, os principais problemas do SVN eram: merges frágeis, com risco de conflitos
+                                complexos (two-way merge); criação de branches ainda era uma tarefa cara (apesar do
+                                marketing afirmar o contrário); dificuldade em comparar branches complexos; problemas de
+                                desempenho em projetos grandes; entre outros.
+                            </p>
+                            <p>
+                                O branching no SVN foi uma melhoria em relação ao CVS, mas ainda apresentava limitações
+                                que o tornavam caro em termos práticos. Criar um branch no CVS/SVN era equivalente a
+                                <strong>duplicar</strong> o diretório principal. Agora imagine fazer isso com frequência
+                                em projetos gigantes como o kernel do Linux... Mesclar dois branches no SVN era uma
+                                operação <strong>custosa</strong> e, principalmente, <strong>ineficiente</strong>,
+                                devido ao fraco algoritmo de merge, chamado <strong>two-way merge</strong>. Na prática,
+                                realizar um merge significava comparar TUDO de um branch contra TUDO do branch trunk
+                                (branch principal do SVN, equivalente ao master/main do Git). Esse processo fazia com
+                                que conflitos surgissem com extrema facilidade. Já o CVS aplicava o three-way merge, de
+                                forma limitada, pois não rastreava bem histórico de merges anteriores. (Nesse aspecto,
+                                podemos concluir que SVN não era um CVS feito direito...)
+                            </p>
+                            <p>Devido a todos esses problemas do CVS e SVN, Linus Torvalds</p>
                         </div>
+                    </section>
+                    <section class="portfolio-description">
+                        <h1 class="h4 portfolio-title">Referencias</h1>
+                        <h6>CVS:</h6>
+                        <p>https://www.projecthut.com/cvs-version-control-system-explained/?utm_source=chatgpt.com</p>
+                        <p>
+                            https://web.mit.edu/macdev/Development/Documentation/www/CVS%20Documentation/Understanding%20CVS.html?utm_source=chatgpt.com
+                        </p>
+                        <p>https://tartarus.org/~simon/cvs-vs-svn.html</p>
                     </section>
                     <section class="working-in-progress"></section>
                 </article>
