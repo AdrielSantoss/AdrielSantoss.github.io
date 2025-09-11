@@ -30,7 +30,7 @@
                     <section class="portfolio-description">
                         <div class="about-text">
                             <p>
-                                Há algum tempo, me deparei com o artigo "Write Yourself a Git". Ao lê-lo, despertou em
+                                Há algum tempo, me deparei com o artigo "Write Yourself a Git" Ao lê-lo, despertou em
                                 mim um desejo que se somou a uma vontade antiga que eu já possuía: implementar uma
                                 versão simplificada do Git, com o objetivo de exercitar, de maneira prática, tudo aquilo
                                 que eu já havia estudado em "Git Internals".
@@ -55,7 +55,8 @@
                                 Dito isso, o meu objetivo nesse artigo, é descrever como foi essa experiencia, o que eu
                                 aprendi nesse periodo.
                             </p>
-
+                        </div>
+                        <div class="about-text">
                             <h1 class="h4 portfolio-title">Estudar o passado é conhecer o presente</h1>
                             <p>
                                 Prometo não me alongar muito, portanto, tente não dormir… Se você quer realmente
@@ -115,11 +116,45 @@
                                 devido ao fraco algoritmo de merge, chamado <strong>two-way merge</strong>. Na prática,
                                 realizar um merge significava comparar TUDO de um branch contra TUDO do branch trunk
                                 (branch principal do SVN, equivalente ao master/main do Git). Esse processo fazia com
-                                que conflitos surgissem com extrema facilidade. Já o CVS aplicava o three-way merge, de
-                                forma limitada, pois não rastreava bem histórico de merges anteriores. (Nesse aspecto,
-                                podemos concluir que SVN não era um CVS feito direito...)
+                                que conflitos surgissem com extrema facilidade. Já o CVS aplicava o
+                                <b>three-way merge</b>, de forma limitada, pois não rastreava bem histórico de merges
+                                anteriores. (Nesse aspecto, podemos concluir que SVN não era um CVS feito direito...)
                             </p>
-                            <p>Devido a todos esses problemas do CVS e SVN, Linus Torvalds</p>
+                            <p>
+                                Devido a todos os problemas do CVS e do SVN, Linus Torvalds optou por utilizar o
+                                BitKeeper no desenvolvimento do kernel no início dos anos 2000. Os principais motivos
+                                dessa escolha eram que o BitKeeper era um sistema distribuído, lidava melhor com grandes
+                                bases de código (um ponto crítico em que CVS e SVN falhavam) e oferecia um mecanismo de
+                                merge relativamente eficiente.
+                            </p>
+                            <p>
+                                A BitMover, empresa responsável pelo BitKeeper, ofereceu licenças gratuitas para uso no
+                                kernel Linux, desde que não fossem utilizadas para desenvolver ferramentas concorrentes.
+                                Apesar da contradição ideológica de depender de um software proprietário para criar um
+                                software livre, tudo corria bem até que, em 2005, o acesso gratuito ao BitKeeper foi
+                                revogado.
+                            </p>
+                            <p>
+                                Esse foi o ponto decisivo que levou diretamente ao nascimento do Git. A BitMover começou
+                                a desconfiar que a comunidade do Linux estava realizando engenharia reversa do protocolo
+                                de rede do BitKeeper. De certa forma, isso era verdade: muitos desenvolvedores não
+                                aceitavam a ideia de depender de um software fechado para um projeto como o kernel, e
+                                alguns começaram a criar alternativas capazes de ler e interagir com repositórios do
+                                BitKeeper. A mais conhecida delas foi o <em>SourcePuller</em>.
+                            </p>
+                            <p>
+                                Após a revogação das licenças gratuitas do BitKeeper, Linus Torvalds decidiu resolver
+                                esse problema de forma definitiva. Ele queria um sistema de controle de versão que
+                                atendesse aos seguintes requisitos: ser distribuído, eficiente, rápido, resistente à
+                                corrupção de dados e 100% software livre.
+                            </p>
+                            <p>
+                                As opções disponíveis na época eram: Mercurial, Bazaar, Darcs e Monotone. Todas, no
+                                entanto, apresentavam problemas de desempenho em projetos grandes como o kernel. Com
+                                essas alternativas descartadas, restou apenas uma saída: criar um novo sistema de
+                                versionamento. Assim nasceu o Git, que se tornaria o sistema de controle de versão mais
+                                utilizado da história.
+                            </p>
                         </div>
                     </section>
                     <section class="portfolio-description">
