@@ -176,7 +176,7 @@
                             <h1 class="h4 portfolio-title">Init e Objects</h1>
                             <p>
                                 Em resumo, o Git é um sistema que cria e manipula um "banco de dados de objetos". Esses
-                                objetos são: <em>Blob</em>, <em>Tree</em>, <em>Commit</em> e <em>Tag</em>. Sendo a
+                                objetos são: <em>Blob</em>, <em>Tree</em>, <em>Commit</em> e <em>Tag</em>. Sendo o
                                 <em>Tag</em> um objeto não essencial para o funcionamento do Git. Implementei comandos
                                 capazes de criar, excluir e editar os três objetos essenciais. Conforme eu for
                                 detalhando a implementação de cada comando, também explicarei como esses objetos
@@ -184,12 +184,35 @@
                             </p>
                             <p>
                                 O primeiro comando abordado será o de inicialização do repositório
-                                <code>.gitadr</code> (equivalente ao <code>.git</code>). É dentro desse repositório (ou
-                                pasta, se você for da terra do Windows) que são armazenados os objetos e arquivos
-                                auxiliares necessários para o funcionamento do Git.
+                                <em>.gitadr</em> (equivalente ao <em>.git</em>). É dentro desse repositório (ou pasta,
+                                se você for da terra do Windows) que são armazenados os objetos e arquivos auxiliares
+                                necessários para o funcionamento do Git.
                             </p>
                             <p>Nesse comando não há mistério:</p>
-                            <code>teste</code>
+                            <pre><code >using Git.Core;
+    using System.Text;
+
+    namespace Csharp.Commands
+    {
+        public class CatFile
+        {
+            public static string Execute(string[] args)
+            {
+                if (args.Length < 2 || args[0] != "-p")
+                {
+                    Console.WriteLine("Uso: gitadr cat-file [-p] <hash>");
+                    return string.Empty;
+                }
+
+                var data = Sha1Utils.GetObjectDataBySha1(args[1]);
+                var nullIndex = Array.IndexOf(data, (byte)0);
+                var content = Encoding.UTF8.GetString(data[(nullIndex + 1)..]);
+
+                Console.WriteLine(content);
+                return content;
+            }
+        }
+    }</code></pre>
                         </div>
                     </section>
                     <section class="portfolio-description">

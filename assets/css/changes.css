@@ -109,3 +109,45 @@
   color: var(--vegas-gold);
   display: inline;
 }
+
+/* Blocos de código */
+pre {
+  background-color: #1e1e1e; /* fundo escuro */
+  color: #d4d4d4; /* texto principal */
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto; /* scroll horizontal se necessário */
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.95em;
+  line-height: 1.5em;
+  margin: 1em 0;
+  border: 1px solid #333; /* borda sutil */
+}
+
+/* CODE STYLE */
+code {
+  background-color: #2d2d2d;
+  color: #f8f8f2;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.95em;
+}
+
+pre span.keyword {
+  color: #569cd6;
+  font-weight: bold;
+}
+
+pre span.string {
+  color: #d69d85;
+}
+
+pre span.comment {
+  color: #6a9955;
+  font-style: italic;
+}
+
+pre span.function {
+  color: #dcdcaa;
+}
