@@ -32,7 +32,7 @@ export function scroll() {
 
 // LOAD LAYOUT FUNCS
 loadNavbar();
-loadSideBarBlog();
+loadSideBar();
 loadWorkingInProgress();
 imgExpandedClickListener();
 scroll();
