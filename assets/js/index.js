@@ -1,5 +1,5 @@
 import { loadNavbar } from './elements/navbar.js';
-import { loadSideBar } from './elements/sidebar.js';
+import { loadSideBar, loadSideBarBlog } from './elements/sidebar.js';
 import { loadWorkingInProgress } from './elements/wip.js';
 
 export function getElement(selector) {
@@ -32,7 +32,7 @@ export function scroll() {
 
 // LOAD LAYOUT FUNCS
 loadNavbar();
-loadSideBar();
+loadSideBarBlog();
 loadWorkingInProgress();
 imgExpandedClickListener();
 scroll();

@@ -135,3 +135,101 @@ export function loadSideBar() {
         }
     });
 }
+
+export function loadSideBarBlog() {
+    const href = window.location.href;
+
+    const mainContent = getElement('.main-body');
+    mainContent.innerHTML = `
+        <aside class="sidebar" data-sidebar>
+            <div class="sidebar-info">
+                            <figure class="avatar-box">
+                    <img
+                        src="https://avatars.githubusercontent.com/u/64885646?v=4"
+                        alt="ADRIEL SANTOS"
+                        width="80"
+                        style="border-radius: 30px"
+                    />
+                </figure>
+                <ul class="contacts-list">
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="git-branch-outline"></ion-icon>
+                        </div>
+
+                        <div class="contact-info">
+                            <span class="contact-link">Criando o meu próprio git</span>
+                        </div>
+                    </li>
+
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="book-outline"></ion-icon>
+                        </div>
+
+                        <div class="contact-info">
+                            <span class="contact-link">Estudar o passado é conhecer o presente</span>
+                        </div>
+                    </li>
+
+                    <li class="contact-item">
+                        <div class="icon-box">
+                            <ion-icon name="business-outline"></ion-icon>
+                        </div>
+
+                        <div class="contact-info">
+                            <span class="contact-link">Init e Objects</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-info_more">
+                <div class="separator"></div>
+                
+                <ul class="social-list">
+                    <li class="social-item">
+                        <a href="#" class="social-link">
+                            <ion-icon name="logo-facebook"></ion-icon>
+                        </a>
+                    </li>
+
+                    <li class="social-item">
+                        <a href="#" class="social-link">
+                            <ion-icon name="logo-twitter"></ion-icon>
+                        </a>
+                    </li>
+
+                    <li class="social-item">
+                        <a href="#" class="social-link">
+                            <ion-icon name="logo-instagram"></ion-icon>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="separator"></div>
+            </div>
+        </aside>
+        ${mainContent.innerHTML}
+    `;
+
+    const infoMoreBtn = document.getElementsByClassName('info_more-btn')[0];
+
+    infoMoreBtn.addEventListener('click', (event) => {
+        const sidebar = document.getElementsByClassName('sidebar')[0];
+        const sidebarInfoMore = document.getElementsByClassName('sidebar-info_more')[0];
+        const sidebarInfoMoreLabel = document.getElementsByClassName('info_more_label')[0];
+
+        if (sidebarInfoMore.style.visibility === 'visible') {
+            sidebarInfoMore.style.opacity = 0;
+            sidebarInfoMore.style.visibility = 'hidden';
+            sidebar.style.maxHeight = '180px';
+            sidebarInfoMoreLabel.innerHTML = 'Exibir Contatos';
+        } else {
+            sidebarInfoMore.style.opacity = 1;
+            sidebarInfoMore.style.visibility = 'visible';
+            sidebar.style.maxHeight = '800px';
+            sidebarInfoMoreLabel.innerHTML = 'Fechar Contatos';
+        }
+    });
+}
