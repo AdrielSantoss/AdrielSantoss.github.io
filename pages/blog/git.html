@@ -68,6 +68,17 @@
                                 Python. No meu caso, escolhi C# (.NET 9.0) por preferência pessoal. Este projeto pode
                                 ser desenvolvido com fluidez em qualquer linguagem moderna de alto nível.
                             </p>
+                            <p>
+                                Obviamente, não vou conseguir documentar e detalhar todos os comandos, apenas vou citar
+                                os principais para explicar a estrutura do git, para entender como implementei cada
+                                comando, acesse o projeto no
+                                <a
+                                    href="https://github.com/AdrielSantoss/Write-Yourself-A-Git"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >Github</a
+                                >.
+                            </p>
                         </div>
                         <div class="blog-text">
                             <h1 class="h4 portfolio-title">Estudar o passado é conhecer o presente</h1>
@@ -188,31 +199,58 @@
                                 se você for da terra do Windows) que são armazenados os objetos e arquivos auxiliares
                                 necessários para o funcionamento do Git.
                             </p>
-                            <p>Nesse comando não há mistério:</p>
-                            <pre><code >using Git.Core;
-    using System.Text;
+                            <pre><code>using Git.Core;
+using System.Text;
 
-    namespace Csharp.Commands
+namespace Git.Commands
+{
+    public class Init
     {
-        public class CatFile
+        public static void Execute()
         {
-            public static string Execute(string[] args)
+            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+
+            if (Directory.Exists(gitDir))
             {
-                if (args.Length < 2 || args[0] != "-p")
-                {
-                    Console.WriteLine("Uso: gitadr cat-file [-p] <hash>");
-                    return string.Empty;
-                }
-
-                var data = Sha1Utils.GetObjectDataBySha1(args[1]);
-                var nullIndex = Array.IndexOf(data, (byte)0);
-                var content = Encoding.UTF8.GetString(data[(nullIndex + 1)..]);
-
-                Console.WriteLine(content);
-                return content;
+                Console.WriteLine("Repositório .gitadr já existe.");
+                return;
             }
+
+            Directory.CreateDirectory(gitDir);
+            Directory.CreateDirectory(Path.Combine(gitDir, "objects"));
+            Directory.CreateDirectory(Path.Combine(gitDir, "refs"));
+            Directory.CreateDirectory(Path.Combine(gitDir, "refs", "heads"));
+
+            File.WriteAllText(Path.Combine(gitDir, "refs", "heads", "master"), string.Empty);
+            File.WriteAllText(Path.Combine(gitDir, "HEAD"), $"ref: refs{Path.DirectorySeparatorChar}heads{Path.DirectorySeparatorChar}master");
+
+            Console.WriteLine($"Repositório inicializado em {gitDir}");
         }
-    }</code></pre>
+    }
+}</code></pre>
+
+                            <p>Estrutura criada pelo comando <code>init</code>:</p>
+
+                            <p>
+                                <strong>.gitadr</strong>: diretório principal do sistema (batizei como "gitadr", de
+                                <em>Adriel</em>). <br />
+
+                                <strong>/objects</strong>: onde ficam os objetos do Git (<em>Blob</em>, <em>Tree</em>,
+                                <em>Commit</em> e <em>Tag</em>). <br />
+
+                                <strong>/refs/heads</strong>: contém os arquivos que representam os branches. O projeto
+                                já inicia com o branch <code>master</code>. <br />
+
+                                <strong>HEAD</strong>: arquivo que guarda a referência do branch atual, iniciando com
+                                <code>ref: refs/heads/master</code>. <br />
+                            </p>
+
+                            <p>
+                                Esse comando não tem grandes segredos: ele basicamente cria diretórios e arquivos. Note
+                                que mantive a convenção de usar um nome iniciado por ponto (<code>.gitadr</code>) para o
+                                diretório principal. Em sistemas Unix-like (Linux e macOS), arquivos e pastas que
+                                começam com <code>.</code> são tratados como ocultos.
+                            </p>
                         </div>
                     </section>
                     <section class="portfolio-description">
