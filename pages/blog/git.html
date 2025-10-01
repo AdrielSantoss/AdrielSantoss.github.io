@@ -232,8 +232,8 @@ namespace Git.Commands
                             <p>Estrutura criada pelo comando <code>init</code>:</p>
 
                             <p>
-                                <strong>.gitadr</strong>: diretório principal do sistema (batizei como "gitadr", de
-                                <em>Adriel</em>). <br />
+                                <strong>.gitadr</strong>: diretório principal do sistema ("adr" = <em>Adriel</em>).
+                                <br />
 
                                 <strong>/objects</strong>: onde ficam os objetos do Git (<em>Blob</em>, <em>Tree</em>,
                                 <em>Commit</em> e <em>Tag</em>). <br />
@@ -252,8 +252,55 @@ namespace Git.Commands
                                 começam com <code>.</code> são tratados como ocultos.
                             </p>
                         </div>
+                        <div class="blog-text">
+                            <h1 class="h4 portfolio-title">Hash-Object</h1>
+
+                            <p>
+                                Este é um dos comandos
+                                <a href="https://wyag.thb.lt" target="_blank" class="blog-link">plumbing</a> mais
+                                importantes do Git. Seu objetivo é transformar um arquivo em um objeto <em>blob</em> e
+                                armazená-lo no repositório.
+                            </p>
+                            <p>
+                                Um objeto <em>blob</em> (<strong>binary large object</strong>) nada mais é do que um
+                                conjunto de bytes que guarda apenas duas informações: o tamanho do conteúdo e o próprio
+                                conteúdo do arquivo. Sua estrutura binária segue o formato:
+                            </p>
+                            <pre><code>blob content.length\0contentBytes</code></pre>
+                            <p>
+                                <strong><code>blob content.length</code></strong
+                                >: Cabeçalho do objeto. É composto pela palavra <code>blob</code>, seguida de um espaço
+                                em branco e do tamanho total do conteúdo em bytes. <br />
+
+                                <strong><code>\0</code></strong
+                                >: Caractere nulo que separa o cabeçalho do conteúdo. <br />
+
+                                <strong><code>contentBytes</code></strong
+                                >: O conteúdo do arquivo em si, armazenado em formato binário.
+                            </p>
+                            <p>
+                                Repare que o <em>blob</em> não guarda informações como nome do arquivo, autor ou data de
+                                criação. Para ele, esses metadados são irrelevantes: o que importa é apenas o conteúdo
+                                puro.
+                            </p>
+                            <p>
+                                Depois de combinar os bytes do cabeçalho com os bytes do conteúdo, o resultado é
+                                processado pela função
+                                <strong>SHA-1</strong>. Essa função gera um identificador único de 20 bytes, que em
+                                seguida é convertido para uma representação em string hexadecimal. O resultado é algo
+                                como:
+                            </p>
+
+                            <pre><code>658e12ad10bfd93dcf0712de258795828f6c4240</code></pre>
+
+                            <p>
+                                Provavelmente esse formato já lhe parece familiar: é o hash que identifica TODOS os
+                                objetos no Git.
+                            </p>
+                            <p></p>
+                        </div>
                     </section>
-                    <section class="portfolio-description">
+                    <!-- <section class="portfolio-description">
                         <h1 class="h4 portfolio-title">Referencias</h1>
                         <h6>CVS:</h6>
                         <p>https://www.projecthut.com/cvs-version-control-system-explained/?utm_source=chatgpt.com</p>
@@ -261,7 +308,7 @@ namespace Git.Commands
                             https://web.mit.edu/macdev/Development/Documentation/www/CVS%20Documentation/Understanding%20CVS.html?utm_source=chatgpt.com
                         </p>
                         <p>https://tartarus.org/~simon/cvs-vs-svn.html</p>
-                    </section>
+                    </section> -->
                     <section class="working-in-progress"></section>
                 </article>
             </div>
