@@ -151,3 +151,21 @@ pre span.comment {
 pre span.function {
   color: #dcdcaa;
 }
+
+/* DETAILS */
+
+details {
+  margin: 10px 0;
+  border-radius: 6px;
+  padding: 5px 10px;
+}
+
+summary {
+  font-weight: bold;
+  cursor: pointer;
+  color: #dcdcaa;
+}
+
+summary::-webkit-details-marker {
+  display: none; /* remove o ícone padrão no Chrome */
+}

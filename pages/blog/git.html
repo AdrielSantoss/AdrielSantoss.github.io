@@ -199,7 +199,9 @@
                                 se você for da terra do Windows) que são armazenados os objetos e arquivos auxiliares
                                 necessários para o funcionamento do Git.
                             </p>
-                            <pre><code>using Git.Core;
+                            <details>
+                                <summary>Código fonte do comando Init</summary>
+                                <pre><code>using Git.Core;
 using System.Text;
 
 namespace Git.Commands
@@ -228,6 +230,7 @@ namespace Git.Commands
         }
     }
 }</code></pre>
+                            </details>
 
                             <p>Estrutura criada pelo comando <code>init</code>:</p>
 
@@ -294,10 +297,105 @@ namespace Git.Commands
                             <pre><code>658e12ad10bfd93dcf0712de258795828f6c4240</code></pre>
 
                             <p>
-                                Provavelmente esse formato já lhe parece familiar: é o hash que identifica TODOS os
-                                objetos no Git.
+                                Esse formato de hash provavelmente já lhe é familiar: é o identificador único de
+                                <strong>todos</strong> os objetos no Git. Cada hash possui 40 caracteres hexadecimais.
+                                No armazenamento, os 2 primeiros caracteres são usados para nomear o diretório, e os 38
+                                restantes para nomear o arquivo do objeto.
                             </p>
-                            <p></p>
+
+                            <p>
+                                Os arquivos binários dos objetos não ficam soltos diretamente dentro de
+                                <code>/objects</code>. Em vez disso, cada objeto é armazenado em um subdiretório cujo
+                                nome corresponde aos dois primeiros caracteres do hash SHA-1. Essa divisão surgiu por
+                                conta das limitações de sistemas de arquivos mais antigos (como ext2, FAT32 ou versões
+                                iniciais do NTFS), que não lidavam bem com diretórios contendo dezenas ou até centenas
+                                de milhares de arquivos.
+                            </p>
+
+                            <p>
+                                Se você abrir agora o diretório <code>.git/objects</code>, verá exatamente essa
+                                estrutura. Exemplo dos diretórios de objetos:
+                            </p>
+
+                            <div class="item item-diagrama">
+                                <div class="item-description">
+                                    <small><i>Clique para expandir</i></small>
+                                </div>
+                                <img
+                                    src="../../assets/images/blog/gitadr/diretorios-de-objetos.png"
+                                    class="img-expanded"
+                                    style="width: 100%"
+                                />
+                                <div class="item-description">
+                                    <small
+                                        ><i
+                                            >Cada diretório representa o prefixo (2 caracteres) de um hash de objeto.</i
+                                        ></small
+                                    >
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <p>Exemplo de um objeto armazenado com seu hash completo dentro do diretório:</p>
+
+                            <div class="item item-diagrama">
+                                <div class="item-description">
+                                    <small><i>Clique para expandir</i></small>
+                                </div>
+                                <img
+                                    src="../../assets/images/blog/gitadr/objeto.png"
+                                    class="img-expanded"
+                                    style="width: 100%"
+                                />
+                                <div class="item-description">
+                                    <small
+                                        ><i
+                                            >Arquivo binário de um objeto blob, nomeado com 38 caracteres hexadecimais
+                                            do hash.</i
+                                        ></small
+                                    >
+                                </div>
+                            </div>
+
+                            <p>
+                                Entendendo essa estrutura, a implementação do comando <code>hash-object</code> se torna
+                                simples: basta gerar o hash SHA-1 do conteúdo com uma biblioteca de criptografia e criar
+                                o arquivo binário correspondente.
+                            </p>
+
+                            <details>
+                                <summary>Código fonte do comando Hash-Object</summary>
+                                <pre><code>using Git.Core;
+using System.Text;
+
+namespace Git.Commands
+{
+    public class Init
+    {
+        public static void Execute()
+        {
+            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+
+            if (Directory.Exists(gitDir))
+            {
+                Console.WriteLine("Repositório .gitadr já existe.");
+                return;
+            }
+
+            Directory.CreateDirectory(gitDir);
+            Directory.CreateDirectory(Path.Combine(gitDir, "objects"));
+            Directory.CreateDirectory(Path.Combine(gitDir, "refs"));
+            Directory.CreateDirectory(Path.Combine(gitDir, "refs", "heads"));
+
+            File.WriteAllText(Path.Combine(gitDir, "refs", "heads", "master"), string.Empty);
+            File.WriteAllText(Path.Combine(gitDir, "HEAD"), $"ref: refs{Path.DirectorySeparatorChar}heads{Path.DirectorySeparatorChar}master");
+
+            Console.WriteLine($"Repositório inicializado em {gitDir}");
+        }
+    }
+}</code></pre>
+                            </details>
                         </div>
                     </section>
                     <!-- <section class="portfolio-description">
