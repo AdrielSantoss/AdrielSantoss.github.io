@@ -366,36 +366,169 @@ namespace Git.Commands
 
                             <details>
                                 <summary>Código fonte do comando Hash-Object</summary>
-                                <pre><code>using Git.Core;
-using System.Text;
+                                <pre><code>using Csharp.Core;
+using Git.Core;
 
 namespace Git.Commands
 {
-    public class Init
+    public class HashObject
     {
-        public static void Execute()
+        public static string Execute(string[] args)
         {
-            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
-
-            if (Directory.Exists(gitDir))
+            if (args.Length < 1)
             {
-                Console.WriteLine("Repositório .gitadr já existe.");
-                return;
+                Console.WriteLine("Uso: gitadr hash-object [-w] <arquivo>");
+                return string.Empty;
             }
 
-            Directory.CreateDirectory(gitDir);
-            Directory.CreateDirectory(Path.Combine(gitDir, "objects"));
-            Directory.CreateDirectory(Path.Combine(gitDir, "refs"));
-            Directory.CreateDirectory(Path.Combine(gitDir, "refs", "heads"));
+            var write = args[0] == "-w";
+            var path = write ? args[1] : args[0];
 
-            File.WriteAllText(Path.Combine(gitDir, "refs", "heads", "master"), string.Empty);
-            File.WriteAllText(Path.Combine(gitDir, "HEAD"), $"ref: refs{Path.DirectorySeparatorChar}heads{Path.DirectorySeparatorChar}master");
+            if (!File.Exists(path))
+            {
+                throw new Exception($"Arquivo não encontrado: {path}");
+            }
 
-            Console.WriteLine($"Repositório inicializado em {gitDir}");
+            var (sha1Hash, fullBlob) = BlobUtils.WriteBlob(path);
+
+            if (write)
+            {
+                ObjectStore.WriteObject(sha1Hash, fullBlob);
+            }
+            else
+            {
+                Console.WriteLine(sha1Hash);
+            }
+
+            return sha1Hash;
+        }
+    }
+}
+</code></pre>
+                        </details>
+
+                        <details>
+                            <summary>Código fonte dos métodos utilitários sha1 (Sha1Utils.cs)</summary>
+                            <p>
+                                Nessa classe, está presente os métodos utilitários para a utilização e aplicação da criptografia sha1, alguns métodos abaixos vão ser reaproveitados em outros comandos.
+                            </p>
+                                <pre><code>using System.IO.Compression;
+using System.Security.Cryptography;
+
+namespace Git.Core
+{
+    public class Sha1Utils
+    {
+        public static byte[] CombineBytes(byte[] a, byte[] b)
+        {
+            var combined = new byte[a.Length + b.Length];
+            Buffer.BlockCopy(a, 0, combined, 0, a.Length);
+            Buffer.BlockCopy(b, 0, combined, a.Length, b.Length);
+
+            return combined;
+        }
+
+        public static string Sha1BytesToString(byte[] sha1)
+        {
+            return BitConverter.ToString(sha1).Replace("-", "").ToLower();
+        }
+
+        public static byte[] Sha1StringToBytes(string sha1)
+        {
+            var bytes = new byte[20];
+            for (var i = 0; i < 20; i++)
+            {
+                var byteString = sha1.Substring(i * 2, 2);
+                bytes[i] = Convert.ToByte(byteString, 16);
+            }
+
+            return bytes;
+        }
+
+        public static string CreateSha1FromByteData(byte[] data)
+        {
+            using var sha1 = SHA1.Create();
+            var hashBytes = sha1.ComputeHash(data);
+
+            return Sha1BytesToString(hashBytes);
+        }
+
+        public static byte[] GetObjectDataBySha1(string sha1)
+        {
+            var dir = Path.Combine(".gitadr", "objects", sha1.Substring(0, 2));
+            var file = sha1.Substring(2);
+            var path = Path.Combine(dir, file);
+
+            if (!Directory.Exists(dir) || !File.Exists(path))
+            {
+                throw new Exception($"Objeto não encontrado: ${sha1} não encontrado.");
+            }
+
+            using var fs = File.OpenRead(path);
+            using var zlib = new ZLibStream(fs, CompressionMode.Decompress);
+            using var outputStream = new MemoryStream();
+
+            zlib.CopyTo(outputStream);
+            var data = outputStream.ToArray();
+
+            var nullIndex = Array.IndexOf(data, (byte)0);
+            if (nullIndex == -1)
+            {
+                throw new Exception("Objeto inválido (sem header)");
+            }
+
+            return data;
+        }
+
+        public static void WriteFileAndDirectoriesFromSha1(string path, string sha1)
+        {
+            var data = GetObjectDataBySha1(sha1);
+            var nullIndex = Array.IndexOf(data, (byte)0);
+            var blob = data[(nullIndex + 1)..];
+
+            var dir = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            File.WriteAllBytes(path, blob);
+        }
+    }
+}
+
+</code></pre>
+                        </details>
+                        <details>
+                            <p>
+                                Nessa classe, está presente o método utilitário para a criação do arquivo binário do objeto dentro do diretório <code>.gitadr/objects</code>.
+                                Esse método vai ser muito reutilizado em outros comandos.
+                            </p>
+                            <summary>Código fonte do método de criação de um objeto do git (ObjectStore.cs)</summary>
+                            <pre><code>using System.IO.Compression;
+
+namespace Git.Core
+{
+    public class ObjectStore
+    {
+        public static void WriteObject(string sha1, byte[] data)
+        {
+            string dir = Path.Combine(".gitadr", "objects", sha1.Substring(0, 2));
+            string file = sha1.Substring(2);
+
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            string path = Path.Combine(dir, file);
+            using var fs = File.Create(path);
+            using var zlib = new ZLibStream(fs, CompressionMode.Compress);
+            zlib.Write(data, 0, data.Length);
         }
     }
 }</code></pre>
-                            </details>
+                        </details>
                         </div>
                     </section>
                     <!-- <section class="portfolio-description">
