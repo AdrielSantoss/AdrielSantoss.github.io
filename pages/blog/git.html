@@ -530,6 +530,59 @@ namespace Git.Core
 }</code></pre>
                         </details>
                         </div>
+                        <div class="blog-text">
+                            <h1 class="h4 portfolio-title">Cat-File</h1>
+
+                            <p>
+                                O comando <code>cat-file</code> permite ler o conteúdo de um objeto no Git.  
+                                Ele recebe como parâmetro o hash SHA-1 do objeto e, a partir dele, localiza o arquivo correspondente dentro de 
+                                <code>.gitadr/objects</code>.  
+                                Primeiro, utiliza os dois primeiros caracteres do hash para identificar o diretório.  
+                                Em seguida, abre o arquivo, realiza a descompactação e exibe o conteúdo do objeto na tela.
+                            </p>
+
+                            <p>
+                                Se você acompanhou o código do comando <code>hash-object</code>, deve ter notado que o objeto é armazenado 
+                                em formato compactado com <strong>zlib</strong>.  
+                                Ou seja, o Git não guarda os dados em binário puro: antes de gravar, ele comprime o conteúdo, e ao ler, 
+                                precisa descompactá-lo para exibição.
+                            </p>
+
+                            <p>
+                                Depois de entender como os objeto blob do git funciona, e depois de implementar o hash-object, esse comando se torna extremamente fácil e intuitivo.
+                            </p>
+
+                            <details>
+                            <summary>Código fonte do comando Cat-File</summary>
+                            <p>
+                                <i>Este comando utiliza métodos da classe <strong>sha1Utils.cs</strong> (mencionada no comando hash-object)</i>
+                            </p>
+                            <pre><code>using Git.Core;
+using System.Text;
+
+namespace Git.Commands
+{
+    public class CatFile
+    {
+        public static string Execute(string[] args)
+        {
+            if (args.Length < 2 || args[0] != "-p")
+            {
+                Console.WriteLine("Uso: gitadr cat-file [-p] <hash>");
+                return string.Empty;
+            }
+
+            var data = Sha1Utils.GetObjectDataBySha1(args[1]);
+            var nullIndex = Array.IndexOf(data, (byte)0);
+            var content = Encoding.UTF8.GetString(data[(nullIndex + 1)..]);
+
+            Console.WriteLine(content);
+            return content;
+        }
+    }
+}</code></pre>
+                        </details>
+                        </div>
                     </section>
                     <!-- <section class="portfolio-description">
                         <h1 class="h4 portfolio-title">Referencias</h1>
