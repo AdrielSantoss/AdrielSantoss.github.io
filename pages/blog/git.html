@@ -963,6 +963,331 @@ namespace Git.Commands
 </code></pre>
 </details>                            
                         </div>
+                        <div class="blog-text">
+                            <h1 class="h4 portfolio-title">Add</h1>
+                            
+                            <p>
+                                Este é o primeiro comando <a href="https://wyag.thb.lt" target="_blank" class="blog-link">porcelain</a> 
+                                que os usuários normalmente utilizam no dia a dia.  
+                                No Git oficial, o <code>add</code> utiliza internamente um comando <a href="https://wyag.thb.lt" target="_blank" class="blog-link">plumbing</a> chamado <code>update-index</code>.
+                            </p>
+
+                            <p>
+                                No meu clone, optei por criar diretamente o comando <code>add</code>.  
+                                Assim, <code>gitadr add</code> equivale a <code>git hash-object</code> + <code>git update-index</code> no Git oficial.
+                            </p>
+
+                            <p>
+                                Ao entender o funcionamento do meu comando <code>add</code> e analisar o código, você automaticamente compreenderá 
+                                como funciona o <code>update-index</code>.  
+                                Caso queira implementar o <code>update-index</code> separadamente, fique à vontade: ele apenas adiciona ou atualiza o hash SHA-1 no arquivo <code>index</code>, o que é relativamente simples.
+                            </p>
+
+                            <p>
+                                O comando <code>add</code> realiza basicamente duas operações: cria os objetos e atualiza o arquivo <code>index</code>.  
+                                Esse arquivo é gerado na primeira execução do <code>add</code> e fica armazenado em <i>./gitadr/index</i>.  
+                                Também conhecido como <i>staging area</i>, o <code>index</code> funciona como uma ponte entre o workspace e o commit, permitindo que o Git saiba exatamente quais alterações serão incluídas no próximo commit.
+                            </p>
+
+                            <p>
+                                No Git oficial, o arquivo <code>index</code> é binário e contém diversas informações sobre arquivos e diretórios 
+                                (caminho, hash SHA-1, mode, flags internas etc.).  
+                                No <code>gitadr</code>, simplifiquei o índice: ele é um arquivo de texto que armazena apenas duas informações por arquivo: <i>SHA-1</i> e <i>caminho</i>.  
+                                Isso é suficiente para criar uma <i>staging area</i> eficiente, capaz de controlar quais arquivos alterados serão incluídos no próximo commit.
+                            </p>
+                            
+                            <p>
+                                A estrutura do conteúdo do arquivo index é assim: <i>sha1 + espaço em branco + caminho do arquivo + quebra de linha</i>.
+                                Segue abaixo um exemplo:
+                            </p>
+                            <pre><code>4a481a3aa65ec275d2fd0f751e995e2450fbc6c4 src/fileA.txt
+0c991fcb4fe1739224d4a0df2973df2de4eef4ad src/lib/fileB.txt</code></pre>
+
+<details>
+    <summary>Código fonte do comando Add</summary>
+    <p>
+        Perceba que é possivel adicionar a worskpace inteira na staging area com o comando <code>gitadr add .</code> ou todos os arquivos de um determinado diretório, com <code>gitadr add [diretório]</code>
+    </p>
+    <pre><code>using Git.Core;
+
+namespace Git.Commands
+{
+    public class Add
+    {
+        public static void Execute(string[] args)
+        {
+            if (args.Length &lt; 1)
+            {
+                Console.WriteLine("Uso: gitadr add &lt;arquivo | diretório | .&gt;");
+                return;
+            }
+
+            var target = args[0];
+
+            if (target == ".")
+            {
+                AddAll();
+                return;
+            }
+
+            if (Directory.Exists(target))
+            {
+                ExecuteRecursive(Path.GetFullPath(target));
+                StageDeletionsUnderPath(Path.GetFullPath(target));
+                return;
+            }
+
+            var rel = Path.GetRelativePath(Directory.GetCurrentDirectory(), target);
+            AddOrUpdateIndexFile(rel);
+        }
+
+        public static void AddAll()
+        {
+            var workspaceFiles = IndexUtils.RecursiveReadWorkSapce(Directory.GetCurrentDirectory(), new Dictionary&lt;string, string&gt;());
+            var indexFiles = IndexUtils.GetIndexEntries(true);
+
+            foreach (var file in workspaceFiles.Keys)
+            {
+                AddOrUpdateIndexFile(file);
+            }
+
+            foreach (var file in indexFiles.Keys.ToList())
+            {
+                if (!workspaceFiles.ContainsKey(file))
+                {
+                    indexFiles.Remove(file);
+                    IndexUtils.CreateOrUpdateIndex(string.Join('\n', indexFiles.Select(kv => $"{kv.Value} {kv.Key}")) + "\n");
+                }
+            }
+        }
+
+        public static void ExecuteRecursive(string directory)
+        {
+            foreach (var file in Directory.GetFiles(directory))
+            {
+                if (IndexUtils.ignoreFiles.Any(ignoreFile => Path.GetFileName(file) == ignoreFile))
+                    continue;
+
+                AddOrUpdateIndexFile(Path.GetRelativePath(Directory.GetCurrentDirectory(), file));
+            }
+
+            foreach (var subdir in Directory.GetDirectories(directory))
+            {
+                if (IndexUtils.ignoreFiles.Any(ignoreFile => Path.GetFileName(subdir) == ignoreFile))
+                    continue;
+
+                ExecuteRecursive(subdir);
+            }
+        }
+
+        private static void StageDeletionsUnderPath(string basePath)
+        {
+            var root = Directory.GetCurrentDirectory();
+            var relBase = Path.GetRelativePath(root, basePath);
+            if (relBase == "." || string.IsNullOrEmpty(relBase))
+            {
+                relBase = string.Empty;
+            }
+
+            var index = IndexUtils.GetIndexEntries(true);
+            var newContentLines = new List&lt;string&gt;();
+
+            foreach (var kv in index)
+            {
+                var file = kv.Key;
+                var sha1 = kv.Value;
+
+                bool underBase =
+                    string.IsNullOrEmpty(relBase) ||
+                    file == relBase ||
+                    file.StartsWith(relBase + Path.DirectorySeparatorChar);
+
+                if (underBase)
+                {
+                    var fullPath = Path.Combine(root, file);
+                    if (!File.Exists(fullPath))
+                    {
+                        continue;
+                    }
+                }
+
+                newContentLines.Add($"{sha1} {file}");
+            }
+
+            IndexUtils.CreateOrUpdateIndex(string.Join('\n', newContentLines) + "\n");
+        }
+
+        public static void AddOrUpdateIndexFile(string file, string? sha1Param = null)
+        {
+            var index = IndexUtils.GetIndexEntries(true);
+
+            if (!File.Exists(file))
+            {
+                if (index.ContainsKey(file))
+                {
+                    index.Remove(file);
+                    IndexUtils.CreateOrUpdateIndex(string.Join('\n', index.Select(kv => $"{kv.Value} {kv.Key}")) + "\n");
+                }
+                return;
+            }
+
+            var sha1 = sha1Param ?? HashObject.Execute(new string[] { "-w", file });
+            index[file] = sha1;
+
+            IndexUtils.CreateOrUpdateIndex(string.Join('\n', index.Select(kv => $"{kv.Value} {kv.Key}")) + "\n");
+        }
+    }
+}
+</code></pre>
+</details>           
+<details>
+    <summary>Código fonte da classe indexUtils.cs</summary>
+    <pre><code>namespace Git.Core
+{
+    public class IndexUtils
+    {
+        public static readonly string[] ignoreFiles = { ".gitadr" };
+        public static Dictionary&lt;string, string&gt; GetIndexEntries(bool createIndexFile = false)
+        {
+            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+            var pathIndex = Path.Combine(gitDir, "index");
+
+            if (!File.Exists(pathIndex))
+            {
+                if (createIndexFile)
+                {
+                    File.WriteAllText(pathIndex, string.Empty);
+                }
+
+                return new Dictionary&lt;string, string&gt;();
+            }
+
+            var content = File.ReadAllText(pathIndex);
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                if (createIndexFile)
+                {
+                    File.WriteAllText(pathIndex, content);
+                }
+
+                return new Dictionary&lt;string, string&gt;();
+            }
+
+            var entries = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+            var indexMap = new Dictionary&lt;string, string&gt;();
+
+            foreach (var line in entries)
+            {
+                var parts = line.Split(' ', 2);
+
+                var sha1 = parts[0];
+                var path = parts[1];
+
+                var relPath = Path.GetRelativePath(Directory.GetCurrentDirectory(), path);
+
+                relPath = relPath.Replace('/', Path.DirectorySeparatorChar);
+
+                indexMap[relPath] = sha1;
+            }
+
+            return indexMap;
+        }
+
+        public static void CreateOrUpdateIndex(string contenet)
+        {
+            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+            var path = Path.Combine(gitDir, "index");
+
+            File.WriteAllText(path, contenet);
+        }
+
+        public static List&lt;string&gt; RecursiveUpdateIndexFromTree(string prefix, string treeSha1, List&lt;string&gt; indexLines)
+        {
+            var treeEntries = TreeUtils.GetTreeData(treeSha1);
+
+            foreach (var entry in treeEntries)
+            {
+                var fullPath = TreeUtils.CombinePrefix(prefix, entry.Name);
+
+                if (entry.Mode == "040000")
+                {
+                    RecursiveUpdateIndexFromTree(fullPath, entry.Sha1, indexLines);
+                }
+                else
+                {
+                    indexLines.Add($"{entry.Sha1} {fullPath}");
+                }
+            }
+
+            CreateOrUpdateIndex(string.Join('\n', indexLines) + "\n");
+
+            return indexLines;
+        }
+
+        public static Dictionary&lt;string, string&gt; RecursiveReadWorkSapce(string dir, Dictionary&lt;string, string&gt; dict)
+        {
+            foreach (var entry in Directory.GetFiles(dir))
+            {
+                if (ignoreFiles.Any(ignoreFile => Path.GetFileName(entry) == ignoreFile))
+                {
+                    continue;
+                }
+
+                var fullPath = Path.GetRelativePath(Directory.GetCurrentDirectory(), entry);
+                dict[fullPath] = BlobUtils.GetSha1FromBlob(entry);
+            }
+
+            foreach (var entry in Directory.GetDirectories(dir))
+            {
+                if (ignoreFiles.Any(ignoreDir => Path.GetFileName(entry) == ignoreDir))
+                {
+                    continue;
+                }
+
+                RecursiveReadWorkSapce(entry, dict);
+            }
+
+            return dict;
+        }
+
+        public static string NormalizePath(string path)
+        {
+            var fullPath = Path.GetFullPath(path);
+            var repoRoot = Directory.GetParent(Path.Combine(Directory.GetCurrentDirectory(), ".gitadr"))!.FullName;
+            var relativePath = Path.GetRelativePath(repoRoot, fullPath);
+
+            return relativePath.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar);
+        }
+
+        public static void RemoveEmptyDirectories(string root)
+        {
+            var allDirs = Directory.GetDirectories(root, "*", SearchOption.AllDirectories)
+                                   .OrderByDescending(d => d.Length);
+
+            var gitDir = Path.GetFullPath(Path.Combine(root, ".gitadr"));
+
+            foreach (var dir in allDirs)
+            {
+                var full = Path.GetFullPath(dir);
+                if (full.Equals(gitDir, StringComparison.OrdinalIgnoreCase) || full.StartsWith(gitDir + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (!Directory.EnumerateFileSystemEntries(full).Any())
+                {
+                    Directory.Delete(full, recursive: false);
+                }
+            }
+        }
+    }
+}
+</code></pre>
+</details>
+
+                        </div>
                     </section>
                     <!-- <section class="portfolio-description">
                         <h1 class="h4 portfolio-title">Referencias</h1>
