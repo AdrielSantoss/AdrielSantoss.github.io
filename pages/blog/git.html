@@ -375,9 +375,9 @@ namespace Git.Commands
     {
         public static string Execute(string[] args)
         {
-            if (args.Length < 1)
+            if (args.Length &lt; 1)
             {
-                Console.WriteLine("Uso: gitadr hash-object [-w] <arquivo>");
+                Console.WriteLine("Uso: gitadr hash-object [-w] &lt;arquivo&gt;");
                 return string.Empty;
             }
 
@@ -436,7 +436,7 @@ namespace Git.Core
         public static byte[] Sha1StringToBytes(string sha1)
         {
             var bytes = new byte[20];
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i &lt; 20; i++)
             {
                 var byteString = sha1.Substring(i * 2, 2);
                 bytes[i] = Convert.ToByte(byteString, 16);
@@ -568,7 +568,7 @@ namespace Git.Commands
         {
             if (args.Length < 2 || args[0] != "-p")
             {
-                Console.WriteLine("Uso: gitadr cat-file [-p] <hash>");
+                Console.WriteLine("Uso: gitadr cat-file [-p] &lt;hash&gt;");
                 return string.Empty;
             }
 
@@ -587,43 +587,329 @@ namespace Git.Commands
                             <h1 class="h4 portfolio-title">Write-Tree</h1>
 
                             <p>
-                                Este comando cria um novo objeto: objeto tree. Este objeto representa diretórios e subdiretórios.
-                                Em resumo, Enquanto os <code>blobs</code> representam os arquivos do teu projeto, os <code>trees</code> representam os diretórios/pastas em que se encontram os arquivos.
+                                Este comando percorre todos os arquivos e diretórios do projeto (a partir do diretório raiz), 
+                                criando <code>blobs</code> para os arquivos e objetos <code>tree</code> para os diretórios.  
+                                Em resumo: enquanto os <code>blobs</code> representam os arquivos do projeto, as <code>trees</code> 
+                                representam os diretórios em que esses arquivos estão.
                             </p>
+
                             <p>
-                                A estrutura binária da tree é semelhante ao <code>blob</code>, contendo um cabeçalho e um conteúdo (todo objeto do git possui essa estrutura), o que muda no tree é o seu conteúdo, que armazena o hash de blobs e outras trees, montando assim uma estrutura de árvore. Na prática, uma tree é um ponteiro para um blob e ou outra tree.
+                                A estrutura binária de um objeto <code>tree</code> é semelhante à de um <code>blob</code>: 
+                                todo objeto do Git possui um cabeçalho e um conteúdo.  
+                                A diferença é que o conteúdo de uma <code>tree</code> armazena os hashes de <code>blobs</code> e de outras <code>trees</code>, 
+                                formando assim uma verdadeira estrutura em árvore.  
+                                Na prática, uma <code>tree</code> funciona como um ponteiro para um <code>blob</code> ou outra <code>tree</code>.
                             </p>
+
                             <p>
-                                é super importante entender estrutura de árvores se voce quer compreender o coração do git, pois na prática tudo no git faz referencia a uma arvore, um commit por exemplo, faz referencia a um hash de um objeto arvore, e um branch referencia a um commit (vamos falar de branch mais tarde). Entender como funciona estrutura de dados de árvores é de suma necessidade para quem quer entender como um sistema de versionamento de arquivos funciona.
+                                Entender a estrutura de árvores é essencial para compreender o funcionamento interno do Git.  
+                                Por exemplo: um commit referencia o hash de um objeto <code>tree</code>, e um branch referencia um commit 
+                                (falaremos sobre branches mais adiante).  
+                                Assim, dominar a lógica de árvores é fundamental para quem deseja compreender como um sistema de versionamento de arquivos funciona.
                             </p>
+
                             <p>
-                                A estrutura binária de um objeto tree é assim:
+                                A estrutura binária de um objeto <code>tree</code> é:
                             </p>
+
                             <pre><code>tree content.length\0contentBytes</code></pre>
-                            <p>
-                                <strong><code>tree content.length</code></strong
-                                >: Cabeçalho do objeto. É composto pela palavra <code>tree</code>, seguida de um espaço
-                                em branco e do tamanho total do conteúdo em bytes. <br />
 
-                                <strong><code>\0</code></strong
-                                >: Caractere nulo que separa o cabeçalho do conteúdo. <br />
-
-                                <strong><code>contentBytes</code></strong
-                                >: O conteúdo da tree, que pode ser assim:
-
-                           <pre><code>100644 arquivo_nome.txt\0658e12ad10bfd93dcf0712de258795828f6c4240
- 100644 arquivo2_nome.txt\0238e12ad10bfd93dcf0712de258795828f634250</code></pre>
                             <p>
-                                <strong><code>100644</code></strong>: Esse código antes do nome do arquivo/diretório é o <code>mode</code> do objeto, esse código representa o tipo e as permissões de read/write. O mode é seguido de um espaço em branco.
+                                <strong><code>tree content.length</code></strong>: cabeçalho do objeto.  
+                                Composto pela palavra <code>tree</code>, seguida de um espaço e do tamanho total do conteúdo em bytes. <br />
+
+                                <strong><code>\0</code></strong>: caractere nulo que separa o cabeçalho do conteúdo. <br />
+
+                                <strong><code>contentBytes</code></strong>: conteúdo da <code>tree</code>, que armazena referências aos arquivos e subdiretórios.  
+                                Exemplo:
                             </p>
-                            </p>
+
+                            <pre><code>100644 arquivo_nome.txt\0658e12ad10bfd93dcf0712de258795828f6c4240
+100644 arquivo2_nome.txt\0238e12ad10bfd93dcf0712de258795828f634250</code></pre>
+
                             <p>
-                                Completo (header + content) ficaria assim:
+                                O objeto completo (cabeçalho + conteúdo) ficaria assim:
                             </p>
+
                             <pre><code>tree 40405339\0100644 arquivo_nome.txt\0658e12ad10bfd93dcf0712de258795828f6c4240100644 arquivo2_nome.txt\0238e12ad10bfd93dcf0712de258795828f634250</code></pre>
+
                             <p>
-                                Vamos destrinchar esse conteúdo
+                                <strong><code>100644</code></strong>: esse código antes do nome do arquivo ou diretório é o <code>mode</code> do objeto.  
+                                Ele indica o tipo e as permissões de leitura/escrita, seguindo o padrão do Unix file mode.  
+                                Neste clone do Git, interpreto apenas dois modos: <code>100644</code> (blob) e <code>040000</code> (tree).  
+                                O <code>mode</code> é seguido de um espaço em branco antes do nome do arquivo ou diretório.
                             </p>
+                            <details>
+                            <summary>Todos os file modes reconhecidos pelo Git</summary>
+                                <table class="table">
+                                <thead> 
+                                    <tr>
+                                    <th>Mode</th>
+                                    <th>Tipo de objeto</th>
+                                    <th>Descrição</th>
+                                    <th>Exemplo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-td">
+                                    <td >040000</td>
+                                    <td>tree</td>
+                                    <td>Diretório (contém outras entradas)</td>
+                                    <td>src/</td>
+                                    </tr>
+                                    <tr>
+                                    <td>100644</td>
+                                    <td>blob</td>
+                                    <td>Arquivo normal, não executável</td>
+                                    <td>README.md</td>
+                                    </tr>
+                                    <tr>
+                                    <td>100755</td>
+                                    <td>blob</td>
+                                    <td>Arquivo executável</td>
+                                    <td>scripts/build.sh</td>
+                                    </tr>
+                                    <tr>
+                                    <td>120000</td>
+                                    <td>blob</td>
+                                    <td>Link simbólico (conteúdo do blob = caminho alvo)</td>
+                                    <td>link -> ../docs</td>
+                                    </tr>
+                                    <tr>
+                                    <td>160000</td>
+                                    <td>commit</td>
+                                    <td>Submódulo (ponteiro para um commit de outro repositório)</td>
+                                    <td>vendor/libfoo (submodule)</td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                            </details>
+                            <p>
+                                <strong><code>arquivo_nome.txt</code></strong>: Nome do arquivo ou do diretório.
+                            </p>
+                            <p>
+                                <strong><code>\0</code></strong>: Caractere nulo que separa o cabeçalho do conteúdo.
+                            </p>
+                            <p>
+                                <strong><code>658e12ad10bfd93dcf0712de258795828f6c4240100644</code></strong>: Hash sha1 do blob ou tree.
+                            </p>
+                            <p>
+                                A estrutura desses objetos é baseada na forma como os arquivos e diretórios são interpretados pelos sistemas de arquivos do unix como (ext2/ext3). Segue uma comparação visual:
+                            </p>
+                            <p>
+                                Diretório no Unix (ext2/ext4)
+                                <pre><code>[tipo/mode] [nome] [ponteiro → inode]
+
+exemplo:
+
+[0100644] [file.txt] [inode=1234]
+</code></pre>
+                            </p>
+                            <p>
+                                Tree no Git:
+                                <pre><code>[mode] [nome]\0[hash (20 bytes)]
+
+exemplo:
+
+100644 file.txt\0658e12ad10bfd93dcf0712de258795828f6c4240
+</code></pre>
+                            </p>
+                            
+                            <details>
+                            <summary>Código fonte do comando Write-Tree</summary>
+<pre><code>using Git.Core;
+using static Git.Core.TreeUtils;
+
+namespace Git.Commands
+{
+    public class WriteTree
+    {
+        public static string Execute()
+        {
+            return WriteTreeRecursive(Directory.GetCurrentDirectory());
+        }
+
+        public static string WriteTreeRecursive(string directory)
+        {
+            var entries = new List&lt;TreeEntry&gt;();
+
+            foreach (var file in Directory.GetFiles(directory))
+            {
+                if (IndexUtils.ignoreFiles.Any(ignoreFile => Path.GetFileName(file) == ignoreFile))
+                {
+                    continue;
+                }
+
+                var (blobSha1, fullBlob) = BlobUtils.WriteBlob(file);
+                ObjectStore.WriteObject(blobSha1, fullBlob);
+
+                entries.Add(new TreeEntry
+                {
+                    Mode = "100644",
+                    Name = Path.GetFileName(file),
+                    Sha1 = blobSha1
+                });
+            }
+
+            foreach (var subdir in Directory.GetDirectories(directory))
+            {
+                if (IndexUtils.ignoreFiles.Any(ignoreFile => Path.GetFileName(subdir) == ignoreFile))
+                {
+                    continue;
+                }
+
+                var treeSha1 = WriteTreeRecursive(subdir);
+
+                entries.Add(new TreeEntry
+                {
+                    Mode = "040000",
+                    Name = Path.GetFileName(subdir),
+                    Sha1 = treeSha1
+                });
+            }
+
+            if (entries.Count > 0)
+            {
+                return TreeObject.WriteTree(entries);
+            }
+
+            return string.Empty;
+        }
+    }
+}
+</code></pre>
+                        </details>
+                        <details>
+                            <summary>Código fonte da classe TreeObject.cs</summary>
+<pre><code>using System.Text;
+using static Git.Core.TreeUtils;
+
+namespace Git.Core
+{
+    public class TreeObject
+    {
+        public static string WriteTree(List&lt;TreeEntry&gt; entries)
+        {
+            using var treeStream = new MemoryStream();
+
+            foreach (var entry in entries)
+            {
+                var modeBytes = Encoding.ASCII.GetBytes(entry.Mode + " ");
+                var nameBytes = Encoding.UTF8.GetBytes(entry.Name);
+                var sha1Bytes = Sha1Utils.Sha1StringToBytes(entry.Sha1);
+
+                treeStream.Write(modeBytes, 0, modeBytes.Length);
+                treeStream.Write(nameBytes, 0, nameBytes.Length);
+                treeStream.WriteByte(0); // separador \0
+                treeStream.Write(sha1Bytes, 0, sha1Bytes.Length);
+            }
+
+            var treeContent = treeStream.ToArray();
+            var header = $"tree {treeContent.Length}\0";
+            var fullTree = Sha1Utils.CombineBytes(Encoding.UTF8.GetBytes(header), treeContent);
+
+            var treeSha1 = Sha1Utils.CreateSha1FromByteData(fullTree);
+            ObjectStore.WriteObject(treeSha1, fullTree);
+
+            return treeSha1;
+        }
+    }
+}
+</code></pre>
+                            </details>
+<details>
+    <summary>Código fonte da classe TreeUtils.cs</summary>
+    <pre><code>using System.Text;
+
+namespace Git.Core
+{
+    public class TreeUtils
+    {
+        public class TreeEntry
+        {
+            public required string Mode { get; set; }
+            public required string Name { get; set; }
+            public required string Sha1 { get; set; }
+        }
+
+        public static List&lt;TreeEntry&gt; GetTreeData(string sha1Param)
+        {
+            var data = Sha1Utils.GetObjectDataBySha1(sha1Param);
+
+            var nullIndexHeader = Array.IndexOf(data, (byte)0);
+            var content = data.Skip(nullIndexHeader + 1).ToArray();
+
+            var entries = new List&lt;TreeEntry&gt;();
+            int offset = 0;
+
+            while (offset &lt; content.Length)
+            {
+                int modeEnd = Array.IndexOf(content, (byte)0x20, offset);
+                var mode = Encoding.UTF8.GetString(content, offset, modeEnd - offset);
+
+                int nameEnd = Array.IndexOf(content, (byte)0, modeEnd + 1);
+                var name = Encoding.UTF8.GetString(content, modeEnd + 1, nameEnd - (modeEnd + 1));
+
+                var sha1Bytes = content.Skip(nameEnd + 1).Take(20).ToArray();
+                var sha1 = Sha1Utils.Sha1BytesToString(sha1Bytes);
+
+                entries.Add(new TreeEntry { Mode = mode, Sha1 = sha1, Name = name });
+
+                offset = nameEnd + 1 + 20;
+            }
+
+            return entries;
+        }
+
+        public static Dictionary&lt;string, (string Mode, string Sha1)&gt; GetTreeEntriesFromSha1(string prefix, string treeSha1, Dictionary&lt;string, (string Mode, string Sha1)&gt; dict)
+        {
+            var entries = GetTreeData(treeSha1);
+
+            foreach (var entry in entries)
+            {
+                var fullPath = TreeUtils.CombinePrefix(prefix, entry.Name);
+
+                if (entry.Mode == "040000")
+                {
+                    GetTreeEntriesFromSha1(fullPath, entry.Sha1, dict);
+                }
+                else
+                {
+                    dict[fullPath] = (entry.Mode, entry.Sha1);
+                }
+            }
+
+            return dict;
+        }
+
+        public static string CombinePrefix(string prefix, string name)
+        {
+            return string.IsNullOrEmpty(prefix) ? name : Path.Combine(prefix, name);
+        }
+    }
+}
+
+</code></pre>
+</details>
+                            <p>
+                                Com o comando <code>write-tree</code>, a estrutura de dados principal do Git é criada.  
+                                A seguir, podemos ver um exemplo de como as <code>trees</code> e <code>blobs</code> se referenciam entre si (resultado do comando write-tree):
+                            </p>
+
+                            <div class="item item-diagrama">
+                                <div class="item-description">
+                                    <small><i>Clique para expandir</i></small>
+                                </div>
+                                <img
+                                    src="../../assets/images/blog/gitadr/data-model-1.png"
+                                    class="img-expanded"
+                                    style="width: 100%"
+                                />
+                                
+                            </div>
+                        </div>
+                        <div class="blog-text">
+                            <h1 class="h4 portfolio-title">Ls-Tree</h1>
                         </div>
                     </section>
                     <!-- <section class="portfolio-description">

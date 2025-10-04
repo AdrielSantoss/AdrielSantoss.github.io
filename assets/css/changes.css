@@ -169,3 +169,20 @@ summary {
 summary::-webkit-details-marker {
   display: none; /* remove o ícone padrão no Chrome */
 }
+
+/* TABLE */
+
+.table {
+  color: white;
+}
+
+.table-td {
+  border: 1px solid var(--vegas-gold);
+}
+
+th,
+td {
+  text-align: left; /* tudo alinhado à esquerda */
+  padding: 8px 12px;
+  border-bottom: 1px solid #ddd;
+}
