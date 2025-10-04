@@ -583,6 +583,48 @@ namespace Git.Commands
 }</code></pre>
                         </details>
                         </div>
+                        <div class="blog-text">
+                            <h1 class="h4 portfolio-title">Write-Tree</h1>
+
+                            <p>
+                                Este comando cria um novo objeto: objeto tree. Este objeto representa diretórios e subdiretórios.
+                                Em resumo, Enquanto os <code>blobs</code> representam os arquivos do teu projeto, os <code>trees</code> representam os diretórios/pastas em que se encontram os arquivos.
+                            </p>
+                            <p>
+                                A estrutura binária da tree é semelhante ao <code>blob</code>, contendo um cabeçalho e um conteúdo (todo objeto do git possui essa estrutura), o que muda no tree é o seu conteúdo, que armazena o hash de blobs e outras trees, montando assim uma estrutura de árvore. Na prática, uma tree é um ponteiro para um blob e ou outra tree.
+                            </p>
+                            <p>
+                                é super importante entender estrutura de árvores se voce quer compreender o coração do git, pois na prática tudo no git faz referencia a uma arvore, um commit por exemplo, faz referencia a um hash de um objeto arvore, e um branch referencia a um commit (vamos falar de branch mais tarde). Entender como funciona estrutura de dados de árvores é de suma necessidade para quem quer entender como um sistema de versionamento de arquivos funciona.
+                            </p>
+                            <p>
+                                A estrutura binária de um objeto tree é assim:
+                            </p>
+                            <pre><code>tree content.length\0contentBytes</code></pre>
+                            <p>
+                                <strong><code>tree content.length</code></strong
+                                >: Cabeçalho do objeto. É composto pela palavra <code>tree</code>, seguida de um espaço
+                                em branco e do tamanho total do conteúdo em bytes. <br />
+
+                                <strong><code>\0</code></strong
+                                >: Caractere nulo que separa o cabeçalho do conteúdo. <br />
+
+                                <strong><code>contentBytes</code></strong
+                                >: O conteúdo da tree, que pode ser assim:
+
+                           <pre><code>100644 arquivo_nome.txt\0658e12ad10bfd93dcf0712de258795828f6c4240
+ 100644 arquivo2_nome.txt\0238e12ad10bfd93dcf0712de258795828f634250</code></pre>
+                            <p>
+                                <strong><code>100644</code></strong>: Esse código antes do nome do arquivo/diretório é o <code>mode</code> do objeto, esse código representa o tipo e as permissões de read/write. O mode é seguido de um espaço em branco.
+                            </p>
+                            </p>
+                            <p>
+                                Completo (header + content) ficaria assim:
+                            </p>
+                            <pre><code>tree 40405339\0100644 arquivo_nome.txt\0658e12ad10bfd93dcf0712de258795828f6c4240100644 arquivo2_nome.txt\0238e12ad10bfd93dcf0712de258795828f634250</code></pre>
+                            <p>
+                                Vamos destrinchar esse conteúdo
+                            </p>
+                        </div>
                     </section>
                     <!-- <section class="portfolio-description">
                         <h1 class="h4 portfolio-title">Referencias</h1>
