@@ -910,6 +910,58 @@ namespace Git.Core
                         </div>
                         <div class="blog-text">
                             <h1 class="h4 portfolio-title">Ls-Tree</h1>
+
+                            <p>
+                                Este é o comando que exibe o conteúdo de uma tree. No git oficial também é possivel utilizar o <code>cat-file</code> para exibir o conteúdo de uma tree, mas para fins didático
+                                optei por separar:  <br>
+                                <code>cat-file</code>: Exibir conteúdo de um blob. <br>
+                                <code>ls-tree</code>: Exibir conteúdo de uma tree.
+                            </p>
+                            <p>
+                                Este comando vai exibir exatamente as informações contidas no conteúdo do objeto <code>tree</code> que detalhei na descrição do comando <code>write-tree</code>
+                            </p>
+                            <p>
+                                O conteúdo da tree será exibido dessa forma no console:
+                            </p>
+                            <pre><code>[mode] [type] [sha1] [name]</code></pre>                        
+<details>
+    <summary>Código fonte do comando Ls-Tree</summary>
+    <p>
+        <i>Este comando utiliza métodos da classe <strong>treeUtils.cs</strong> (mencionada no comando write-tree)</i>
+    </p>
+    <pre><code>using Git.Core;
+
+namespace Git.Commands
+{
+    public class LsTree
+    {
+        public static string Execute(string[] args)
+        {
+            if (args.Length &lt; 2 || args[0] != "-p")
+            {
+                Console.WriteLine("Uso: gitadr ls-tree [-p] &lt;hash&gt;");
+                return string.Empty;
+            }
+
+            var entries = TreeUtils.GetTreeData(args[1]);
+
+            var result = string.Empty;
+
+            foreach (var entry in entries)
+            {
+                var type = entry.Mode == "040000" ? "tree" : "blob";
+                var lineData = $"{entry.Mode} {type} {entry.Sha1} {entry.Name}";
+
+                Console.WriteLine(lineData);
+                result += lineData + "\n";
+            }
+
+            return result;
+        }
+    }
+}
+</code></pre>
+</details>                            
                         </div>
                     </section>
                     <!-- <section class="portfolio-description">
