@@ -1598,7 +1598,7 @@ namespace Git.Core
 
             var tree = Encoding.UTF8.GetBytes($"tree {rootSha1}\n");
 
-            var parents = new List<byte[]>();
+            var parents = new List&lt;byte&gt;();
 
             if (sha1Parents != null) 
             {
@@ -1617,8 +1617,8 @@ namespace Git.Core
                 }
             }
 
-            var author = Encoding.UTF8.GetBytes($"author Guest <author@gmail.com> {CommitUtils.GetTimestamp()} {CommitUtils.GetTimezone()}\n");
-            var committer = Encoding.UTF8.GetBytes($"committer Guest <commiter@email.com> {CommitUtils.GetTimestamp()} {CommitUtils.GetTimezone()}\n");
+            var author = Encoding.UTF8.GetBytes($"author Guest &lt;author@gmail.com&gt; {CommitUtils.GetTimestamp()} {CommitUtils.GetTimezone()}\n");
+            var committer = Encoding.UTF8.GetBytes($"committer Guest &lt;commiter@email.com&gt; {CommitUtils.GetTimestamp()} {CommitUtils.GetTimezone()}\n");
             var message = Encoding.UTF8.GetBytes($"{msg}\n");
 
             commitStream.Write(tree, 0, tree.Length);
