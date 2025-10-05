@@ -1286,7 +1286,367 @@ namespace Git.Commands
 }
 </code></pre>
 </details>
+                        </div>
+                        <div class="blog-text">
+                            <h1 class="h4 portfolio-title">Commit</h1>
 
+                            <p>
+                                Este é o comando clássico do Git — provavelmente o mais conhecido de todos.  
+                                Em essência, ele realiza duas operações principais: <code>write-tree</code> e a criação de um novo objeto <code>commit</code>.  
+                                Primeiro, o comando lê os arquivos presentes no <i>index</i> e monta uma árvore completa desses arquivos e diretórios através do <code>write-tree</code>.  
+                                Em seguida, é criado o objeto <code>commit</code>, que armazena o hash SHA-1 da árvore raiz gerada e o hash do commit anterior (<i>parent commit</i>), caso exista.
+                            </p>
+
+                            <p>
+                                Em resumo, um objeto <code>commit</code> é essencialmente um ponteiro para uma árvore (<code>tree</code>) acompanhado de metadados.  
+                                Além dos hashes da árvore e do commit anterior, ele também contém informações como autor, e-mail, data e hora, além da mensagem do commit.
+                            </p>
+
+                            <p>
+                                Particularmente, não gosto da explicação popular que diz: <i>"um commit é um ponto na linha do tempo"</i>.  
+                                Embora isso possa ajudar iniciantes que não entendem nada de git a formar uma ideia vaga, essa definição não reflete o que o Commit realmente faz — e pode até dar a impressão de que o Git é uma ferramenta mágica que "controla" o tempo.  
+                                Prefiro uma explicação mais precisa: <i>"um commit representa um estado do seu projeto"</i>.  
+                                Isso traduz melhor a realidade: cada commit é um ponteiro para uma árvore que descreve todos os arquivos do repositório naquele momento.  
+                                Assim, cada commit captura um estado completo do projeto.
+                            </p>
+
+                            <p>
+                                Abaixo está a estrutura de um objeto <code>commit</code>:
+                            </p>
+                            <pre><code>commit [tamanho]\0
+tree [sha1 da tree raiz]
+parent [sha1 do commit pai]     # (opcional — só existe se não for o primeiro commit)
+author [nome] [email] [timestamp] [timezone]
+committer [nome] [email] [timestamp] [timezone]
+
+[mensagem do commit]
+
+exemplo:
+
+commit 187\0
+tree 9a1fc4d8e1dba7a4d1246b26d4a2c716b8bfc1f1
+parent 5c2f8a91a9a24f21df739eac78a9c53ebc71e63c
+author Linus Torvalds [torvalds@linux-foundation.org] [1618590723] [-0700]
+committer Linus Torvalds [torvalds@linux-foundation.org] [1618590723] [-0700]
+
+[Fix race condition in file locking]
+</code></pre>
+<details>
+    <summary>Código fonte do comando Commit</summary>
+    <pre><code>using Git.Core;
+using static Git.Core.TreeUtils;
+
+namespace Git.Commands
+{
+    public class Commit
+    {
+        public static string Execute(string[] args)
+        {
+            if (args.Length &lt; 2 || args[0] != "-m")
+            {
+                Console.WriteLine("Uso: gitadr commit [-m] &lt;mensagem_do_commit&gt;");
+                return string.Empty;
+            }
+
+            var indexEntries = IndexUtils.GetIndexEntries(false);
+
+            if (indexEntries == null || indexEntries.Keys.Count == 0)
+            {
+                Console.WriteLine("Nenhum arquivo na staging area.");
+                return string.Empty;
+            }
+
+            var parentCommit = CommitUtils.GetLastCommitSha1FromHead();
+
+            if (!string.IsNullOrEmpty(parentCommit))
+            {
+                var headTreeSha1 = CommitUtils.GetCommitTreeSha1(parentCommit);
+                var headEntries = TreeUtils.GetTreeEntriesFromSha1("", headTreeSha1, new Dictionary&lt;string, (string Mode, string Sha1)&gt;());
+
+                var hasChanges = false;
+
+                if (indexEntries.Count != headEntries.Count)
+                {
+                    hasChanges = true;
+                }
+                else
+                {
+                    foreach (var kv in indexEntries)
+                    {
+                        if (!headEntries.TryGetValue(kv.Key, out var head) || head.Sha1 != kv.Value)
+                        {
+                            hasChanges = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!hasChanges)
+                {
+                    Console.WriteLine("working tree limpa.");
+                    return string.Empty;
+                }
+            }
+                    
+            var rootSha1 = BuildCommitTree(indexEntries, parentCommit);
+
+            var commitSha1 = CommitObject.WriteCommit(rootSha1, args[1]);
+
+            UpdateHead(commitSha1);
+
+            return commitSha1;
+        }
+
+        private static string BuildCommitTree(Dictionary&lt;string, string&gt; indexMap, string? parentCommit)
+        {
+            var baseFiles = new Dictionary&lt;string, (string Mode, string Sha1)&gt;();
+
+            if (!string.IsNullOrEmpty(parentCommit))
+            {
+                var parentTreeSha1 = CommitUtils.GetCommitTreeSha1(parentCommit);
+                TreeUtils.GetTreeEntriesFromSha1("", parentTreeSha1, baseFiles);
+            }
+
+            var newFiles = baseFiles.Keys.Union(indexMap.Keys);
+
+            foreach (var file in newFiles)
+            {
+                var stagedFileSha1 = indexMap.ContainsKey(file) ? indexMap[file] : null;
+                var baseFileSha1 = baseFiles.ContainsKey(file) ? baseFiles[file].Sha1 : null;
+
+                if (stagedFileSha1 == null && baseFileSha1 != null)
+                {
+                    baseFiles.Remove(file);
+                    continue;
+                }
+
+                baseFiles[file] = ("100644", stagedFileSha1!);
+            }
+
+            string WriteDir(string prefix)
+            {
+                var childNames = baseFiles.Keys
+                    .Where(p => IsUnderPrefix(p, prefix))
+                    .Select(p =>
+                    {
+                        var remainder = GetRemainder(p, prefix);
+                        return remainder.Split(Path.DirectorySeparatorChar)[0];
+                    })
+                    .Distinct()
+                    .OrderBy(n => n)
+                    .ToList();
+
+                var entries = new List&lt;TreeEntry&gt;();
+
+                foreach (var name in childNames)
+                {
+                    var fullPath = TreeUtils.CombinePrefix(prefix, name);
+
+                    if (baseFiles.TryGetValue(fullPath, out var fileInfo))
+                    {
+                        entries.Add(new TreeEntry
+                        {
+                            Mode = fileInfo.Mode,
+                            Name = name,
+                            Sha1 = fileInfo.Sha1
+                        });
+                    }
+                    else
+                    {
+                        var subTreeSha1 = WriteDir(fullPath);
+                        entries.Add(new TreeEntry
+                        {
+                            Mode = "040000",
+                            Name = name,
+                            Sha1 = subTreeSha1
+                        });
+                    }
+                }
+
+                return TreeObject.WriteTree(entries);
+            }
+
+            return WriteDir("");
+        }
+
+        private static bool IsUnderPrefix(string path, string prefix)
+        {
+            if (string.IsNullOrEmpty(prefix))
+            {
+                return true;
+            }
+
+            if (path.Length &lt; prefix.Length)
+            {
+                return false;
+            }
+
+            if (!path.StartsWith(prefix)) 
+            { 
+                return false; 
+            }
+
+            if (path.Length == prefix.Length) 
+            { 
+                return false; 
+            }
+
+            return path[prefix.Length] == Path.DirectorySeparatorChar;
+        }
+
+        private static string GetRemainder(string path, string prefix)
+        {
+            if (string.IsNullOrEmpty(prefix))
+            {
+                return path;
+            }
+
+            return path.Substring(prefix.Length + 1);
+        }
+
+        private static void UpdateHead(string commitSha1)
+        {
+            var refs = BranchUtils.GetHead();
+            var parts = refs.Split(" ", 2);
+            BranchUtils.CreateOrUpdateBranch(parts[1], commitSha1);
+        }
+    }
+}
+</code></pre>
+</details>
+<details>
+    <summary>Código fonte da classe commitUtils.cs</summary>
+    <p>
+        Classe que possui os método utilitários para manipulação de commits.
+    </p>
+    <pre><code>using System.Text;
+
+namespace Git.Core
+{
+    public class CommitUtils
+    {
+        public static string GetTimestamp() => DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+        public static string GetTimezone() => DateTimeOffset.Now.ToString("zzz").Replace(":", "");
+
+        public static string GetLastCommitSha1FromHead()
+        {
+            var gitAdrDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+            var refs = BranchUtils.GetHead();
+            var parts = refs.Split(" ", 2);
+
+            return File.ReadAllText(Path.Combine(gitAdrDir, parts[1]));
+        }
+
+        public static string GetCommitTreeSha1(string commitSha1)
+        {
+            var data = Sha1Utils.GetObjectDataBySha1(commitSha1);
+            var nullIdx = Array.IndexOf(data, (byte)0);
+            var content = data[(nullIdx + 1)..];
+
+            var text = Encoding.UTF8.GetString(content);
+            var lineTree = text.Split('\n').First(l => l.StartsWith("tree "));
+                
+            var parts = lineTree.Split(' ', 2);
+
+            return parts[1];
+        }
+
+        public static List&lt;string&gt; GetCommitParents(string commitSha1)
+        {
+            var data = Sha1Utils.GetObjectDataBySha1(commitSha1);
+            var nullIdx = Array.IndexOf(data, (byte)0);
+            var content = data[(nullIdx + 1)..];
+
+            var text = Encoding.UTF8.GetString(content);
+            var parents = text.Split('\n').Where(l => l.StartsWith("parent "));
+
+            var commits = new List&lt;string&gt;();
+
+            foreach (var parent in parents)
+            {
+                commits.Add(parent.Split(" ", 2)[1]);
+            }
+
+            return commits;
+        }
+    }
+}
+</code></pre>
+</details>
+<details>
+    <summary>Código fonte da classe commitObject.cs</summary>
+
+    <p>
+        Classe que possui o método de criação do arquivo binário do objeto commit.
+    </p>
+    <p>
+        Perceba que eu coloquei author e comitter com informações hardcoded. 
+        É possivel tornar essas infos dinamicas, para isso será necessário criar comandos de configuração que armazanem informações em um arquivo de config, para saber mais leia sobre as <a href="https://git-scm.com/docs/git-config" target="_blank" class="blog-link">configurações de usuário do git</a>.
+    </p>
+    <p>
+        Comandos de configs não abordam nenhum conceito estrutural do git, então, fica a teu critério essa implementação.
+    </p>
+    <pre><code>using System.Text;
+
+namespace Git.Core
+{
+    public class CommitObject
+    {
+        public static string WriteCommit(string rootSha1, string msg, string[]? sha1Parents = null)
+        {
+            using var commitStream = new MemoryStream();
+
+            var tree = Encoding.UTF8.GetBytes($"tree {rootSha1}\n");
+
+            var parents = new List<byte[]>();
+
+            if (sha1Parents != null) 
+            {
+                foreach (var sha1 in sha1Parents)
+                {
+                    parents.Add(Encoding.UTF8.GetBytes($"parent {sha1}\n"));
+                }
+            }
+            else
+            {
+                var parentSah1 = CommitUtils.GetLastCommitSha1FromHead();
+               
+                if (!string.IsNullOrWhiteSpace(parentSah1))
+                {
+                    parents.Add(Encoding.UTF8.GetBytes($"parent {parentSah1}\n"));
+                }
+            }
+
+            var author = Encoding.UTF8.GetBytes($"author Guest <author@gmail.com> {CommitUtils.GetTimestamp()} {CommitUtils.GetTimezone()}\n");
+            var committer = Encoding.UTF8.GetBytes($"committer Guest <commiter@email.com> {CommitUtils.GetTimestamp()} {CommitUtils.GetTimezone()}\n");
+            var message = Encoding.UTF8.GetBytes($"{msg}\n");
+
+            commitStream.Write(tree, 0, tree.Length);
+
+            foreach(var parent in parents)
+            {
+                commitStream.Write(parent, 0, parent.Length);
+            }  
+
+            commitStream.Write(author, 0, author.Length);
+            commitStream.Write(committer, 0, committer.Length);
+            commitStream.WriteByte(0x0A);
+            commitStream.Write(message, 0, message.Length);
+
+            var commitContent = commitStream.ToArray();
+            var header = $"commit {commitContent.Length}\0";
+
+            var fullCommit = Sha1Utils.CombineBytes(Encoding.UTF8.GetBytes(header), commitContent);
+            var commitSha1 = Sha1Utils.CreateSha1FromByteData(fullCommit);
+
+            ObjectStore.WriteObject(commitSha1, fullCommit);
+
+            return commitSha1;
+        }
+    }
+}
+</code></pre>
+</details>
                         </div>
                     </section>
                     <!-- <section class="portfolio-description">
