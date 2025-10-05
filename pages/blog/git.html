@@ -1647,6 +1647,243 @@ namespace Git.Core
 }
 </code></pre>
 </details>
+                            <p>
+                                Até agora conseguimos construir exatamente essa estrutura:
+                            </p>
+                            <div class="item item-diagrama">
+                                <div class="item-description">
+                                    <small><i>Clique para expandir</i></small>
+                                </div>
+                                <img
+                                    src="../../assets/images/blog/gitadr/commit-and-tree.png"
+                                    class="img-expanded"
+                                    style="width: 100%"
+                                />
+                                                    <small
+                                        ><i
+                                            >Imagem retirada do livro do git.</i
+                                        ></small
+                                    >
+                            </div>
+                        </div>
+                        <div class="blog-text">
+                            <h1 class="h4 portfolio-title">Branch</h1>
+
+                            <p>
+                                Este comando permite criar, listar e remover branches.  
+                                Antes de tudo, é fundamental entender o que é um branch e como ele funciona:  
+                                um <strong>branch</strong> nada mais é do que <strong>um ponteiro para um commit</strong>.
+                            </p>
+
+                            <p>
+                                Os branches são armazenados como arquivos de texto dentro de <i>.gitadr/refs/heads</i>.  
+                                O nome de cada arquivo corresponde ao nome do branch, e o conteúdo desse arquivo é o hash SHA-1 do último commit daquele branch.  
+                                A cada novo commit, o arquivo do branch é atualizado com o hash do commit recém-criado.
+                            </p>
+
+                            <p>
+                                Já o arquivo <code>HEAD</code>, localizado em <i>.gitadr/HEAD</i>, indica qual branch está ativo no momento.  
+                                Quando você executa <code>gitadr init</code>, o branch padrão <code>master</code> é criado, e o arquivo <code>HEAD</code> recebe o valor  
+                                <code>ref: refs/heads/master</code>, informando que o branch ativo é o <code>master</code>.
+                            </p>
+
+                            <p>
+                                Ao criar um novo branch, o GitAdr simplesmente gera um novo arquivo em  
+                                <i>.gitadr/refs/heads/[novo_branch]</i>, cujo conteúdo é o mesmo hash SHA-1 do branch atual (aquele apontado por <code>HEAD</code>).  
+                                Isso significa que o novo branch passa a apontar para o mesmo commit do branch de origem.  
+                                Veja o exemplo abaixo:
+                            </p>
+
+                            <pre><code>
+gitadr init
+1. [branch "master" é criado em .gitadr/refs/heads/master]
+2. [arquivo HEAD é criado com o conteúdo: ref: refs/heads/master]
+
+gitadr add + gitadr commit
+1. [commit criado com hash SHA-1 "abc123..."]
+2. [arquivo do branch (.gitadr/refs/heads/master) é atualizado com o novo hash "abc123..."]
+
+gitadr branch teste
+1. [novo arquivo criado em .gitadr/refs/heads/teste]
+2. [o conteúdo desse arquivo é o mesmo hash SHA-1 da master: "abc123..." (branch de origem)]</code></pre>
+
+                        <p>
+                            Novos branches são sempre criados a partir de um commit existente do branch de origem, garantindo um fluxo linear no histórico do repositório.  
+                            Essa referência ao commit de origem é fundamental, pois será utilizada posteriormente durante a operação de <i>merge</i> (que veremos mais adiante).
+                        </p>
+
+                        <p>
+                            Note como o conceito de branch no Git é algo extremamente <strong>simples</strong> e <strong>leve</strong>: um branch não é uma cópia completa do branch de origem, mas apenas um pequeno arquivo de texto que armazena o identificador (hash SHA-1) de um commit, o qual por sua vez referencia uma árvore (<i>tree</i>) de arquivos e diretórios.  
+                            Por isso, é possível criar milhares de branches sem qualquer impacto perceptível na performance do Git.
+                        </p>
+
+                        <p>
+                            Diagrama visual da criação de um branch "feature" a partir de um commit da master:
+                        </p>
+                        <pre><code>o---o---o master
+     \
+      o---o feature</code></pre>
+
+<details>
+    <summary>Código fonte do comando branch</summary>
+
+    <pre><code>using Git.Core;
+
+namespace Git.Commands
+{
+    public class Branch
+    {
+        public static List&lt;string&gt;? Execute(string[] args)
+        {
+            if (args.Length &lt; 1)
+            {
+                var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+                var branchs = Directory.GetFiles(Path.Combine(gitDir, $"refs{Path.DirectorySeparatorChar}heads"));
+                var head = BranchUtils.GetHead().Replace(@$"ref: refs{Path.DirectorySeparatorChar}heads{Path.DirectorySeparatorChar}", string.Empty);
+                var allBranches = new List&lt;string&gt;();
+
+                foreach (var branch in branchs)
+                {
+                    var name = Path.GetFileName(branch);
+                    var formattedName = $"{(name == head ? "*" : string.Empty)} {name}";
+
+                    Console.WriteLine(formattedName);
+                    allBranches.Add(formattedName.Trim());
+                }
+
+                return allBranches;
+            }
+
+            var branchName = args[0];
+
+            if (args.Length == 2 && args[0] == "-d") 
+            {
+                branchName = args[1];
+                var head = BranchUtils.GetHead().Replace(@$"ref: refs{Path.DirectorySeparatorChar}heads{Path.DirectorySeparatorChar}", string.Empty);
+
+                if (branchName == head)
+                {
+                    Console.WriteLine("Não é possivel excluir o HEAD.");
+
+                    return null;
+                }
+
+                var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+                File.Delete(Path.Combine(gitDir, $"refs{Path.DirectorySeparatorChar}heads{Path.DirectorySeparatorChar}{branchName}"));
+
+                return null;
+            }
+
+            var existHeadFile = BranchUtils.GetCommitHeadFromBranch(branchName);
+
+            if (existHeadFile != null)
+            {
+                Console.WriteLine($"Já existe um branch com o nome {branchName}");
+                return null;
+            }
+
+            var lastCommitSha1 = CommitUtils.GetLastCommitSha1FromHead();
+
+            if (string.IsNullOrWhiteSpace(lastCommitSha1))
+            {
+                Console.WriteLine($"Não é possivel criar um branch quando não existem commits.");
+                return null;
+            }
+
+            BranchUtils.CreateOrUpdateBranch($"refs{Path.DirectorySeparatorChar}heads{Path.DirectorySeparatorChar}{branchName}", lastCommitSha1);
+
+            Console.WriteLine($"Branch {branchName} criado com sucesso");
+
+            return null;
+        }
+    }
+}
+</code></pre>
+</details>      
+<details>
+    <summary>Código fonte da classe branchUtils.cs</summary>
+
+    <pre><code>using System.Text;
+
+namespace Git.Core
+{
+    public class BranchUtils
+    {
+        public static string GetHead()
+        {
+            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+            var path = Path.Combine(gitDir, "HEAD");
+
+            return File.ReadAllText(path);
+        }
+
+        public static void WriteHead(string headContent)
+        {
+            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+            var path = Path.Combine(gitDir, "HEAD");
+
+            File.WriteAllText(path, headContent);
+        }
+
+        public static string? GetCommitHeadFromBranch(string branchFileName)
+        {
+            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+            var path = Path.Combine(gitDir, $"refs{Path.DirectorySeparatorChar}heads", branchFileName);
+
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            return File.ReadAllText(path);
+        }
+
+        public static List&lt;string&gt;? GetAllCommitsFromBranch(string branchFileName)
+        {
+            var head = GetCommitHeadFromBranch(branchFileName);
+
+            if (string.IsNullOrWhiteSpace(head))
+            {
+                return null;
+            }
+
+            void GetParentCommit(string sha1, List&lt;string&gt; commits)
+            {
+                var data = Sha1Utils.GetObjectDataBySha1(sha1);
+                var nullIndex = Array.IndexOf(data, (byte)0);
+                var content = Encoding.UTF8.GetString(data[(nullIndex + 1)..]);
+
+                var lines = content.Split('\n');
+
+                var parent = lines.FirstOrDefault(line => line.StartsWith("parent "));
+
+                if (!string.IsNullOrWhiteSpace(parent))
+                {
+                    var commitParent = parent.Split(" ")[1];
+                    commits.Add(commitParent);
+
+                    GetParentCommit(commitParent, commits);
+                }
+            }
+
+            var listCommits = new List&lt;string&gt;() { head };
+
+            GetParentCommit(head, listCommits);
+
+            return listCommits;
+        }
+
+        public static void CreateOrUpdateBranch(string branchPath, string commitSha1)
+        {
+            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".gitadr");
+            var path = Path.Combine(gitDir, branchPath);
+
+            File.WriteAllText(path, commitSha1);
+        }
+    }
+}
+</code></pre>
+</details>  
                         </div>
                     </section>
                     <!-- <section class="portfolio-description">
