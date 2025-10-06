@@ -2035,6 +2035,100 @@ namespace Git.Commands
 </code></pre>
 </details>  
                         </div>
+            
+
+<div class="blog-text">
+    <h1 class="h4 portfolio-title">Merge</h1>
+
+    <p>
+        Com o comando <code>merge</code>, podemos mesclar dois branches.  
+        Em termos simples, um <strong>merge</strong> é o processo de comparar duas árvores — ou seja, dois conjuntos de commits — e unir suas diferenças.  
+        Quando mesclamos um branch A em um branch B, estamos basicamente aplicando as alterações do A dentro do B.
+    </p>
+
+    <p>
+        Fazer merges no Git é, na maior parte do tempo, simples.  
+        É comum manter branches vivos por longos períodos, recebendo merges periódicos e resolvendo pequenos conflitos quando necessário.  
+        A própria documentação do Git recomenda não deixar um branch ficar muito tempo desatualizado em relação ao principal (geralmente <code>master</code> ou <code>main</code>), pois isso aumenta a chance de conflitos grandes e difíceis de resolver.  
+        Por isso, realizar merges frequentes é uma boa prática para manter os branches sincronizados e facilitar a integração contínua.
+    </p>
+
+    <p>
+        Quando executamos <code>git merge feature</code> enquanto estamos no branch <code>master</code>, o Git tenta unir o histórico de commits da <code>feature</code> dentro do histórico atual.  
+        Para fazer isso, ele precisa encontrar um ponto em comum entre os dois branches — esse ponto é chamado de <strong>commit ancestral comum</strong>.
+    </p>
+
+    <pre><code>
+A---B---C master
+     \
+      D---E feature
+    </code></pre>
+
+    <p>
+        Nesse exemplo, o commit <code>B</code> é o ancestral comum entre os dois branches.  
+        O Git então compara as diferenças entre:
+    </p>
+    <ul>
+        <li><strong>O ancestral comum</strong> (<code>B</code>)</li>
+        <li><strong>A ponta do branch atual</strong> (<code>C</code>)</li>
+        <li><strong>A ponta do branch a ser mesclado</strong> (<code>E</code>)</li>
+    </ul>
+
+    <p>
+        Essa comparação entre três commits é chamada de <strong>3-way merge</strong> (mesclagem em três vias).  
+        O Git analisa o que mudou de <code>B → C</code> e o que mudou de <code>B → E</code>.  
+        Se essas mudanças não afetarem as mesmas linhas ou arquivos, o Git consegue mesclar automaticamente.
+    </p>
+
+    <p>
+        Um <strong>conflito de merge</strong> ocorre quando os dois branches modificam a mesma linha de um arquivo (ou um exclui e o outro altera o mesmo arquivo).  
+        Nesse caso, o Git não consegue decidir qual versão deve prevalecer e marca o conflito para que o desenvolvedor escolha manualmente.
+    </p>
+
+    <pre><code>
+<<<<<<< HEAD
+print("Olá, mundo!")
+=======
+print("Olá, universo!")
+>>>>>>> feature
+    </code></pre>
+
+    <p>
+        Esse é o formato que o Git usa para mostrar conflitos.  
+        O trecho entre <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> e <code>=======</code> mostra o conteúdo do branch atual,  
+        e o trecho entre <code>=======</code> e <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> mostra o conteúdo do branch que está sendo mesclado.  
+        Após escolher a versão correta (ou combinar ambas), basta salvar o arquivo e executar:
+    </p>
+
+    <pre><code>git add arquivo.txt
+git commit</code></pre>
+
+    <p>
+        O commit resultante será um <strong>commit de merge</strong>, que une os dois históricos em um ponto comum.
+    </p>
+
+     <p>
+        O Git oferece diferentes estratégias para realizar merges, dependendo da situação:
+    </p>
+
+    <ul>
+        <li>
+            <strong>Recursive/Ort (padrão)</strong> — usada em merges comuns entre dois branches.  
+            É a estratégia que realiza o 3-way merge automaticamente e tenta resolver conflitos simples.
+        </li>
+        <li>
+            <strong>Ours</strong> — ignora as alterações do branch que está sendo mesclado, mantendo apenas as do branch atual.
+        </li>
+        <li>
+            <strong>Theirs</strong> — o oposto de <code>ours</code>; ignora o branch atual e mantém o conteúdo do branch que está sendo mesclado.
+        </li>
+        <li>
+            <strong>Octopus</strong> — usada para mesclar mais de dois branches de uma só vez (geralmente em merges automáticos de integração).
+        </li>
+    </ul>
+</div>
+
+                      
                     </section>
                     <!-- <section class="portfolio-description">
                         <h1 class="h4 portfolio-title">Referencias</h1>
