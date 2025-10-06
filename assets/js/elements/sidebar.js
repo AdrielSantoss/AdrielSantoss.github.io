@@ -54,18 +54,6 @@ export function loadSideBar() {
 
                     <li class="contact-item">
                         <div class="icon-box">
-                            <ion-icon name="phone-portrait-outline"></ion-icon>
-                        </div>
-
-                        <div class="contact-info">
-                            <p class="contact-title">Phone</p>
-
-                            <a href="tel:+555199667423" class="contact-link">+55 (51) 9966-7423</a>
-                        </div>
-                    </li>
-
-                    <li class="contact-item">
-                        <div class="icon-box">
                             <ion-icon name="business-outline"></ion-icon>
                         </div>
 
