@@ -2126,6 +2126,104 @@ git commit</code></pre>
             <strong>Octopus</strong> — usada para mesclar mais de dois branches de uma só vez (geralmente em merges automáticos de integração).
         </li>
     </ul>
+    <p></p>
+
+    <p>
+        Quando um merge é finalizado, o git cria um novo <strong>commit de merge</strong>.
+        Diferente de um commit comum, que possui apenas um <em>parent</em> (ancestral direto),  
+        um <strong>commit de merge</strong> possui <strong>dois parents</strong>: o commit da branch atual e o commit da branch mesclada.
+    </p>
+
+    <pre><code>
+A---B---C---F (master)
+     \     /
+      D---E (feature)
+    </code></pre>
+
+    <p>
+        Nesse exemplo, o commit <code>F</code> é o <strong>commit de merge</strong>.  
+        Ele tem dois ancestrais: <code>C</code> (do branch <code>master</code>) e <code>E</code> (do branch <code>feature</code>).  
+        O Git cria esse commit automaticamente para representar o ponto onde os dois históricos se unem.
+    </p>
+
+    <p>
+        Internamente, o commit de merge contém uma nova árvore (tree) resultante da mesclagem das duas árvores anteriores,  
+        e seu cabeçalho (header) inclui duas linhas <code>parent</code> em vez de uma:
+    </p>
+
+    <pre><code>
+tree a9b3e4f...
+parent 7f1a2b3  ← commit C
+parent 1d9c4e7  ← commit E
+author João &lt;joao@example.com&gt; 1738702336 +0300
+committer João &lt;joao@example.com&gt; 1738702336 +0300
+Merge branch 'feature' into 'master'
+    </code></pre>
+
+<p>
+    Além do merge tradicional, o Git também oferece um modo de merge chamado <code>--ff-only</code> (fast-forward only).
+    Esse modo é mais simples e restritivo: ele apenas move o ponteiro do branch atual para o commit mais recente do branch de destino,
+    sem criar um novo commit de merge.
+</p>
+
+<p>
+    Isso só é possível quando o histórico do branch atual está diretamente "atrás" do branch que queremos unir, ou seja,
+    quando não existem commits divergentes entre eles.
+    Nesse caso, o Git entende que pode simplesmente "avançar" o ponteiro do branch sem precisar fazer nenhuma comparação de árvores.
+</p>
+
+<pre><code>
+A---B---C  (main)
+           \
+            D---E  (feature)
+</code></pre>
+
+<p>
+    Se executarmos <code>git merge --ff-only feature</code> estando no branch <code>main</code>,
+    o Git não criará um commit de merge. Em vez disso, ele apenas moverá o ponteiro de <code>main</code> até o commit <code>E</code>:
+</p>
+
+<pre><code>
+A---B---C---D---E  (main, feature)
+</code></pre>
+
+<p>
+    Esse tipo de merge mantém o histórico <strong>linear</strong> e limpo — como se todos os commits tivessem ocorrido
+    no mesmo branch. É muito usado em projetos que preferem manter um histórico sem commits de merge visuais.
+</p>
+
+<p>
+    No entanto, se houver commits divergentes (por exemplo, se o branch atual tiver commits que o branch de destino não possui),
+    o Git <strong>não permitirá</strong> o fast-forward e exibirá um erro:
+</p>
+
+<pre><code>
+A---B---C---F  (main)
+     \
+      D---E  (feature)
+
+$ git merge --ff-only feature
+fatal: Not possible to fast-forward, aborting.
+</code></pre>
+
+<p>
+    Nesse caso, só seria possível realizar um merge tradicional, com a criação de um novo commit que unifica as duas histórias.
+</p>
+
+
+<p>
+    No código abaixo, implementei o merge utilizando a estratégia padrão do Git (<strong>Ort</strong>).
+    Essa implementação detecta automaticamente o <strong>commit ancestral comum</strong> e realiza o <strong>commit de merge</strong> quando necessário.
+    Além disso, inclui suporte ao modo <code>--ff-only</code>.
+</p>
+<p>
+    Em caso de conflitos, a operação é <em>abortada</em> e o console exibe quais arquivos apresentaram divergências.
+    Caso deseje evoluir essa implementação, é possível adicionar facilmente um mecanismo de resolução de conflitos,
+    já que a estrutura principal do processo de merge já está pronta.
+</p>
+<p>
+    Não implementei uma exibição de conflitos igual ao git, por motivo de <code>preguiça</code>, já implementamos toda a estrutura do git, o resto é trabalho manual reutilizando os mesmos conceitos.
+</p>
 </div>
 
                       
