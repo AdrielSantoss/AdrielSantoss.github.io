@@ -60,7 +60,7 @@
                             </p>
                             <p>
                                 Obtive uma experiencia muito interessante, que durou aproximadamente 3 semanas, eu
-                                implementei 14 comandos do git (talvez, com o passar do tempo, implemente ainda mais), e
+                                implementei 15 comandos do git (talvez, com o passar do tempo, implemente ainda mais), e
                                 cada comando constrói e manipula os tres princiapis objetos do git: Blob, Tree e Commit.
                                 Dito isso, o meu objetivo nesse artigo, é descrever como foi essa experiencia, o que eu
                                 aprendi nesse periodo.
@@ -2224,9 +2224,362 @@ fatal: Not possible to fast-forward, aborting.
     Caso deseje evoluir essa implementação, é possível adicionar facilmente um mecanismo de resolução de conflitos,
     já que a estrutura principal do processo de merge já está pronta.
 </p>
-<p>
-    Não implementei uma exibição de conflitos igual ao git, por motivo de <code>preguiça</code>, já implementamos toda a estrutura do git, o resto é trabalho manual reutilizando os mesmos conceitos.
-</p>
+
+<details>
+    <summary>Código fonte do comando Merge</summary>
+
+    <p>Este comando utiliza: <i>BranchUtils.cs, TreeUtils.cs, CommitUtils.cs, IndexUtils.cs e Sha1Utils.cs</i>. Todas essas classes tiveram seu código fonte mencionadas acima na documentação de outros comandos.</p>
+
+    <pre><code>using Git.Core;
+using TreeEntry = Git.Core.TreeUtils.TreeEntry;
+
+namespace Git.Commands
+{
+    public class Merge
+    {
+        public static void Execute(string[] args)
+        {
+            if (args.Length &lt; 1)
+            {
+                Console.WriteLine("Uso: gitadr merge &lt;branch&gt;");
+                return;
+            }
+
+            var ffOnly = false;
+            string targetBranch;
+
+            if (args[0] == "--ff-only" && args.Length >= 2)
+            {
+                ffOnly = true;
+                targetBranch = args[1];
+            }
+            else
+            {
+                targetBranch = args[0];
+            }
+
+            var targetCommit = BranchUtils.GetCommitHeadFromBranch(targetBranch);
+
+            if (targetCommit == null)
+            {
+                Console.WriteLine($"Não existe um branch com o nome {targetBranch}");
+                return;
+            }
+
+            var headBranch = BranchUtils.GetHead();
+            var headCommit = CommitUtils.GetLastCommitSha1FromHead();
+            var headCommits = BranchUtils.GetAllCommitsFromBranch(headBranch.Replace($"ref: refs{Path.DirectorySeparatorChar}heads{Path.DirectorySeparatorChar}", ""));
+
+            var targetTreeSha1 = CommitUtils.GetCommitTreeSha1(targetCommit);
+            var targetCommits = BranchUtils.GetAllCommitsFromBranch(targetBranch);
+
+            if (targetCommits!.All(commit => headCommits!.Contains(commit)))
+            {
+                Console.WriteLine($"Already up to date.");
+
+                return;
+            }
+
+            var commitBase = FindMergeBase(headCommit, targetCommit);
+
+            var baseTreeSha1 = CommitUtils.GetCommitTreeSha1(commitBase!);
+            var baseEntries = TreeUtils.GetTreeData(baseTreeSha1);
+
+            var headTreeSha1 = CommitUtils.GetCommitTreeSha1(headCommit);
+            var headEntries = TreeUtils.GetTreeData(headTreeSha1);
+
+            var targetEntries = TreeUtils.GetTreeData(targetTreeSha1);
+
+            var addedOrUpdatedFiles = new Dictionary&lt;string, string&gt;();
+            var removedFiles = new Dictionary&lt;string, string&gt;();
+
+            if (ffOnly)
+            {
+                var canFastForward = headCommits!.All(c => targetCommits!.Contains(c));
+
+                if (!canFastForward)
+                {
+                    Console.WriteLine($"Não é possível realizar fast-forward merge para {targetBranch}, abortando.");
+                    return;
+                }
+
+                var survivingFiles = new HashSet&lt;string&gt;();
+                UpdateIndexAndWorkSpaceFromTree(targetEntries, survivingFiles);
+                RemoveFilesAndDirectories(survivingFiles);
+
+                BranchUtils.CreateOrUpdateBranch(headBranch.Replace("ref: ", string.Empty), targetCommit);
+                Console.WriteLine($"Fast-forward merge realizado para {targetBranch}");
+                return;
+            }
+
+            var mergedEntries = BuildTreeFromTwoTreeDiffs(baseEntries, headEntries, targetEntries);
+
+            if (mergedEntries.Count > 0)
+            {
+                var survivingFiles = new HashSet&lt;string&gt;();
+                UpdateIndexAndWorkSpaceFromTree(mergedEntries, survivingFiles);
+                RemoveFilesAndDirectories(survivingFiles);
+
+                var mergeRootSha1 = TreeObject.WriteTree(mergedEntries);
+                var mergeCommitSha1 = CommitObject.WriteCommit(
+                                        mergeRootSha1, 
+                                        $"Merge branch {targetBranch} into {headBranch.Replace(@$"ref: refs{Path.DirectorySeparatorChar}heads{Path.DirectorySeparatorChar}", string.Empty)}", 
+                                        [headCommit, targetCommit]);
+
+                BranchUtils.CreateOrUpdateBranch(headBranch.Replace("ref: ", string.Empty), mergeCommitSha1);
+            }
+        }
+
+        private static List&lt;TreeEntry&gt; BuildTreeFromTwoTreeDiffs(
+            List&lt;TreeEntry&gt; baseEntries,
+            List&lt;TreeEntry&gt; headEntries,
+            List&lt;TreeEntry&gt; targetEntries
+        )
+        {
+            var mergedEntries = new List&lt;TreeEntry&gt;();
+
+            var allNames = baseEntries.Select(e => e.Name)
+                .Union(headEntries.Select(e => e.Name))
+                .Union(targetEntries.Select(e => e.Name));
+
+            foreach (var name in allNames)
+            {
+                var baseEntry = baseEntries.FirstOrDefault(e => e.Name == name);
+                var headEntry = headEntries.FirstOrDefault(e => e.Name == name);
+                var targetEntry = targetEntries.FirstOrDefault(e => e.Name == name);
+
+                if (baseEntry == null && headEntry == null && targetEntry != null)
+                {
+                    mergedEntries.Add(targetEntry);
+                    continue;
+                }
+
+                if (baseEntry == null && targetEntry == null && headEntry != null)
+                {
+                    mergedEntries.Add(headEntry);
+                    continue;
+                }
+
+                if (headEntry == null && targetEntry == null && baseEntry != null)
+                {
+                    continue;
+                }
+
+                if (headEntry != null && targetEntry != null && baseEntry != null)
+                {
+                    if (headEntry.Mode.StartsWith("040") || targetEntry.Mode.StartsWith("040"))
+                    {
+                        var headSubtree = headEntry != null ? TreeUtils.GetTreeData(headEntry.Sha1) : new List&lt;TreeEntry&gt;();
+                        var targetSubtree = targetEntry != null ? TreeUtils.GetTreeData(targetEntry.Sha1) : new List&lt;TreeEntry&gt;();
+                        var baseSubtree = baseEntry != null ? TreeUtils.GetTreeData(baseEntry.Sha1) : new List&lt;TreeEntry&gt;();
+
+                        var mergedSubtree = BuildTreeFromTwoTreeDiffs(baseSubtree, headSubtree, targetSubtree);
+
+                        if (mergedSubtree.Any())
+                        {
+                            var newTreeSha1 = TreeObject.WriteTree(mergedSubtree);
+                            mergedEntries.Add(new TreeEntry
+                            {
+                                Mode = "040000",
+                                Name = name,
+                                Sha1 = newTreeSha1
+                            });
+                        }
+
+                        continue;
+                    }
+
+                    if (baseEntry.Sha1 == headEntry.Sha1 && headEntry.Sha1 == targetEntry.Sha1)
+                    {
+                        mergedEntries.Add(targetEntry);
+                    }
+
+                    if (baseEntry.Sha1 == headEntry.Sha1 && headEntry.Sha1 != targetEntry.Sha1)
+                    {
+                        mergedEntries.Add(targetEntry);
+                    }
+
+                    if (baseEntry.Sha1 == targetEntry.Sha1 && headEntry.Sha1 != targetEntry.Sha1)
+                    {
+                        mergedEntries.Add(headEntry);
+                    }
+
+                    if (baseEntry.Sha1 != targetEntry.Sha1 && baseEntry.Sha1 != headEntry.Sha1)
+                    {
+                        Console.WriteLine($"Conflito detectado no arquivo {name}");
+                        return new List&lt;TreeEntry&gt;();
+                    }
+
+                    continue;
+                }
+            }
+
+            return mergedEntries;
+        }
+
+        private static void UpdateIndexAndWorkSpaceFromTree(List&lt;TreeEntry&gt; treeData, HashSet&lt;string&gt; survivingFiles)
+        {
+            foreach (var entry in treeData)
+            {
+                if (entry.Mode.StartsWith("040"))
+                {
+                    var subEntries = TreeUtils.GetTreeData(entry.Sha1);
+
+                    foreach (var subEntry in subEntries)
+                    {
+                        var fullPath = Path.Combine(entry.Name, subEntry.Name);
+
+                        if (subEntry.Mode.StartsWith("040"))
+                        {
+                            UpdateIndexAndWorkSpaceFromTree(
+                                new List&lt;TreeEntry&gt; {
+                                    new TreeEntry {
+                                        Mode = subEntry.Mode,
+                                        Name = fullPath,
+                                        Sha1 = subEntry.Sha1
+                                    }
+                                },
+                                survivingFiles
+                            );
+                        }
+                        else
+                        {
+                            AddOrUpdateIndexFile(fullPath, subEntry.Sha1);
+                            survivingFiles.Add(fullPath);
+                            Sha1Utils.WriteFileAndDirectoriesFromSha1(fullPath, subEntry.Sha1);
+                        }
+                    }
+
+                    continue;
+                }
+
+                AddOrUpdateIndexFile(entry.Name, entry.Sha1);
+                survivingFiles.Add(entry.Name);
+
+                Sha1Utils.WriteFileAndDirectoriesFromSha1(entry.Name, entry.Sha1);
+            }
+        }
+
+        private static void RemoveFilesAndDirectories(HashSet&lt;string&gt; survivingFiles)
+        {
+            var currentIndex = IndexUtils.GetIndexEntries(true);
+
+            foreach (var file in currentIndex.Keys)
+            {
+                if (!survivingFiles.Contains(file))
+                {
+                    RemoveIndexFile(file);
+                    if (File.Exists(file))
+                    {
+                        File.Delete(file);
+                    }
+                }
+            }
+
+            IndexUtils.RemoveEmptyDirectories(Directory.GetCurrentDirectory());
+        }
+
+        private static void AddOrUpdateIndexFile(string file, string sha1)
+        {
+            var lines = IndexUtils.GetIndexEntries(true);
+
+            var newContentLines = new List&lt;string&gt;();
+            var found = false;
+
+            foreach (var fileName in lines.Keys)
+            {
+                var fileSha1 = lines[fileName];
+
+                if (fileName == file)
+                {
+                    found = true;
+                    if (fileSha1 == sha1)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        newContentLines.Add($"{sha1} {fileName}");
+                    }
+                }
+                else
+                {
+                    newContentLines.Add($"{fileSha1} {fileName}");
+                }
+            }
+
+            if (!found)
+            {
+                newContentLines.Add($"{sha1} {file}");
+            }
+
+            IndexUtils.CreateOrUpdateIndex(string.Join('\n', newContentLines) + "\n");
+        }
+
+        private static void RemoveIndexFile(string file)
+        {
+            var lines = IndexUtils.GetIndexEntries(true);
+            lines.Remove(file);
+            var newContentLines = new List&lt;string&gt;();
+
+            foreach (var fileName in lines.Keys)
+            {
+                newContentLines.Add($"{lines[fileName]} {fileName}");
+            }
+
+            IndexUtils.CreateOrUpdateIndex(string.Join('\n', newContentLines) + "\n");
+        }
+
+        private static string? FindMergeBase(string headCommit, string targetCommit)
+        {
+            var headAncestors = new HashSet&lt;string&gt;(GetAllCommitsFromCommit(headCommit));
+
+            var targetAncestors = GetAllCommitsFromCommit(targetCommit);
+
+            foreach (var commit in targetAncestors)
+            {
+                if (headAncestors.Contains(commit))
+                {
+                    return commit;
+                }
+            }
+
+            return null;
+        }
+
+        private static List&lt;string&gt; GetAllCommitsFromCommit(string commitSha1)
+        {
+            var commits = new List&lt;string&gt;();
+            var stack = new Stack&lt;string&gt;();
+            var visited = new HashSet&lt;string&gt;();
+
+            stack.Push(commitSha1);
+
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+
+                if (visited.Contains(current))
+                {
+                    continue;
+                }
+
+                visited.Add(current);
+                commits.Add(current);
+
+                var parents = CommitUtils.GetCommitParents(current);
+                foreach (var parent in parents)
+                {
+                    stack.Push(parent);
+                }
+            }
+
+            return commits;
+        }
+    }
+}
+</code></pre>
+</details>  
 </div>
 
                       
