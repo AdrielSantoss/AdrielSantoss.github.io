@@ -36,3 +36,5 @@ loadSideBar();
 loadWorkingInProgress();
 imgExpandedClickListener();
 scroll();
+
+window.loadSideBarBlog = loadSideBarBlog;
