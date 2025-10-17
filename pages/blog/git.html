@@ -31,7 +31,7 @@
                     </section>
 
                     <section class="portfolio-description">
-                        <div class="blog-text">
+                        <div id="intro" class="blog-text">
                             <p>
                                 Há algum tempo, me deparei com o artigo
                                 <a href="https://wyag.thb.lt" target="_blank" class="blog-link">Write Yourself a Git</a>
@@ -83,7 +83,7 @@
                                 >.
                             </p>
                         </div>
-                        <div class="blog-text">
+                        <div id="history" class="blog-text">
                             <h1 class="h4 portfolio-title">Estudar o passado é conhecer o presente</h1>
                             <p>
                                 Prometo não me alongar muito, portanto, tente não dormir… Se você quer realmente
@@ -186,7 +186,7 @@
                                 utilizado da história.
                             </p>
                         </div>
-                        <div class="blog-text">
+                        <div id="init" class="blog-text">
                             <h1 class="h4 portfolio-title">Init e Objects</h1>
                             <p>
                                 Em resumo, o Git é um sistema que cria e manipula um "banco de dados de objetos". Esses
@@ -258,7 +258,7 @@ namespace Git.Commands
                                 começam com <code>.</code> são tratados como ocultos.
                             </p>
                         </div>
-                        <div class="blog-text">
+                        <div id="hash-object" class="blog-text">
                             <h1 class="h4 portfolio-title">Hash-Object</h1>
 
                             <p>
@@ -533,7 +533,7 @@ namespace Git.Core
 }</code></pre>
                         </details>
                         </div>
-                        <div class="blog-text">
+                        <div id="cat-file" class="blog-text">
                             <h1 class="h4 portfolio-title">Cat-File</h1>
 
                             <p>
@@ -586,7 +586,7 @@ namespace Git.Commands
 }</code></pre>
                         </details>
                         </div>
-                        <div class="blog-text">
+                        <div id="write-tree" class="blog-text">
                             <h1 class="h4 portfolio-title">Write-Tree</h1>
 
                             <p>
@@ -911,7 +911,7 @@ namespace Git.Core
                                 
                             </div>
                         </div>
-                        <div class="blog-text">
+                        <div id="ls-tree" class="blog-text">
                             <h1 class="h4 portfolio-title">Ls-Tree</h1>
 
                             <p>
@@ -966,7 +966,7 @@ namespace Git.Commands
 </code></pre>
 </details>                            
                         </div>
-                        <div class="blog-text">
+                        <div id="add" class="blog-text">
                             <h1 class="h4 portfolio-title">Add</h1>
                             
                             <p>
@@ -1290,7 +1290,7 @@ namespace Git.Commands
 </code></pre>
 </details>
                         </div>
-                        <div class="blog-text">
+                        <div id="commit" class="blog-text">
                             <h1 class="h4 portfolio-title">Commit</h1>
 
                             <p>
@@ -1888,7 +1888,7 @@ namespace Git.Core
 </code></pre>
 </details>  
                         </div>
-                        <div class="blog-text">
+                        <div id="switch" class="blog-text">
                             <h1 class="h4 portfolio-title">Switch</h1>
 
                             <p>
@@ -2040,7 +2040,7 @@ namespace Git.Commands
                         </div>
             
 
-<div class="blog-text">
+<div id="merge" class="blog-text">
     <h1 class="h4 portfolio-title">Merge</h1>
 
     <p>
@@ -2581,7 +2581,7 @@ namespace Git.Commands
 </code></pre>
 </details>  
 </div>
-<div class="blog-text">
+<div id="conclusion" class="blog-text">
     <h1 class="h4 portfolio-title">Conclusão</h1>
 
     <p>
@@ -2613,7 +2613,7 @@ namespace Git.Commands
         E se você leu e entendeu tudo (ou quase tudo), espero que também tenha aprendido bastante com o projeto!
     </p>
 </div>
-<div class="blog-text">
+<div id="refs" class="blog-text">
   <h1 class="h4 portfolio-title">Referências</h1>
   <ol class="list-decimal list-inside space-y-1">
     <li><a href="https://www.gnu.org/software/trans-coord/manual/cvs/cvs.html" target="_blank" class="blog-link">Manual do CVS (GNU)</a></li>
@@ -2641,5 +2641,27 @@ namespace Git.Commands
         <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
         <script type="module" src="../../assets/js/index.js"></script>
+        <script type="module">
+            import { loadSideBarBlog } from "../../assets/js/elements/sidebar.js";
+
+            const sections = [
+                { id: "intro", label: "Introdução" },
+                { id: "history", label: "Estudar o passado é conhecer o presente" },
+                { id: "init", label: "Init e Objects" },
+                { id: "hash-object", label: "Hash-Object" },
+                { id: "cat-file", label: "Cat-File" },
+                { id: "write-tree", label: "Write-Tree" },
+                { id: "ls-tree", label: "Ls-Tree" },
+                { id: "add", label: "Add" },
+                { id: "commit", label: "Commit" },
+                { id: "branch", label: "Branch" },
+                { id: "switch", label: "Switch" },
+                { id: "merge", label: "Merge" },
+                { id: "conclusion", label: "Conclusão" },
+                { id: "refs", label: "Referências" },
+            ];
+
+            loadSideBarBlog(sections);
+        </script>
     </body>
 </html>

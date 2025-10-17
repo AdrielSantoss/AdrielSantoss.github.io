@@ -25,7 +25,7 @@ export function imgExpandedClickListener() {
 }
 
 export function scroll() {
-    getElement('.scroll-to').addEventListener('click', () => {
+    getElement('.scroll-to')?.addEventListener('click', () => {
         getElement('.portfolio-features').scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 }

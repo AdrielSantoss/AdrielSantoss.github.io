@@ -1,8 +1,6 @@
 import { getElement } from '../index.js';
 
 export function loadSideBar() {
-    const href = window.location.href;
-
     const mainContent = getElement('.main-body');
     mainContent.innerHTML = `
         <aside class="sidebar" data-sidebar>
@@ -124,144 +122,89 @@ export function loadSideBar() {
     });
 }
 
-export function loadSideBarBlog() {
-    const href = window.location.href;
+export function loadSideBarBlog(items = []) {
+    const sidebar = getElement('.sidebar');
+    if (!sidebar) return console.warn('Sidebar não encontrada.');
 
-    const sidebarContent = getElement('.sidebar');
-    sidebarContent.innerHTML = `
-            <div class="sidebar-info">
-                <h3 style="color: white">Tabela de conteúdo</h3>
-                <button class="info_more-btn" data-sidebar-btn style="margin-top: 10px">
-                    <span class="info_more_label">
-                        Exibir tabela
-                    </span>
+    sidebar.innerHTML = `
+        <div class="sidebar-info">
+            <h3 style="color: white">Tabela de conteúdo</h3>
+            <button class="info_more-btn" data-sidebar-btn style="margin-top: 10px">
+                <span class="info_more_label">Exibir tabela</span>
+                <ion-icon name="chevron-down"></ion-icon>
+            </button>
+        </div>
 
-                    <ion-icon name="chevron-down"></ion-icon>
-                </button>
-            </div>
+        <div class="sidebar-info_more" style="margin-top: 20px; transition: opacity 0.3s;">
+            <ul class="contacts-list"></ul>
+        </div>
 
-            <div class="sidebar-info_more" style="margin-top: 20px">
-                <ul  class="contacts-list">
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >1. Introdução</a
-                            >
-                        </div>
-                    </li>
+        <div class="separator"></div>
 
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >2. Estudar o passado é conhecer o presente</a
-                            >
-                        </div>
-                    </li>
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >3. Init e Objects</a
-                            >
-                        </div>
-                    </li>
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >4. Hash-Object</a
-                            >
-                        </div>
-                    </li>
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >5. Cat-File</a
-                            >
-                        </div>
-                    </li>
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >6. Write-Tree</a
-                            >
-                        </div>
-                    </li>                                        
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >7. Ls-Tree</a
-                            >
-                        </div>
-                    </li>      
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >8. Add</a
-                            >
-                        </div>
-                    </li>      
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >9. Commit</a
-                            >
-                        </div>
-                    </li>     
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >10. Branch</a
-                            >
-                        </div>
-                    </li>           
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >11. Switch</a
-                            >
-                        </div>
-                    </li>
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >12. Merge</a
-                            >
-                        </div>
-                    </li> 
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >13. Conclusão</a
-                            >
-                        </div>
-                    </li>
-                    <li class="contact-item">
-                        <div class="contact-info">
-                            <a href="mailto:adrieldossantos7@gmail.com" class="contact-link"
-                                >14. Referencias</a
-                            >
-                        </div>
-                    </li>                                                            
-                </ul>
-            </div>
+        <ul class="social-list">
+            <li class="social-item">
+                <a href="#" class="social-link">
+                    <ion-icon name="logo-facebook"></ion-icon>
+                </a>
+            </li>
+
+            <li class="social-item">
+                <a href="#" class="social-link">
+                    <ion-icon name="logo-twitter"></ion-icon>
+                </a>
+            </li>
+
+            <li class="social-item">
+                <a href="#" class="social-link">
+                    <ion-icon name="logo-instagram"></ion-icon>
+                </a>
+            </li>
+        </ul>
     `;
 
-    const infoMoreBtn = document.getElementsByClassName('info_more-btn')[0];
+    const list = sidebar.querySelector('.contacts-list');
 
-    infoMoreBtn.addEventListener('click', (event) => {
-        const sidebar = document.getElementsByClassName('sidebar')[0];
-        const sidebarInfoMore = document.getElementsByClassName('sidebar-info_more')[0];
-        const sidebarInfoMoreLabel = document.getElementsByClassName('info_more_label')[0];
+    items.forEach(({ id, label }, index) => {
+        const li = document.createElement('li');
+        li.classList.add('contact-item');
 
-        if (sidebarInfoMore.style.visibility === 'visible') {
+        const div = document.createElement('div');
+        div.classList.add('contact-info');
+
+        const a = document.createElement('a');
+        a.classList.add('contact-link');
+        a.textContent = `${index + 1}. ${label}`;
+        a.href = `#${id}`;
+
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = document.getElementById(id);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        div.appendChild(a);
+        li.appendChild(div);
+        list.appendChild(li);
+    });
+
+    const infoMoreBtn = sidebar.querySelector('.info_more-btn');
+    const sidebarInfoMore = sidebar.querySelector('.sidebar-info_more');
+    const sidebarInfoMoreLabel = sidebar.querySelector('.info_more_label');
+
+    infoMoreBtn.addEventListener('click', () => {
+        const isVisible = sidebarInfoMore.style.visibility === 'visible';
+        if (isVisible) {
             sidebarInfoMore.style.opacity = 0;
             sidebarInfoMore.style.visibility = 'hidden';
             sidebar.style.maxHeight = '100px';
-            sidebarInfoMoreLabel.innerHTML = 'Exibir tabela';
+            sidebarInfoMoreLabel.textContent = 'Exibir tabela';
         } else {
             sidebarInfoMore.style.opacity = 1;
             sidebarInfoMore.style.visibility = 'visible';
             sidebar.style.maxHeight = '800px';
-            sidebarInfoMoreLabel.innerHTML = 'Fechar tabela';
+            sidebarInfoMoreLabel.textContent = 'Fechar tabela';
         }
     });
 }
