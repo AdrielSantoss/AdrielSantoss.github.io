@@ -21,7 +21,6 @@ export function loadNavbar() {
     const currentItems = [
         new NavbarItem('About', '/index.html'),
         new NavbarItem('Resume', '/pages/main/resume.html'),
-        new NavbarItem('Portfolio', '/pages/main/portfolio.html'),
         new NavbarItem('Blog', '/pages/main/blog.html')
     ];
 
