@@ -28,6 +28,7 @@
                             <small class="tag">Rust</small>
                             <small class="tag">Diff</small>
                             <small class="tag">Compressão</small>
+                            <small class="tag">Git</small>
                         </div>
                     </section>
 
@@ -43,10 +44,10 @@
                                 pessoal, mas você pode implementar esses algoritmos em qualquer linguagem que desejar.
                             </p>
                             <p>
-                                Além da integração com o GitAdr, decidi disponibilizar o projeto separadamente no
-                                GitHub. Isso facilita seu uso em ambientes Windows, onde não há, por padrão, nenhuma
-                                ferramenta de diff de texto baseada no algoritmo de Myers — diferente do Linux, que já
-                                inclui o comando <code>diff</code>.
+                                Além da integração com o GitAdr, um dos motivos da criar esse projeto, é que no
+                                trabalho, atualmente eu utilizo Windows 11, e por padrão, o Windowes não possui nenhuma
+                                ferramenta de diff decente, todas são simples de força bruta de comparação linha a
+                                linha, nenhuma baseada no algoritmo do Myers.
                             </p>
                             <p>
                                 E, claro, um dos principais motivos para criar este projeto foi a oportunidade de
@@ -55,6 +56,64 @@
                         </div>
                         <div id="intro" class="about-text">
                             <h1 class="h4 portfolio-title">Estudar o passado é conhecer o presente</h1>
+
+                            <p>
+                                O primeiro algoritmo de diff eficiente foi implementado em <strong>1976</strong> para o
+                                sistema operacional Unix por <strong>Douglas McIlroy</strong> e
+                                <strong>James Hunt</strong> na Bell Labs — assim que surgiu a ferramenta diff que existe
+                                em todo Linux atualmente.
+                            </p>
+                            <p>
+                                Essa ferramenta de diff realiza comparação por <strong>linha</strong> e utiliza o
+                                algoritmo
+                                <a
+                                    href="https://en.wikipedia.org/wiki/Longest_common_subsequence"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >Longest common subsequence (LCS)</a
+                                >, esse algoritmo possui complexidade: <strong>O(n × m)</strong> de tempo e memória.
+                                Sendo <strong>n</strong> o tamanho (número de linhas) do primeiro arquivo e
+                                <strong>m</strong> o tamanho do segundo arquivo.
+                            </p>
+                            <p>
+                                Após o surgimento e popularização do diff baseado em LCS, surgiu o comando
+                                <code>patch</code> criado por Larry Wall (o mesmo criador do Perl). Esse comando
+                                permitia aplicar um arquivo .diff (também chamado .patch) para reconstruir a nova versão
+                                de um arquivo.
+                            </p>
+                            <p>Isso criou o ciclo clássico:</p>
+                            <pre><code>diff old new > changes.patch 
+patch old < changes.patch</code></pre>
+                            <p>
+                                Esse mecanismo se tornou fundamental para o desenvolvimento colaborativo de software
+                                livre (BSD, GNU, etc.).
+                            </p>
+                        </div>
+
+                        <div id="intro" class="about-text">
+                            <h1 class="h4 portfolio-title">LCS</h1>
+
+                            <p>
+                                Ao executar o comando: <code>diff old.txt new.txt > changes.patch</code> o sistema vai
+                                executar o diff com LCS, e criar um novo arquivo (changes.patch) onde estará armazenado
+                                o <strong>delta</strong>. O nome "delta" vem da letra grega Δ (delta), usada em
+                                matemática para representar mudança ou variação. Nesse caso, podemos dizer que o arquivo
+                                <code>changes.patch</code> é o <strong>delta</strong> entre <code>old.txt</code> e
+                                <code>new.txt</code>.
+                            </p>
+                            <p>Segue abaixo um exemplo de conteúdo de um delta:</p>
+
+                            <pre><code>@@ -1,3 +1,3 @@<span style="color: red;">-Linha antiga</span><span style="color: green;">+Linha nova</span>Linha que não mudou</code></pre>
+
+                            <p>
+                                Perceba que na primeira linha do arquivo de delta, existe isso:
+                                <code>@@ -1,3 +1,3 @@</code> essas informações indicam o "contenxto de mudança", isso é
+                                necessário pois um arquivo delta não armazena todo o conteúdo do arquivo original, ele
+                                apenas armazena hunks (nacos) de código, e a ferramenta <code>patch</code> (falarei do
+                                patch mais a diante), precisa saber examente qual ele deve aplicar as mudanças.
+                            </p>
+                            <p><code>@@</code>: Cada hunk começa com <code>@@</code> e termina com <code>@@</code>.</p>
+                            <p>Para entender melhor, veja esse exemplo de um delta:</p>
                         </div>
                     </section>
 
