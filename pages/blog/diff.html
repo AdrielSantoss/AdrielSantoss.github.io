@@ -116,7 +116,9 @@ patch old < changes.patch</code></pre>
                                 Ele calcula o Shortest Edit Script (SES) diretamente, sem precisar construir toda a
                                 matriz da programação dinâmica. A ideia central é representar o processo de edição em um
                                 grafo de caminhos de diferença e encontrar o caminho mais curto usando uma abordagem de
-                                expansão por diagonais.
+                                expansão por diagonais, com complexidade: <strong>Tempo:</strong>
+                                <code>O(N × D)</code> e <strong>Memória:</strong> <code>O(N + M)</code>, onde N e M são
+                                os tamanhos das duas sequências e D é o número mínimo de edições (inserções + deleções).
                             </p>
                             <p>
                                 De forma simplificada, imagine que, em vez de criar uma tabela inteira e percorrê-la até
@@ -173,10 +175,68 @@ Total: aproximadamente 20 células visitadas (em vez de 42)
                                 amplamente utilizado nas ferramentas de diff modernas até hoje.
                             </p>
                             <p>
-                                Diffs como <strong>Patience Diff</strong> ou <strong>Histogram Diff</strong> aplicam
-                                soluções heuristicas, na prática, são pequenas variações do algoritmo do Myers.
+                                Atualmente, o algoritmo de <strong>Myers</strong> é o padrão utilizado pelo
+                                <strong>Git</strong> para a geração de diffs. Ele também está presente nas principais
+                                distribuições Linux, integrado à ferramenta <code>diff</code> do pacote
+                                <code>GNU diffutils</code>. Esse módulo inclui, principalmente, os seguintes
+                                utilitários:
                             </p>
-                            <p><strong>Patience Diff:</strong> Criado por Brah</p>
+
+                            <p>
+                                <code>diff:</code> compara dois arquivos ou diretórios e exibe as diferenças linha a
+                                linha. (<em>Utiliza o algoritmo de Myers</em>) <br /><br />
+
+                                <code>cmp:</code> compara dois arquivos byte a byte (ou linha a linha), indicando o
+                                ponto exato em que diferem. (<em>Não utiliza o algoritmo de Myers</em>) <br /><br />
+
+                                <code>diff3:</code> compara três arquivos — normalmente o “original”, a “versão A” e a
+                                “versão B” — e pode gerar uma fusão (<em>merge</em>) com indicação de conflitos. (<em
+                                    >Utiliza o algoritmo de Myers</em
+                                >) <br /><br />
+
+                                <code>sdiff:</code> compara dois arquivos lado a lado e permite, de forma interativa,
+                                escolher ou mesclar alterações. (<em>Utiliza o algoritmo de Myers</em>)
+                            </p>
+
+                            <p>
+                                Alternativas modernas de Diffs como <strong>Patience Diff</strong> ou
+                                <strong>Histogram Diff</strong> aplicam soluções heuristicas, na prática, são pequenas
+                                variações do algoritmo LCS, ambos com menos perfomance, mas com maior foco em melhorar a
+                                legibilidade do diff.
+                            </p>
+                            <p>
+                                <strong>Sobre o Patience Diff:</strong> foi criado por Bram Cohen (criador do
+                                BitTorrent) em 2007. Em 2008, chegou a ser adotado pelo sistema de controle de versão
+                                <strong>Bazaar</strong> e, em 2010, a equipe do Git adicionou suporte ao algoritmo por
+                                meio da opção <code>--diff-algorithm=patience</code>.
+                            </p>
+                            <p>
+                                Esse algoritmo prioriza a geração de diffs mais <strong>legíveis</strong> para humanos.
+                                Ele faz isso detectando <code>anchors</code> (âncoras), que são linhas únicas presentes
+                                em ambos os arquivos, e aplica o diff apenas <em>entre</em> essas âncoras. Para
+                                identificar essas âncoras, o algoritmo utiliza uma ordenação seguida da resolução do
+                                problema da <strong>LIS</strong> (<em>Longest Increasing Subsequence</em> — subsequência
+                                crescente mais longa).
+                            </p>
+                            <p>
+                                Porém, se nenhuma âncora for encontrada — ou seja, se os arquivos A e B forem
+                                extremamente diferentes —, o <em>Patience Diff</em> passa a utilizar o algoritmo de
+                                <strong>Myers</strong> como estratégia de fallback. Em condições normais, o
+                                <em>Patience Diff</em> possui complexidade de tempo média <code>O(n log n)</code> e
+                                complexidade de memória <code>O(n)</code>, mas, ao recorrer ao algoritmo de Myers, a
+                                complexidade pode chegar a <code>O(n × m)</code> tanto em tempo quanto em uso de
+                                memória.
+                            </p>
+
+                            <p>
+                                <strong>Sobre o Histogram Diff:</strong> esse algoritmo foi introduzido posteriormente
+                                no Git como uma evolução do <em>Patience Diff</em>. Ele também busca gerar diffs mais
+                                <strong>legíveis</strong>, mas utiliza um método baseado em
+                                <strong>histogramas de frequência</strong> para identificar linhas únicas e
+                                significativas nos arquivos. Dessa forma, ele equilibra bem a clareza do resultado com
+                                uma melhor cobertura de mudanças, sendo especialmente útil em arquivos com muitas
+                                repetições de linhas semelhantes. HistogramDiff foi adicionado em 2011 no Git.
+                            </p>
                         </div>
 
                         <div id="intro" class="about-text">
@@ -205,6 +265,8 @@ Total: aproximadamente 20 células visitadas (em vez de 42)
                             <p>Para entender melhor, veja esse exemplo de um delta:</p>
                         </div>
                     </section>
+
+                    <p>https://bramcohen.livejournal.com/73318.html</p>
 
                     <section class="working-in-progress"></section>
                 </article>
