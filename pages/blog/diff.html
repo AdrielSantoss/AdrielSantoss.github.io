@@ -88,6 +88,95 @@ patch old < changes.patch</code></pre>
                                 Esse mecanismo se tornou fundamental para o desenvolvimento colaborativo de software
                                 livre (BSD, GNU, etc.).
                             </p>
+                            <p>
+                                É importante destacar que o algoritmo de LCS utiliza
+                                <strong>programação dinâmica</strong> para resolver o problema. Programação dinâmica é
+                                uma técnica para resolver problemas complexos dividindo-os em subproblemas menores e
+                                reaproveitando resultados já calculados. Ou seja, o problema é resolvido por etapas
+                                (quase sempre utilizando matrizes, mas isso depende do problema).
+                            </p>
+                            <p>
+                                No caso do algoritmo LCS, a solução envolve criar e percorrer uma matriz de acordo com
+                                as linhas dos arquivos que estão sendo comparados. Essa é uma matriz m × n (m = tamanho
+                                do arquivo 1, n = tamanho do arquivo 2), com complexidade:
+                                <code>Tempo: O(m × n) | Memória: O(m × n)</code>. Isso pode ser viável para textos
+                                curtos, mas torna-se completamente inviável para arquivos grandes (por exemplo, milhares
+                                de linhas).
+                            </p>
+                            <p>
+                                Em 1986, esse problema de performance foi resolvido por um cientista da computação
+                                norte-americano chamado <strong>Eugene W. Myers</strong>, que se tornou muito famoso
+                                pelo seu artigo:
+                                <a href="http://www.xmailserver.org/diff2.pdf" class="blog-link">
+                                    An O(ND) Difference Algorithm and Its Variations </a
+                                >. Nesse artigo, Myers apresenta uma otimização da solução do problema de LCS de forma
+                                extremamente eficiente.
+                            </p>
+                            <p>
+                                Ele calcula o Shortest Edit Script (SES) diretamente, sem precisar construir toda a
+                                matriz da programação dinâmica. A ideia central é representar o processo de edição em um
+                                grafo de caminhos de diferença e encontrar o caminho mais curto usando uma abordagem de
+                                expansão por diagonais.
+                            </p>
+                            <p>
+                                De forma simplificada, imagine que, em vez de criar uma tabela inteira e percorrê-la até
+                                chegar à última célula, o algoritmo de Myers realiza <strong>atalhos</strong>,
+                                caminhando apenas pelas diagonais até atingir a última célula da matriz.
+                            </p>
+                            <p>
+                                Para entender melhor, veja este exemplo visual de uma matriz sendo percorrida pelo
+                                algoritmo LCS:
+                            </p>
+
+                            <pre><code>
+arquiv0_A = "ABCABBA"
+arquivo_B = "CBABAC"
+
+    C     B     A    B    A     C
+    +---+---+---+---+---+---+---+--+
+A | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+B | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+C | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+A | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+B | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+B | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+A | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+Total: 7 × 6 = 42 operações
+Ou seja, ele percorre toda a matriz.
+</code></pre>
+                            <p>Agora visualize o trajeto do algoritmo Myers resolvendo o mesmo problema:</p>
+                            <pre><code>
+arquiv0_A = "ABCABBA"
+arquivo_B = "CBABAC"
+
+    C     B     A    B    A     C
+    +---+---+---+---+---+---+---+--+
+A | ⬛ | ⬛ | ✅ | ⬛ | ⬛ | ⬛ |
+B | ⬛ | ✅ | ✅ | ✅ | ⬛ | ⬛ |
+C | ✅ | ✅ | ⬛ | ⬛ | ⬛ | ✅ |
+A | ⬛ | ✅ | ✅ | ⬛ | ✅ | ⬛ |
+B | ⬛ | ✅ | ✅ | ✅ | ⬛ | ⬛ |
+B | ⬛ | ⬛ | ✅ | ✅ | ✅ | ⬛ |
+A | ⬛ | ⬛ | ✅ | ✅ | ✅ | ✅ |
+
+✅ = célula realmente explorada.
+⬛ = célula ignorada/fora do caminho possível.
+
+Total: aproximadamente 20 células visitadas (em vez de 42)
+</code></pre>
+                            <p>
+                                O objetivo de qualquer algoritmo de diff é gerar o Shortest Edit Script (SES): O menor
+                                conjunto de operações (inserções e deleções) necessárias para transformar uma sequência
+                                A em B. Atualmente, o algoritmo de Myers encontra a <strong>solução ótimo</strong> para
+                                o problema do SES, isto é, resolve o problema de forma mais eficiente possivel, e é
+                                amplamente utilizado nas ferramentas de diff modernas até hoje.
+                            </p>
+                            <p>
+                                Diffs como <strong>Patience Diff</strong> ou <strong>Histogram Diff</strong> aplicam
+                                soluções heuristicas, na prática, são pequenas variações do algoritmo do Myers.
+                            </p>
+                            <p><strong>Patience Diff:</strong> Criado por Brah</p>
                         </div>
 
                         <div id="intro" class="about-text">
