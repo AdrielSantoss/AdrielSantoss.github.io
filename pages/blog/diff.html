@@ -107,7 +107,7 @@ patch old < changes.patch</code></pre>
                                 Em 1986, esse problema de performance foi resolvido por um cientista da computação
                                 norte-americano chamado <strong>Eugene W. Myers</strong>, que se tornou muito famoso
                                 pelo seu artigo:
-                                <a href="http://www.xmailserver.org/diff2.pdf" class="blog-link">
+                                <a href="http://www.xmailserver.org/diff2.pdf" class="blog-link" target="_blank">
                                     An O(ND) Difference Algorithm and Its Variations </a
                                 >. Nesse artigo, Myers apresenta uma otimização da solução do problema de LCS de forma
                                 extremamente eficiente.
@@ -170,10 +170,11 @@ Total: aproximadamente 20 células visitadas (em vez de 42)
                             <p>
                                 O objetivo de qualquer algoritmo de diff é gerar o Shortest Edit Script (SES): O menor
                                 conjunto de operações (inserções e deleções) necessárias para transformar uma sequência
-                                A em B. Atualmente, o algoritmo de Myers encontra a <strong>solução ótimo</strong> para
+                                A em B. Atualmente, o algoritmo de Myers encontra a <strong>solução ótima</strong> para
                                 o problema do SES, isto é, resolve o problema de forma mais eficiente possivel, e é
                                 amplamente utilizado nas ferramentas de diff modernas até hoje.
                             </p>
+
                             <p>
                                 Atualmente, o algoritmo de <strong>Myers</strong> é o padrão utilizado pelo
                                 <strong>Git</strong> para a geração de diffs. Ele também está presente nas principais
@@ -240,15 +241,14 @@ Total: aproximadamente 20 células visitadas (em vez de 42)
                         </div>
 
                         <div id="intro" class="about-text">
-                            <h1 class="h4 portfolio-title">LCS</h1>
-
+                            <h1 class="h4 portfolio-title">Deltas e Hunks</h1>
                             <p>
-                                Ao executar o comando: <code>diff old.txt new.txt > changes.patch</code> o sistema vai
-                                executar o diff com LCS, e criar um novo arquivo (changes.patch) onde estará armazenado
-                                o <strong>delta</strong>. O nome "delta" vem da letra grega Δ (delta), usada em
-                                matemática para representar mudança ou variação. Nesse caso, podemos dizer que o arquivo
-                                <code>changes.patch</code> é o <strong>delta</strong> entre <code>old.txt</code> e
-                                <code>new.txt</code>.
+                                Ao executar o comando no Linux: <code>diff old.txt new.txt > changes.patch</code> o
+                                sistema vai executar o diff, e criar um novo arquivo (changes.patch) onde estará
+                                armazenado o <strong>delta</strong>. O nome "delta" vem da letra grega Δ (delta), usada
+                                em matemática para representar mudança ou variação. Nesse caso, podemos dizer que o
+                                arquivo <code>changes.patch</code> é o <strong>delta</strong> entre
+                                <code>old.txt</code> e <code>new.txt</code>.
                             </p>
                             <p>Segue abaixo um exemplo de conteúdo de um delta:</p>
 
@@ -258,15 +258,55 @@ Total: aproximadamente 20 células visitadas (em vez de 42)
                                 Perceba que na primeira linha do arquivo de delta, existe isso:
                                 <code>@@ -1,3 +1,3 @@</code> essas informações indicam o "contenxto de mudança", isso é
                                 necessário pois um arquivo delta não armazena todo o conteúdo do arquivo original, ele
-                                apenas armazena hunks (nacos) de código, e a ferramenta <code>patch</code> (falarei do
-                                patch mais a diante), precisa saber examente qual ele deve aplicar as mudanças.
+                                apenas armazena hunks (nacos) de código, e a ferramenta <code>patch</code>, precisa
+                                saber examente qual ele deve aplicar as mudanças.
                             </p>
                             <p><code>@@</code>: Cada hunk começa com <code>@@</code> e termina com <code>@@</code>.</p>
-                            <p>Para entender melhor, veja esse exemplo de um delta:</p>
+                            <p>
+                                Você provavelmente já se deparou com algo assim ao visualizar as alterações de um commit
+                                no <strong>Git</strong>. Veja o exemplo abaixo:
+                            </p>
+
+                            <div class="item item-diagrama">
+                                <img
+                                    src="../../assets/images/blog/diff-github-example.png"
+                                    class="img-expanded"
+                                    style="width: 100%"
+                                />
+                                <div class="item-description">
+                                    <small><i>Visualização de um diff no GitHub.</i></small>
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <p>
+                                Quando uma nova linha é adicionada, ela é marcada com o símbolo
+                                <small style="color: green">+</small>. Já quando uma linha é removida, ela aparece com o
+                                símbolo <small style="color: red">−</small>. Esse é o formato mais comum para arquivos
+                                de <em>patch</em>, conhecido como
+                                <a
+                                    href="https://www.gnu.org/software/diffutils/manual/html_node/Unified-Format.html"
+                                    class="blog-link"
+                                    target="_blank"
+                                    >Unified Format</a
+                                >.
+                            </p>
+                        </div>
+
+                        <div id="intro" class="about-text">
+                            <h1 class="h4 portfolio-title">LCS</h1>
+
+                            <p>
+                                A melhor forma de entender e implementar o algoritmo de Myers ou o Patience é começando
+                                pela raiz: O LCS. Entender o problema de LCS e a algoritmo clássico é impormtante para
+                                mais a frente compreender a solução ótima do Myers e a heuristica do Patience.
+                            </p>
                         </div>
                     </section>
 
                     <p>https://bramcohen.livejournal.com/73318.html</p>
+                    <p>https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html</p>
 
                     <section class="working-in-progress"></section>
                 </article>
