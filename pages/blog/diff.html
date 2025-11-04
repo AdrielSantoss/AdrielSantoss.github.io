@@ -168,11 +168,14 @@ A | ⬛ | ⬛ | ✅ | ✅ | ✅ | ✅ |
 Total: aproximadamente 20 células visitadas (em vez de 42)
 </code></pre>
                             <p>
-                                O objetivo de qualquer algoritmo de diff é gerar o Shortest Edit Script (SES): O menor
-                                conjunto de operações (inserções e deleções) necessárias para transformar uma sequência
-                                A em B. Atualmente, o algoritmo de Myers encontra a <strong>solução ótima</strong> para
-                                o problema do SES, isto é, resolve o problema de forma mais eficiente possivel, e é
-                                amplamente utilizado nas ferramentas de diff modernas até hoje.
+                                O objetivo de qualquer algoritmo de diff é gerar o
+                                <a href="https://en.wikipedia.org/wiki/Edit_distance" class="blog-link" target="_blank"
+                                    >Shortest Edit Script (SES)</a
+                                >: O menor conjunto de operações (inserções e deleções) necessárias para transformar uma
+                                sequência A em B. Atualmente, o algoritmo de Myers encontra a
+                                <strong>solução ótima</strong> para o problema do SES, isto é, resolve o problema de
+                                forma mais eficiente possivel, e é amplamente utilizado nas ferramentas de diff modernas
+                                até hoje.
                             </p>
 
                             <p>
@@ -216,8 +219,14 @@ Total: aproximadamente 20 células visitadas (em vez de 42)
                                 Ele faz isso detectando <code>anchors</code> (âncoras), que são linhas únicas presentes
                                 em ambos os arquivos, e aplica o diff apenas <em>entre</em> essas âncoras. Para
                                 identificar essas âncoras, o algoritmo utiliza uma ordenação seguida da resolução do
-                                problema da <strong>LIS</strong> (<em>Longest Increasing Subsequence</em> — subsequência
-                                crescente mais longa).
+                                problema da
+                                <a
+                                    href="https://en.wikipedia.org/wiki/Longest_increasing_subsequence"
+                                    class="blog-link"
+                                    target="_blank"
+                                    ><strong>LIS</strong> (<em>Longest Increasing Subsequence</em> — subsequência
+                                    crescente mais longa).</a
+                                >.
                             </p>
                             <p>
                                 Porém, se nenhuma âncora for encontrada — ou seja, se os arquivos A e B forem
@@ -298,9 +307,48 @@ Total: aproximadamente 20 células visitadas (em vez de 42)
                             <h1 class="h4 portfolio-title">LCS</h1>
 
                             <p>
-                                A melhor forma de entender e implementar o algoritmo de Myers ou o Patience é começando
-                                pela raiz: O LCS. Entender o problema de LCS e a algoritmo clássico é impormtante para
-                                mais a frente compreender a solução ótima do Myers e a heuristica do Patience.
+                                A melhor forma de compreender e implementar algoritmos como o <strong>Myers</strong> ou
+                                o <strong>Patience</strong> é começar pela sua base: o <strong>LCS clássico</strong>.
+                                Entender o problema da LCS e o funcionamento do algoritmo tradicional é essencial para,
+                                posteriormente, compreender tanto a solução ótima proposta por Myers quanto a heurística
+                                empregada pelo Patience.
+                            </p>
+
+                            <p>O problema de LCS pode ser resumido da seguinte forma:</p>
+
+                            <pre><code>Dadas duas sequências, queremos encontrar a maior subsequência que aparece em ambas, 
+mantendo a ordem, mas não necessariamente de forma contígua.</code></pre>
+
+                            <p>
+                                Vamos imaginar duas listas. Nosso objetivo é descobrir qual é a maior subsequência comum
+                                entre <code>Lista_A</code> e <code>Lista_B</code>. Veja o exemplo:
+                            </p>
+
+                            <pre><code>Lista_A = A B C D G H
+Lista_B = A E D F H R
+
+"A": aparece nas duas → ✅
+"D": aparece nas duas, depois de "A" → ✅
+"H": aparece nas duas, depois de "D" → ✅
+
+LCS = A D H
+</code></pre>
+
+                            <p>Perceba que a LCS encontrada (<code>A D H</code>) respeita as seguintes regras:</p>
+
+                            <p>
+                                1. Os elementos aparecem tanto em <code>Lista_A</code> quanto em <code>Lista_B</code> →
+                                <i>comum</i> <br /><br />
+
+                                2. Eles mantêm a mesma ordem nas duas listas → <i>subsequência</i> <br /><br />
+
+                                3. <code>A D H</code> é a maior sequência possível que atende às condições anteriores →
+                                <i>mais longa</i>
+                            </p>
+
+                            <p>
+                                Cumprindo essas três condições, obtemos a
+                                <strong>Subsequência Comum Mais Longa (LCS)</strong> que buscávamos.
                             </p>
                         </div>
                     </section>
