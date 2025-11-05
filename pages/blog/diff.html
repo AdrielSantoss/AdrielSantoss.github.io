@@ -347,9 +347,194 @@ LCS = A D H
                             </p>
 
                             <p>
-                                Cumprindo essas três condições, obtemos a
-                                <strong>Subsequência Comum Mais Longa (LCS)</strong> que buscávamos.
+                                Em um algoritmo de <strong>diff de texto</strong>, o papel da LCS é identificar quais
+                                linhas <strong>não mudaram</strong> entre o arquivo A e o arquivo B. A partir dessa
+                                subsequência comum, o algoritmo consegue determinar quais linhas foram
+                                <strong>adicionadas</strong> ou <strong>removidas</strong>.
                             </p>
+
+                            <p>
+                                Com base nisso, é gerado o <strong>Shortest Edit Script (SES)</strong>, que representa o
+                                conjunto mínimo de operações necessárias para transformar o arquivo A no arquivo B. Cada
+                                linha é associada a um tipo de <strong>operação</strong>, são elas:
+                            </p>
+
+                            <ul>
+                                <li><strong>EQUAL</strong>: linha presente em ambos os arquivos (parte da LCS).</li>
+                                <li>
+                                    <strong>INSERT</strong> (<small style="color: green">+</small>): linha adicionada em
+                                    B.
+                                </li>
+                                <li>
+                                    <strong>DELETE</strong> (<small style="color: red">−</small>): linha removida de A.
+                                </li>
+                            </ul>
+
+                            <p>Exemplo:</p>
+
+                            <pre><code>Arquivo A:
+1. nome = "Alice"
+2. idade = 25
+3. cidade = "São Paulo"
+
+Arquivo B:
+1. nome = "Alice"
+2. idade = 26
+3. país = "Brasil"
+4. cidade = "São Paulo"
+
+LCS: ["nome = 'Alice'", "cidade = 'São Paulo'"]
+
+SES:
+  nome = "Alice" → EQUAL
+- idade = 25 → DELETE
++ idade = 26 → INSERT
++ país = "Brasil" → INSERT
+  cidade = "São Paulo" → EQUAL
+</code></pre>
+
+                            <p>
+                                Para entender com precisão como obter a operação para cada linha de cada arquivo, a
+                                lógica é a seguinte:
+                            </p>
+                            <pre><code>
+Validação para identificar a operação necessária:
+
+Arquivo A:
+1. Se essa linha existe na LCS → EQUAL
+2. Se essa linha não existe na LCS → DELETE
+
+Arquivo B:
+1. Se essa linha existe na LCS → EQUAL
+2. Se essa linha não existe na LCS → INSERT
+
+SES EXPLICADO:
+  nome = "Alice" → EQUAL, ESSA LINHA EXISTE NA LCS.
+- idade = 25 → DELETE, ESSA LINHA NÃO EXISTE NA LCS. (LINHA DO ARQUIVO A)
++ idade = 26 → INSERT, ESSA LINHA NÃO EXISTE NA LCS. (LINHA DO ARQUIVO B)
++ país = "Brasil" → INSERT, ESSA LINHA NÃO EXISTE NA LCS. (LINHA DO ARQUIVO B)
+  cidade = "São Paulo" → EQUAL, ESSA LINHA EXISTE NA LCS.
+</code></pre>
+                            <p>
+                                É assim que um diff totalmente baseado no algoritmo de LCS clássico funciona, primeiro
+                                identifica o que <strong>não mudou (LCS)</strong> e depois identifica qual é a
+                                <strong>operação</strong> necessária para cada linha que <strong>mudou</strong> (SES).
+                            </p>
+                            <p>
+                                Como mencionado anteriormente, o problema dessa abordagem, é que ela é ineficiente para
+                                arquivos grandes, com muitas linhas e muitas alterações, mas para entender esse déficit,
+                                temos que sair da teoria e ir para o campo prático, e verificar como funciona a
+                                construção desse algoritmo.
+                            </p>
+                            <p>Segue abaixo o algoritmo que obtém a LCS em Rust:</p>
+
+                            <details>
+                                <summary>Código fonte do algoritmo LCS</summary>
+                                <pre><code>
+fn main() {
+    println!("Resolvendo o problema da LCS!");
+    let entries_a = vec!["A", "G", "G", "T", "A", "B"];
+    let entries_b = vec!["G", "X", "T", "X", "A", "Y", "B"]; 
+
+    let mut dp: Vec&lt;Vec&lt;i32&gt;&gt; = vec![vec![0; entries_b.len() + 1]; entries_a.len() + 1];
+    let lcs_len = dp[entries_a.len()][entries_b.len()];
+
+    for i in 1..=entries_a.len() {
+        for j in 1..=entries_b.len()  {
+            if entries_a[i-1] == entries_b[j-1] {
+                dp[i][j] = dp[i-1][j-1] + 1;
+            }
+            else {
+                dp[i][j] = dp[i-1][j].max(dp[i][j-1]);
+            }
+        }
+    }
+
+    println!("o tamanho da LCS é: {}", lcs_len);
+
+    let mut i = entries_a.len();
+    let mut j = entries_b.len();
+    let mut lcs: Vec&lt;&str&gt; = Vec::new();
+
+    while i > 0 && j > 0 {
+        if entries_a[i-1] == entries_b[j-1] {
+            lcs.push(entries_a[i-1]);
+            j -= 1;
+            i -= 1;
+        }
+        else if dp[i-1][j] > dp[i][j-1] {
+            i -= 1;
+        }
+        else {
+            j -= 1;
+        }
+    }
+
+    lcs.reverse();
+    println!("LCS completa é: {:?}", lcs);
+}
+</code></pre>
+                            </details>
+
+                            <p>
+                                O primeiro <strong>subproblema</strong> que precisamos resolver é: determinar o
+                                <strong>tamanho</strong> da LCS. Esse resultado é fundamental, pois será utilizado
+                                posteriormente para reconstruir a subsequência comum mais longa em si.
+                            </p>
+
+                            <p>
+                                Para isso, inicializamos uma matriz <code>dp</code> (<em>dynamic programming</em>)
+                                preenchida com zeros. Ela possui tamanho <strong>(m + 1) × (n + 1)</strong>, onde
+                                <strong>m</strong> = <code>entries_a.len()</code> (comprimento de <em>A</em>) e
+                                <strong>n</strong> = <code>entries_b.len()</code> (comprimento de <em>B</em>).
+                            </p>
+
+                            <p>
+                                Em seguida, utilizamos dois laços <code>for</code> aninhados para percorrer cada posição
+                                da matriz, conforme mostrado abaixo:
+                            </p>
+
+                            <pre><code>
+for i in 1..=entries_a.len() {
+    for j in 1..=entries_b.len() {
+        if entries_a[i - 1] == entries_b[j - 1] {
+            dp[i][j] = dp[i - 1][j - 1] + 1;
+        } else {
+            dp[i][j] = dp[i - 1][j].max(dp[i][j - 1]);
+        }
+    }
+}
+</code></pre>
+                            <p>
+                                Essa abordagem tem uma complexidade de tempo de
+                                <strong>O(m × n)</strong>, pois cada célula da matriz é visitada exatamente uma vez.
+                                Embora eficiente do ponto de vista teórico-polynomial, o custo de armazenamento e
+                                processamento pode se tornar elevado para arquivos muito grandes — especialmente nas
+                                décadas de 1970 e 1980, quando recursos de memória e CPU eram extremamente limitados.
+                            </p>
+                            <p>Dentro dos for, existe isso:</p>
+                            <pre><code>
+if entries_a[i - 1] == entries_b[j - 1] {
+    dp[i][j] = dp[i - 1][j - 1] + 1;
+} else {
+    dp[i][j] = dp[i - 1][j].max(dp[i][j - 1]);
+}
+</code></pre>
+                            <p>
+                                Você deve estar se perguntando: "que raios esta acontecendo aqui?". Essa é a parte
+                                "mágica" do algoritmo, onde a matemática entra na jogada.
+                            </p>
+                            <p>A fórmula matemática original é essa:</p>
+
+                            <div class="item item-diagrama">
+                                <img
+                                    src="../../assets/images/blog/diff-lcs.png"
+                                    class="img-expanded"
+                                    style="width: 100%"
+                                />
+                            </div>
+                            <br />
+                            <p>Fórmula adaptada para programação dinâmica:</p>
                         </div>
                     </section>
 
