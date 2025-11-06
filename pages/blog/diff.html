@@ -437,7 +437,6 @@ fn main() {
     let entries_b = vec!["G", "X", "T", "X", "A", "Y", "B"]; 
 
     let mut dp: Vec&lt;Vec&lt;i32&gt;&gt; = vec![vec![0; entries_b.len() + 1]; entries_a.len() + 1];
-    let lcs_len = dp[entries_a.len()][entries_b.len()];
 
     for i in 1..=entries_a.len() {
         for j in 1..=entries_b.len()  {
@@ -450,6 +449,7 @@ fn main() {
         }
     }
 
+    let lcs_len = dp[entries_a.len()][entries_b.len()];
     println!("o tamanho da LCS é: {}", lcs_len);
 
     let mut i = entries_a.len();
@@ -534,7 +534,102 @@ if entries_a[i - 1] == entries_b[j - 1] {
                                 />
                             </div>
                             <br />
-                            <p>Fórmula adaptada para programação dinâmica:</p>
+                            <p>Fórmula adaptada para programação dinâmica com a matriz <code>dp</code>:</p>
+
+                            <div class="item item-diagrama">
+                                <img
+                                    src="../../assets/images/blog/diff-lcs-dp.png"
+                                    class="img-expanded"
+                                    style="width: 100%"
+                                />
+                            </div>
+
+                            <br />
+
+                            <p>
+                                Não vou entrar no detalhe matemático dessas fórmulas, apenas vou mostrar o funcionamento
+                                do algoritmo a nivel de programação, caso queira entender essas fórmulas detalhadamente,
+                                recomendo esse artigo:
+                                <a
+                                    href="https://ics.uci.edu/~dhirschb/pubs/p664-hirschberg.pdf"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                ></a>
+                                <a
+                                    href="https://ics.uci.edu/~dhirschb/pubs/p664-hirschberg.pdf"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >Algorithms for the Longest Common Subsequence Problem </a
+                                >. Segue abaixo uma explicação da aplicação das fórmulas do algoritmo em pseudocódigo:
+                            </p>
+
+                            <code>
+                                <pre>
+i = Linha
+j = Coluna
+
+formula 1: dp[i][j] = dp[i - 1][j - 1] + 1;
+formula 2: dp[i - 1][j].max(dp[i][j - 1]); (recebe o maior valor entre "dp[i - 1][j]" e "dp[i][j - 1]")
+
+Quando aplicar cada fórmula:
+
+se entries_a[i - 1] == entries_b[j - 1] → dp[i][j] = dp[i - 1][j - 1] + 1; (fórmula 1)
+se não → dp[i - 1][j].max(dp[i][j - 1]); (fórmula 2)
+                            </pre
+                                >
+                            </code>
+                            <br />
+                            <p>
+                                Após percorrer toda a matriz e setar cada célula com o valor obtido pelas
+                                <strong>fórmulas</strong>, vamos obter uma matriz <code>dp</code> nesse estilo:
+                            </p>
+                            <pre><code>
+let entries_a = vec!["A", "G", "G", "T", "A", "B"];
+let entries_b = vec!["G", "X", "T", "X", "A", "Y", "B"]; 
+
+Matriz dp:
+
+     G   X  T  X  A  Y  B
+     A   0  0  0  0  1  1  1
+     G   1  1  1  1  1  1  1
+     G   1  1  1  1  1  1  1
+     T   1  1  2  2  2  2  2
+     A   1  1  2  2  3  3  3
+     B   1  1  2  2  3  3  4
+</code></pre>
+                            <p>
+                                Perceba o último valor da última célula da dp, na posição: <code>dp[6][8]</code>, o
+                                valor obtido é <strong>4</strong>, esse é o <strong>tamanho da LCS!</strong>
+                            </p>
+                            <p>
+                                Agora, temos que resolver o segundo — e último — subproblema, que é: obter a LCS. Para
+                                isso será necessário utilizar a matriz <code>dp</code> que criamos para resolver o
+                                problema anterior.
+                            </p>
+                            <p>Nesse momento, estamos estudando essa parte do algoritmo:</p>
+                            <pre><code>
+let mut i = entries_a.len();
+let mut j = entries_b.len();
+let mut lcs: Vec&lt;&str&gt; = Vec::new();
+
+while i > 0 && j > 0 {
+    if entries_a[i-1] == entries_b[j-1] {
+        lcs.push(entries_a[i-1]);
+        j -= 1;
+        i -= 1;
+    }
+    else if dp[i-1][j] > dp[i][j-1] {
+        i -= 1;
+    }
+    else {
+        j -= 1;
+    }
+}
+
+lcs.reverse();
+println!("LCS completa é: {:?}", lcs);</code></pre>
+
+                            <p></p>
                         </div>
                     </section>
 
