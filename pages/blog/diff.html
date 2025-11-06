@@ -589,13 +589,15 @@ let entries_b = vec!["G", "X", "T", "X", "A", "Y", "B"];
 
 Matriz dp:
 
-     G   X  T  X  A  Y  B
-     A   0  0  0  0  1  1  1
-     G   1  1  1  1  1  1  1
-     G   1  1  1  1  1  1  1
-     T   1  1  2  2  2  2  2
-     A   1  1  2  2  3  3  3
-     B   1  1  2  2  3  3  4
+      |   | G | X | T | X | A | Y | B
+      | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+  A   | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1
+  G   | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1
+  G   | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1
+  T   | 0 | 1 | 1 | 2 | 2 | 2 | 2 | 2
+  A   | 0 | 1 | 1 | 2 | 2 | 3 | 3 | 3
+  B   | 0 | 1 | 1 | 2 | 2 | 3 | 3 | 4
+
 </code></pre>
                             <p>
                                 Perceba o último valor da última célula da dp, na posição: <code>dp[6][8]</code>, o
