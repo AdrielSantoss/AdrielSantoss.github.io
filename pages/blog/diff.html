@@ -631,7 +631,65 @@ while i > 0 && j > 0 {
 lcs.reverse();
 println!("LCS completa é: {:?}", lcs);</code></pre>
 
-                            <p></p>
+                            <p>
+                                Nessa etapa do algoritmo ocorre o processo conhecido como <strong>backtracking</strong>.
+                                Ele consiste em percorrer a matriz <code>dp</code> de trás para frente — isto é,
+                                partindo do último elemento até o primeiro — para reconstruir a subsequência comum mais
+                                longa (LCS).
+                            </p>
+                            <p>
+                                A cada iteração, comparamos os caracteres das duas sequências e seguimos o caminho que
+                                levou ao valor atual da matriz. Se <code>entries_a[i - 1] == entries_b[j - 1]</code>,
+                                significa que esse caractere faz parte da LCS. Ele é adicionado ao resultado, e movemos
+                                diagonalmente (<code>i -= 1</code> e <code>j -= 1</code>).
+                            </p>
+                            <p>
+                                Caso contrário, seguimos o maior valor entre <code>dp[i - 1][j]</code> e
+                                <code>dp[i][j - 1]</code> — ou seja, avançamos na direção onde há uma subsequência comum
+                                mais longa.
+                            </p>
+                            <p>
+                                No fim do processo, obtemos a LCS na ordem inversa, por isso é necessário aplicar
+                                <code>lcs.reverse()</code> para recuperar a sequência correta.
+                            </p>
+                            <p>Veja esse exemplo visual da matriz <code>dp</code> sendo percorrida:</p>
+
+                            <pre><code>
+Lógica explicada:
+entries_a[i-1] == entries_b[j-1]: Elementos iguais, faz parte da LCS, anda na Diagonal (↖)
+dp[i-1][j] > dp[i][j-1]: Elementos diferentes, não faz parte da LCS, anda para cima ↑
+dp[i-1][j] > dp[i][j-1]: Elementos diferentes, não faz parte da LCS, anda para esquerda ←
+
+Dp:
+      |   | G | X | T | X | A | Y | B
+      | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0
+  A   | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1
+  G   | 0 | 1↖| 1 | 1 | 1 | 1 | 1 | 1
+  G   | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1
+  T   | 0 | 1 | 1 | 2↖| 2 | 2 | 2 | 2
+  A   | 0 | 1 | 1 | 2 | 2 | 3↖| 3 | 3
+  B   | 0 | 1 | 1 | 2 | 2 | 3 | 3 | 4↖
+
+O backtraking percorreu 4 células diagonais: (6,7) → (5,5) → (4,3) → (2,1)
+Cada uma representa um elemento da LCS: G, T, A, B</code></pre>
+
+                            <p>
+                                E essa é a explicação geral do algoritmo utilizado pelos diffs baseados no LCS clássico.
+                                Vale destacar que o algoritmo de LCS não é aplicado apenas em ferramentas de comparação
+                                de texto, mas também é amplamente utilizado em outras áreas, como na
+                                <strong>Bioinformática</strong>, especialmente em tarefas de
+                                <i>alinhamento de sequências</i> de DNA, RNA e proteínas.
+                            </p>
+
+                            <p>
+                                Neste tópico, o foco foi explicar o funcionamento do algoritmo de LCS e sua aplicação
+                                nos algoritmos de diff. No entanto, não cheguei a implementar um diff baseado
+                                diretamente em LCS — até porque esse tipo de abordagem se tornou obsoleta após o
+                                surgimento do algoritmo de <strong>Myers</strong>. Assim, concentrei meus esforços no
+                                desenvolvimento de uma ferramenta de diff utilizando os algoritmos de
+                                <strong>Myers</strong> e <strong>Patience</strong>, que são muito mais eficientes e
+                                modernos.
+                            </p>
                         </div>
                     </section>
 
