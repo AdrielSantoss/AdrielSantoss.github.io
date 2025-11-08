@@ -12,7 +12,7 @@
             <div class="main-content">
                 <article>
                     <section>
-                        <h1 class="h4 portfolio-title">Entendendo algoritmos de diff</h1>
+                        <h1 class="h4 portfolio-title">Entendendo algoritmos de diff de texto</h1>
                         <div>
                             <small style="color: white">17/10/2025</small> -
                             <a
@@ -691,6 +691,233 @@ Cada uma representa um elemento da LCS: G, T, A, B</code></pre>
                                 modernos.
                             </p>
                         </div>
+
+                        <div id="myers" class="about-text">
+                            <h1 class="h4 portfolio-title">Myers</h1>
+
+                            <p>
+                                Antes de apresentar o algoritmo completo de <strong>Myers Diff</strong>, é importante
+                                compreender que, apesar de o algoritmo de Myers ter surgido a partir do problema
+                                clássico da <strong>LCS</strong> (Longest Common Subsequence), ele possui um
+                                <strong>objetivo diferente</strong>. Enquanto o LCS tradicional busca identificar
+                                diretamente a subsequência comum mais longa entre dois textos, o Myers tem como foco
+                                encontrar o <strong>Shortest Edit Script (SES)</strong> — ou seja, a menor sequência de
+                                operações necessárias para transformar o arquivo A no arquivo B.
+                            </p>
+
+                            <p>
+                                Em ferramentas de diff baseadas no algoritmo clássico de <strong>LCS</strong>, o
+                                processo ocorre em duas etapas: primeiro é extraída a LCS entre os textos e, em seguida,
+                                é calculado o <strong>Shortest Edit Script (SES)</strong> a partir dela. Já no algoritmo
+                                de <strong>Myers</strong>, essa lógica é invertida — o <strong>SES</strong> é obtido
+                                diretamente, sem a necessidade de calcular previamente a LCS.
+                            </p>
+
+                            <p>
+                                Embora o algoritmo de Myers tenha sido inspirado no LCS clássico, seu objetivo principal
+                                não é encontrar a LCS, mas sim o conjunto mínimo de operações de edição entre dois
+                                textos. Ainda assim, é possível derivar a LCS de forma opcional, já que as relações
+                                matemáticas entre o SES e a LCS são equivalentes.
+                            </p>
+
+                            <p>
+                                Em resumo, o algoritmo de Myers não constrói toda a matriz <code>dp</code> para calcular
+                                o tamanho da LCS. Em vez disso, ele percorre apenas as
+                                <strong>diagonais possíveis</strong> — os caminhos mais promissores dentro da matriz de
+                                comparação — e a partir dessas diagonais determina diretamente o <strong>SES</strong>.
+                                Como consequência, a <strong>LCS</strong> pode ser obtida indiretamente, simplesmente
+                                observando as operações de <code>MATCH</code> encontradas no script de edição.
+                            </p>
+
+                            <p>
+                                No LCS clássico, cada célula da matriz é visitada, resultando em uma complexidade de
+                                <code>O(m × n)</code> tanto em tempo quanto em memória, onde <code>m</code> e
+                                <code>n</code> são os tamanhos das sequências comparadas. Já o algoritmo de Myers
+                                otimiza esse processo ao reduzir o custo temporal para <code>O(N × D)</code>, sendo
+                                <code>N</code> o tamanho do menor arquivo e <code>D</code> o número mínimo de edições
+                                (inserções ou deleções) necessárias. Além disso, o consumo de memória cai para
+                                <code>O(N + D)</code>. Essa abordagem torna o Myers muito mais eficiente, especialmente
+                                em textos grandes ou quando as diferenças entre as versões são pequenas.
+                            </p>
+
+                            <p>
+                                Veja esse exemplo do algoritmo Myers em Rust (utilizando as mesmas strings dos exemplos
+                                da LCS):
+                            </p>
+
+                            <details>
+                                <summary>Código fonte do algoritmo MYERS</summary>
+                                <pre><code>
+fn main() {
+    println!("Resolvendo o problema do Myers!");
+
+    let entries_a = vec!["A", "G", "G", "T", "A", "B"];
+    let entries_b = vec!["G", "X", "T", "X", "A", "Y", "B"];
+
+    let n = entries_a.len();
+    let m = entries_b.len();
+
+    let max = (n + m) as usize;
+    let offset = max;
+
+    let mut v: Vec&lt;isize&gt; = vec![0; 2 * max + 1];
+    let mut trace: Vec&lt;Vec&lt;isize&gt;&gt; = Vec::new();
+
+    for d in 0..=max as isize {
+        let mut y = 0;
+        let mut x = 0;
+
+        for k in (-d..=d).step_by(2) {
+            let k_idx = (k + offset as isize) as usize;
+
+            x = if k == -d || (k != d && v[(k - 1 + offset as isize) as usize] < v[(k + 1 + offset as isize) as usize]) {
+                v[(k + 1 + offset as isize) as usize]
+            } else {
+                v[(k - 1 + offset as isize) as usize] + 1
+            };
+
+            y = x - k;
+
+            while x < n as isize && y < m as isize && entries_a[x as usize] == entries_b[y as usize] {
+                x += 1;
+                y += 1;
+            }
+
+            v[k_idx] = x;
+
+            if (x as usize) >= n && (y as usize) >= m {
+                println!("Tamanho mínimo do SES (D): {}", d);
+                trace.push(v.clone());
+                break;
+            }
+        }
+
+        if (x as usize) >= n && (y as usize) >= m {
+            break;
+        }
+
+        trace.push(v.clone());
+    }
+
+    let mut x = n as isize;
+    let mut y = m as isize;
+
+    // SES invertido
+    let mut edits: Vec&lt;String&gt; = Vec::new();
+
+    for (d, v) in trace.iter().enumerate().rev() {
+        let k = x - y;
+        let d_isize = d as isize;
+
+        let prev_k = if k == -d_isize
+            || (k != d_isize
+                && v[(k - 1 + offset as isize) as usize] < v[(k + 1 + offset as isize) as usize])
+        {
+            k + 1
+        } else {
+            k - 1
+        };
+
+        let prev_x = v[(prev_k + offset as isize) as usize];
+        let prev_y = prev_x - prev_k;
+
+        // MATCHES — parte da LCS
+        while x > prev_x && y > prev_y {
+            edits.push(format!("MATCH {}", entries_a[(x - 1) as usize]));
+            x -= 1;
+            y -= 1;
+        }
+
+        if d > 0 {
+            if y > 0 && x == prev_x {
+                edits.push(format!("INSERT {}", entries_b[(y - 1) as usize]));
+                y -= 1;
+            } else if x > 0 {
+                edits.push(format!("DELETE {}", entries_a[(x - 1) as usize]));
+                x -= 1;
+            }
+        }
+    }
+
+    let mut lcs: Vec&lt;&str&gt; = Vec::new();
+
+    for op in edits.iter().rev() {
+        if op.starts_with("MATCH") {
+            let value = op.split_whitespace().nth(1).unwrap();
+            lcs.push(value);
+        }
+    }
+
+    println!("\nTamanho da LCS: {}", lcs.len());
+    println!("LCS completa: {:?}", lcs);
+}
+
+</code></pre>
+                            </details>
+
+                            <p>
+                                O algoritmo de Myers inicia percorrendo o espaço de edição em diagonais, representando
+                                todas as possíveis diferenças entre as duas sequências. Em vez de construir uma matriz
+                                completa como no LCS clássico, ele utiliza apenas um vetor <code>v</code> que armazena o
+                                ponto mais distante alcançado em cada diagonal para um determinado número de edições
+                                <code>d</code>. Essa abordagem permite explorar caminhos de forma incremental,
+                                expandindo apenas as diagonais relevantes e ignorando áreas redundantes. A cada iteração
+                                de <code>d</code>, o algoritmo tenta avançar o máximo possível em direções de "match"
+                                (caracteres iguais), formando uma espécie de “caminho” eficiente dentro do grid de
+                                comparação.
+                            </p>
+
+                            <pre>
+                                <code>
+entries_a = [A, G, G, T, A, B]
+entries_b = [G, X, T, X, A, Y, B]
+
+      G   X   T   X   A   Y   B
+   +---+---+---+---+---+---+---+
+A  | \ |   |   |   |   |   |   |
+   +---+---+---+---+---+---+---+
+G  | ↑ | \ |   |   |   |   |   |
+   +---+---+---+---+---+---+---+
+G  |   | ↑ | \ |   |   |   |   |
+   +---+---+---+---+---+---+---+
+T  |   |   | ↑ | \ |   |   |   |
+   +---+---+---+---+---+---+---+
+A  |   |   |   | ↑ | \ |   |   |
+   +---+---+---+---+---+---+---+
+B  |   |   |   |   | ↑ | \ | ✓ |
+   +---+---+---+---+---+---+---+
+                                </code>
+                            </pre>
+                            <p>
+                                Durante a expansão, o algoritmo armazena o estado do vetor <code>v</code> em cada
+                                iteração dentro de uma estrutura de rastreamento (<code>trace</code>). Essa fase é
+                                essencial para reconstruir posteriormente o caminho exato das edições mínimas (a
+                                Shortest Edit Script - SES). Cada posição salva em <code>trace</code> representa uma
+                                "foto" do progresso do algoritmo em um determinado número de edições, permitindo que o
+                                backtracking seja feito de forma eficiente sem recalcular as diagonais.
+                            </p>
+                            <p>
+                                Quando o algoritmo encontra um caminho que cobre ambas as sequências (<code>x ≥ n</code>
+                                e <code>y ≥ m</code>), inicia-se o processo inverso: o <strong>backtracking</strong>. A
+                                partir do estado final armazenado em <code>trace</code>, o algoritmo volta pelas
+                                iterações, reconstruindo as operações que levaram à transformação da sequência A em B.
+                                Nessa etapa são identificadas as operações de inserção, deleção e correspondência
+                                (matches), compondo o conjunto mínimo de edições. Além disso, a sequência de
+                                correspondências define implicitamente a Longest Common Subsequence (LCS), que pode ser
+                                extraída diretamente do resultado.
+                            </p>
+                            <p>
+                                Por fim, o algoritmo imprime ou retorna o resultado do diff: a sequência de edições
+                                (SES) e, opcionalmente, a LCS. Essa saída pode ser utilizada tanto para visualizar as
+                                diferenças entre duas versões de um texto quanto para análises mais complexas, como
+                                fusão de branches em sistemas de controle de versão. Essa abordagem garante alta
+                                eficiência, com complexidade de tempo e espaço <code>O(N + D²)</code> em sua forma
+                                básica, ou <code>O(ND)</code> em versões otimizadas — significativamente melhor do que o
+                                <code>O(N × M)</code> do LCS clássico.
+                            </p>
+
+                            <!-- Adicionar código do myers diff aqui -->
+                        </div>
                     </section>
 
                     <p>https://bramcohen.livejournal.com/73318.html</p>
@@ -711,7 +938,8 @@ Cada uma representa um elemento da LCS: G, T, A, B</code></pre>
                 { id: 'intro', label: 'Introdução' },
                 { id: 'history', label: 'Estudar o passado é conhecer o presente' },
                 { id: 'hunks', label: 'Deltas e Hunks' },
-                { id: 'lcs', label: 'LCS' }
+                { id: 'lcs', label: 'LCS' },
+                { id: 'myers', label: 'Myers' }
             ];
 
             loadSideBarBlog(sections);
