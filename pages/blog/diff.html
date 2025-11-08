@@ -1075,6 +1075,34 @@ fn backtracking&lt;'a&gt;(
 </code></pre>
                             </details>
                         </div>
+
+                        <div id="patience" class="about-text">
+                            <h1 class="h4 portfolio-title">Patience</h1>
+                            <p>
+                                O objetivo do Patience é outro: Gerar deltas mais legiveis para humanos. O foco do
+                                patience é aparencia e não perfomance. Para isso ele implementa o algoritmo
+                                <strong>LIS (Longest Increasing Subsequence)</strong>, funciona muito bem para arquivos
+                                de textos com poucas alteração ou arquivos que possuem muitas linhas em comum, mas para
+                                casos extremos, como arquivos com muitas mudançás e diferenças, ele recorre ao algoritmo
+                                do Myers como fallback.
+                            </p>
+                            <p>
+                                Para entender como o Patience-diff funciona e como ele gera deltas mais legiveis,
+                                primeiro devemos entender como funciona o algoritmo <strong>LIS</strong> e qual o
+                                objetivo disso.
+                            </p>
+                            <p>
+                                A diferença do LIS para LCS é só uma: <strong>ordenação</strong>, como visto
+                                anteriormente, a LCS não necessária mente precisa ser ordenada, ou seja, é possivel
+                                encontrar a LCS de um texto com linhas elementos não ordenados, exemplo:
+                            </p>
+
+                            <pre><code>
+Sequência: [10, 22, 9, 33, 21, 50, 41, 60]
+
+LIS = [10, 22, 33, 50, 60]
+    </code></pre>
+                        </div>
                     </section>
 
                     <p>https://bramcohen.livejournal.com/73318.html</p>
@@ -1096,7 +1124,8 @@ fn backtracking&lt;'a&gt;(
                 { id: 'history', label: 'Estudar o passado é conhecer o presente' },
                 { id: 'hunks', label: 'Deltas e Hunks' },
                 { id: 'lcs', label: 'LCS' },
-                { id: 'myers', label: 'Myers' }
+                { id: 'myers', label: 'Myers' },
+                { id: 'patience', label: 'Patience' }
             ];
 
             loadSideBarBlog(sections);
