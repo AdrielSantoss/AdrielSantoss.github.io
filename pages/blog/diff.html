@@ -1098,10 +1098,362 @@ fn backtracking&lt;'a&gt;(
                             </p>
 
                             <pre><code>
+Sequência A: [3, 9, 8, 3, 9, 7, 9, 7, 0]
+Sequência B: [3, 3, 9, 9, 9, 1, 7, 2, 0]
+
+LCS = [3, 9, 9, 7, 0]
+
+Note que os números não estão em ordem crescente, mas respeitam a ordem em que aparecem nas duas listas.</code></pre>
+                            <br />
+
+                            <p>Exemplo da LIS:</p>
+                            <pre><code>
 Sequência: [10, 22, 9, 33, 21, 50, 41, 60]
 
 LIS = [10, 22, 33, 50, 60]
-    </code></pre>
+
+Note que os números estão em ordem crescente, além de respeitar a ordem em que aparecem nas duas listas os elementos estão ordenados.</code></pre>
+                            <p>Segue abaixo o algoritmo da LIS:</p>
+
+                            <details>
+                                <summary>Código fonte do algoritmo LIS</summary>
+                                <pre><code>
+fn main() {
+    println!("Resolvendo o problema da LIS!");
+
+    let entries = vec![10, 22, 9, 33, 21, 50, 41, 60];
+    let mut tails: Vec&lt;i32&gt; = Vec::new();
+    let mut indices: Vec&lt;usize&gt; = Vec::new();
+    let mut prev_index: Vec&lt;Option&lt;usize&gt;&gt; = vec![None; entries.len()];
+
+    for (index, entry) in entries.iter().enumerate() {
+        let pos = match tails.binary_search(entry) {
+            Ok(pos) => pos,
+            Err(pos) => pos
+        };
+
+        if pos == tails.len() {    
+            tails.push(*entry);
+            indices.push(index);
+        }
+        else {
+            tails[pos] = *entry;
+            indices[pos] = index;
+        }
+
+        if pos == 0 {
+            prev_index[index] = None;
+        }
+        else {
+            prev_index[index] = Some(indices[pos - 1]);
+        }
+    }
+
+    let mut last_index: Option&lt;usize&gt; = Some(indices[tails.len() - 1]);
+    let mut lis: Vec&lt;i32&gt; = Vec::new();
+
+    while last_index != None {
+        let i = last_index.unwrap();
+        lis.push(entries[i]);
+
+        last_index = prev_index[i];
+    }
+
+    lis.reverse();
+
+    println!("Tails:");
+    for tail in tails {
+        print!("{}", tail);
+    }
+    
+    println!("\nIndices:");
+    for idx in &indices {
+        print!("{}", idx);
+    }
+
+    println!("\nLis:");
+    for index in lis {
+        print!("{}", index);
+    }
+}
+</code></pre>
+                            </details>
+
+                            <p>
+                                Diferente do algoritmo LCS, a LIS não lida com matriz, o problema da Longest Increasing
+                                subsequence é resolvido com o uso de 3 arrays auxiliares, são eles:
+                            </p>
+
+                            <p>
+                                <code>Tails:</code> <br />
+
+                                Armazena o menor elemento possível para cada comprimento de subsequência crescente. Ou
+                                seja, tails[k] guarda o menor valor que pode terminar uma subsequência crescente de
+                                tamanho (k + 1). Isso permite decidir rapidamente (via busca binária) onde inserir o
+                                próximo elemento.
+                            </p>
+
+                            <p>
+                                <code>Indices:</code> <br />
+                                Guarda os índices correspondentes aos elementos dentro de 'tails' no vetor original.
+                                Eles servem para reconstruir o caminho (a subsequência completa) ao final do algoritmo.
+                            </p>
+
+                            <p>
+                                <code>prev_index:</code> <br />
+                                Armazena, para cada posição do vetor original, o índice do elemento anterior na
+                                subsequência crescente. Esse vetor é usado na reconstrução final da LIS, percorrendo de
+                                trás para frente até formar toda a sequência.
+                            </p>
+                            <p>Veja como fica o estado de cada array no loop principal do algoritmo:</p>
+                            <details>
+                                <summary>Simulação visual do algoritmo LIS</summary>
+                                <pre>
+                                <code>
+entries = [10, 22, 9, 33, 21, 50, 41, 60]
+
+Iteração 0 ─ entry = 10
+tails       = [10]
+indices     = [0]
+prev_index  = [None, None, None, None, None, None, None, None]
+
+Iteração 1 ─ entry = 22
+tails       = [10, 22]
+indices     = [0, 1]
+prev_index  = [None, Some(0), None, None, None, None, None, None]
+
+Iteração 2 ─ entry = 9
+tails       = [9, 22]
+indices     = [2, 1]
+prev_index  = [None, Some(0), None, None, None, None, None, None]
+
+Iteração 3 ─ entry = 33
+tails       = [9, 22, 33]
+indices     = [2, 1, 3]
+prev_index  = [None, Some(0), None, Some(1), None, None, None, None]
+
+Iteração 4 ─ entry = 21
+tails       = [9, 21, 33]
+indices     = [2, 4, 3]
+prev_index  = [None, Some(0), None, Some(1), Some(2), None, None, None]
+
+Iteração 5 ─ entry = 50
+tails       = [9, 21, 33, 50]
+indices     = [2, 4, 3, 5]
+prev_index  = [None, Some(0), None, Some(1), Some(2), Some(3), None, None]
+
+Iteração 6 ─ entry = 41
+tails       = [9, 21, 33, 41]
+indices     = [2, 4, 3, 6]
+prev_index  = [None, Some(0), None, Some(1), Some(2), Some(3), Some(3), None]
+
+Iteração 7 ─ entry = 60
+tails       = [9, 21, 33, 41, 60]
+indices     = [2, 4, 3, 6, 7]
+prev_index  = [None, Some(0), None, Some(1), Some(2), Some(3), Some(3), Some(6)]
+
+----------------------------------------------------
+Reconstrução:
+Começando de last_index = indices[4] = 7
+
+prev_index encadeia:
+7 → 6 → 3 → 1 → 0
+
+LIS (reverso): [60, 41, 33, 22, 10]
+LIS final: [10, 22, 33, 41, 60]</code>
+                            </pre>
+                            </details>
+
+                            <p>
+                                No Patience-diff, o algoritmo LIS é utilizado para obter as <strong>âncoras</strong>.
+                                Âncoras são linhas que aparecem em ambas as versões do texto <em>na mesma ordem</em> e
+                                que, portanto, servem como pontos de referência estáveis para alinhar as diferenças.
+                            </p>
+
+                            <p>
+                                Em outras palavras, as âncoras representam a
+                                <strong>subsequência crescente mais longa (LIS)</strong>
+                                das linhas que são únicas e coincidem entre os dois arquivos. Essas linhas formam uma
+                                base sólida sobre a qual o restante do diff é construído, melhorando a legibilidade do
+                                resultado final.
+                            </p>
+
+                            <p>
+                                Após identificar as âncoras, o algoritmo divide o problema em blocos menores: cada
+                                trecho entre duas âncoras é tratado recursivamente, aplicando novamente o mesmo processo
+                                de correspondência e comparação. Dessa forma, o Patience Diff combina precisão e
+                                clareza, produzindo um diff mais legível que o gerado por algoritmos puramente baseados
+                                em LCS.
+                            </p>
+
+                            <p>
+                                Resumidamente, o diff é aplicado <strong>ENTRE</strong> as âncoras, veja esse exemplo de
+                                detecção de âncoras para entender:
+                            </p>
+
+                            <pre><code>
+Exemplo:
+Texto A:
+1: fn main() {
+2:   println!("Olá");
+3:   println!("Mundo");
+4: }
+
+Texto B:
+1: fn main() {
+2:   println!("Mundo");
+3:   println!("!");
+4: }
+
+Âncoras (LIS sobre as linhas únicas e comuns):
+[ "fn main() {", "println!(\"Mundo\");", "}" ]
+
+Essas linhas servem como delimitadores fixos para o algoritmo,
+ajudando a identificar de forma eficiente quais trechos mudaram
+entre as âncoras.
+</code></pre>
+
+                            <p>
+                                Se em algum momento do processo de comparação nenhuma <strong>âncora</strong> for
+                                encontrada, isso indica que os arquivos possuem muitas diferenças ou não há linhas
+                                únicas que possam servir de referência estável. Nesses casos, o
+                                <strong>Patience Diff</strong> utiliza o algoritmo <strong>Myers</strong> como
+                                estratégia de fallback para continuar o cálculo das diferenças.
+                            </p>
+
+                            <p>
+                                Para visualizar as diferenças de um delta gerado pelo Patience e um delta gerado pelo
+                                Myers, voce pode ver isso no
+                                <a
+                                    href="https://github.com/AdrielSantoss/Myers-Patience-Diff"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >Blog do Bram cohen</a
+                                >
+                                .
+                            </p>
+
+                            <p>
+                                Segue abaixo o código fonte completo do patience diff utilizando o algoritmo
+                                <strong>LIS</strong>, separei o código em uma biblioteca (crate lib). Veja:
+                            </p>
+
+                            <details>
+                                <summary>Código fonte do sistema Patience-Diff</summary>
+                                <pre><code>
+use std::collections::HashMap;
+
+use myers::myers_diff;
+use utils::DiffOp;
+
+pub fn patience_diff&lt;'a&gt;(content_a: &'a [&'a str], content_b: &'a [&'a str]) -> Vec&lt;DiffOp&lt;'a&gt;&gt; {
+    let anchors = find_unique_anchors(content_a, content_b);
+
+    if anchors.is_empty() {
+        return myers_diff(content_a, content_b);
+    }
+
+    let positions_b: Vec&lt;usize&gt; = anchors.iter().map(|(_, _, idx_b)| *idx_b).collect();
+    let lis_idx = get_lis_indices(&positions_b);
+    let anchors_final: Vec&lt;_&gt; = lis_idx.iter().map(|&i| anchors[i]).collect();
+
+    let mut diff = Vec::new();
+    let mut last_a = 0;
+    let mut last_b = 0;
+
+    for &(anchor_line, idx_a, idx_b) in &anchors_final {
+        let sub_a = &content_a[last_a..idx_a];
+        let sub_b = &content_b[last_b..idx_b];
+
+        if !sub_a.is_empty() || !sub_b.is_empty() {
+            diff.extend(myers_diff(sub_a, sub_b));
+        }
+
+        diff.push(DiffOp::Match(anchor_line));
+
+        last_a = idx_a + 1;
+        last_b = idx_b + 1;
+    }
+
+    let sub_a = &content_a[last_a..];
+    let sub_b = &content_b[last_b..];
+    if !sub_a.is_empty() || !sub_b.is_empty() {
+        diff.extend(myers_diff(sub_a, sub_b));
+    }
+
+    diff
+}
+
+fn find_unique_anchors&lt;'a&gt;(content_a: &'a [&'a str], content_b: &'a [&'a str]) -> Vec&lt;(&'a str, usize, usize)&gt; {
+    let unique_a = get_unique_lines(content_a);
+    let unique_b = get_unique_lines(content_b);
+
+    let mut anchors = Vec::new();
+    for &line in content_a.iter() {
+        if let (Some(&idx_a), Some(&idx_b)) = (unique_a.get(line), unique_b.get(line)) {
+            anchors.push((line, idx_a, idx_b));
+        }
+    }
+
+    anchors
+}
+
+fn get_unique_lines&lt;'a&gt;(content_lines: &'a [&'a str]) -> HashMap&lt;&'a str, usize&gt; {
+    let mut freq = HashMap::with_capacity(content_lines.len());
+    let mut result = HashMap::with_capacity(content_lines.len());
+
+    for (i, &line) in content_lines.iter().enumerate() {
+        let count = freq.entry(line).or_insert(0);
+        *count += 1;
+
+        if *count == 1 {
+            result.insert(line, i);
+        } else {
+            result.remove(line);
+        }
+    }
+
+    result
+}
+
+fn get_lis_indices(seq: &[usize]) -> Vec&lt;usize&gt; {
+    if seq.is_empty() {
+        return Vec::new();
+    }
+
+    let mut tails_vals = Vec::with_capacity(seq.len());
+    let mut tails_indices = Vec::with_capacity(seq.len());
+    let mut predecessors = vec![None; seq.len()];
+
+    for (i, &x) in seq.iter().enumerate() {
+        let pos = tails_vals.binary_search(&x).unwrap_or_else(|p| p);
+
+        if pos == tails_vals.len() {
+            tails_vals.push(x);
+            tails_indices.push(i);
+        } else {
+            tails_vals[pos] = x;
+            tails_indices[pos] = i;
+        }
+
+        if pos > 0 {
+            predecessors[i] = Some(tails_indices[pos - 1]);
+        }
+    }
+
+    let mut lis = Vec::new();
+    if let Some(&last_index) = tails_indices.last() {
+        let mut k = Some(last_index);
+        while let Some(idx) = k {
+            lis.push(idx);
+            k = predecessors[idx];
+        }
+        lis.reverse();
+    }
+
+    lis
+}</code></pre>
+                            </details>
                         </div>
                     </section>
 
