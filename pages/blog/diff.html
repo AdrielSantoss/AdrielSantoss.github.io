@@ -553,11 +553,6 @@ if entries_a[i - 1] == entries_b[j - 1] {
                                 <a
                                     href="https://ics.uci.edu/~dhirschb/pubs/p664-hirschberg.pdf"
                                     target="_blank"
-                                    rel="noopener noreferrer"
-                                ></a>
-                                <a
-                                    href="https://ics.uci.edu/~dhirschb/pubs/p664-hirschberg.pdf"
-                                    target="_blank"
                                     class="blog-link"
                                     >Algorithms for the Longest Common Subsequence Problem </a
                                 >. Segue abaixo uma explicação da aplicação das fórmulas do algoritmo em pseudocódigo:
@@ -1324,10 +1319,7 @@ entre as âncoras.
                             <p>
                                 Para visualizar as diferenças de um delta gerado pelo Patience e um delta gerado pelo
                                 Myers, voce pode ver isso no
-                                <a
-                                    href="https://github.com/AdrielSantoss/Myers-Patience-Diff"
-                                    target="_blank"
-                                    class="blog-link"
+                                <a href="https://bramcohen.livejournal.com/73318.html" target="_blank" class="blog-link"
                                     >Blog do Bram cohen</a
                                 >
                                 .
@@ -1455,12 +1447,133 @@ fn get_lis_indices(seq: &[usize]) -> Vec&lt;usize&gt; {
 }</code></pre>
                             </details>
                         </div>
+
+                        <div id="conclusion" class="about-text">
+                            <h1 class="h4 portfolio-title">Conclusão</h1>
+
+                            <p>
+                                Esse foi um breve resumo dos principais algoritmos de diff, aprendi bastante sobre
+                                algoritmos e programação dinâmica. Esses algoritmos são excelentes para quem está
+                                estudando algoritmo e estruta de dados na faculdade.
+                            </p>
+
+                            <p>
+                                Perceba que eu me concentrei muito em descrever o funcionamento do algoritmo clássico do
+                                LCS, fiz isso pois, esse algoritmo além de ser o primeiro a ser utilizado em ferramentas
+                                de diff, também é a base dos demais que vieram a seguir: Myers e Patience.
+                            </p>
+
+                            <p>
+                                Depois de implementar esses dois diffs com Rust, eu exportei ele como
+                                <code>dll</code> para utiliza-lo no <strong>gitAdr</strong>, criando assim um novo
+                                comando: <code>gitadr diff</code>.
+                            </p>
+                        </div>
+
+                        <div id="conclusion" class="about-text">
+                            <h1 class="h4 portfolio-title">Conclusão</h1>
+
+                            <p>
+                                Esse foi um breve resumo dos principais algoritmos de diff, aprendi bastante sobre
+                                algoritmos e programação dinâmica. Esses algoritmos são excelentes para quem está
+                                estudando algoritmo e estruta de dados na faculdade.
+                            </p>
+
+                            <p>
+                                Perceba que eu me concentrei muito em descrever o funcionamento do algoritmo clássico do
+                                LCS, fiz isso pois, esse algoritmo além de ser o primeiro a ser utilizado em ferramentas
+                                de diff, também é a base dos demais que vieram a seguir: Myers e Patience.
+                            </p>
+
+                            <p>
+                                Depois de implementar esses dois diffs com Rust, eu exportei ele como
+                                <code>dll</code> para utiliza-lo no <strong>gitAdr</strong>, criando assim um novo
+                                comando: <code>gitadr diff</code>.
+                            </p>
+                        </div>
+
+                        <div id="refs" class="blog-text">
+                            <h1 class="h4 portfolio-title">Referências</h1>
+                            <ul class="list-decimal list-inside space-y-1">
+                                <li>
+                                    <a
+                                        href="https://ics.uci.edu/~dhirschb/pubs/p664-hirschberg.pdf"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >Algorithms for the Longest Common Subsequence Problem — Artigo PDF </a
+                                    >.
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://en.wikipedia.org/wiki/Longest_common_subsequence"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >Longest common subsequence (LCS) — Wikipedia</a
+                                    >
+                                </li>
+                                <li>
+                                    <a href="http://www.xmailserver.org/diff2.pdf" class="blog-link" target="_blank">
+                                        An O(ND) Difference Algorithm and Its Variations — Artigo PDF
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://en.wikipedia.org/wiki/Edit_distance"
+                                        class="blog-link"
+                                        target="_blank"
+                                        >Shortest Edit Script (SES) — Wikipedia</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://www.gnu.org/software/diffutils/manual"
+                                        class="blog-link"
+                                        target="_blank"
+                                        >GNU diffutils - Comparing and Merging Files — GNU manual</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://blog.jcoglan.com/2017/09/19/the-patience-diff-algorithm"
+                                        class="blog-link"
+                                        target="_blank"
+                                    >
+                                        The patience diff algorithm — James coglan
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://blog.jcoglan.com/2017/02/12/the-myers-diff-algorithm-part-1"
+                                        class="blog-link"
+                                        target="_blank"
+                                    >
+                                        The Myers diff algorithm — James coglan
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://bramcohen.livejournal.com/73318.html"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >Patience Diff Advantages — Bram cohen</a
+                                    >
+                                </li>
+                                <li>
+                                    <a href="https://git-scm.com/docs/git-diff" target="_blank" class="blog-link"
+                                        >Git diff — Git docs</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://ably.com/blog/practical-guide-to-diff-algorithms"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >The definitive guide to diff algorithms and patch formats — Ably</a
+                                    >
+                                </li>
+                            </ul>
+                        </div>
                     </section>
-
-                    <p>https://bramcohen.livejournal.com/73318.html</p>
-                    <p>https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html</p>
-
-                    <section class="working-in-progress"></section>
                 </article>
             </div>
         </main>
@@ -1477,7 +1590,9 @@ fn get_lis_indices(seq: &[usize]) -> Vec&lt;usize&gt; {
                 { id: 'hunks', label: 'Deltas e Hunks' },
                 { id: 'lcs', label: 'LCS' },
                 { id: 'myers', label: 'Myers' },
-                { id: 'patience', label: 'Patience' }
+                { id: 'patience', label: 'Patience' },
+                { id: 'conclusion', label: 'Conclusão' },
+                { id: 'refs', label: 'Referências' }
             ];
 
             loadSideBarBlog(sections);
