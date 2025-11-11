@@ -97,7 +97,7 @@
                             </p>
                         </div>
 
-                        <div id="oque-é-api" class="blog-text">
+                        <div id="api" class="blog-text">
                             <h1 class="h4 portfolio-title">O que é uma API</h1>
 
                             <p>
@@ -217,5 +217,16 @@
         <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
         <script type="module" src="../../../assets/js/index.js"></script>
+        <script type="module">
+            import { loadSideBarBlog } from '../../assets/js/elements/sidebar.js';
+
+            const sections = [
+                { id: 'intro', label: 'Introdução' },
+                { id: 'api', label: 'O que é uma API' },
+                { id: 'api', label: 'O que é REST' }
+            ];
+
+            loadSideBarBlog(sections);
+        </script>
     </body>
 </html>
