@@ -33,6 +33,7 @@
                             <small class="tag">Fastify</small>
                             <small class="tag">Prisma</small>
                             <small class="tag">ORM</small>
+                            <small class="tag">Teste automatizado</small>
                         </div>
                     </section>
 
@@ -79,7 +80,7 @@
                                 um tempo morrem, perdem espaço para uma nova biblioteca que dominou a área. Por isso, eu
                                 não gosto de escrever sobre bibliotecas e frameworks, pois esse conteúdo costuma se
                                 <strong>defazar</strong> muito rápido. Nesse blog, o objetivo é falar sobre conceitos de
-                                arquitetura REST, o foco não é as novas bibliotecas, elas foram apenas o gatiho que me
+                                arquitetura REST, o foco não é as novas bibliotecas, elas foram apenas o gatilho que me
                                 motivou a fazer esse projeto/estudo.
                             </p>
 
@@ -94,6 +95,117 @@
                                 Além de relembrar conceitos, quero aproveitar essa oportunidade para pesquisar e
                                 aprender coisas novas.
                             </p>
+                        </div>
+
+                        <div id="oque-é-api" class="blog-text">
+                            <h1 class="h4 portfolio-title">O que é uma API</h1>
+
+                            <p>
+                                Primeiro, devemos entender o que é uma Api: API é a sigla para Application Programming
+                                Interface (em português, Interface de Programação de Aplicações).
+                            </p>
+
+                            <p>
+                                Em resumo, API é um meio de <strong>comunicação</strong> entre dois sistemas, entenda
+                                API como um conjunto de regras, protocolos e ferramentas que permite que diferentes
+                                softwares se comuniquem e troquem informação.
+                            </p>
+
+                            <p>
+                                Quando criamos uma API, basicamente estamos criando um tipo de software que define uma
+                                <strong>interface</strong> para outros sistemas se comunicarem com ele — expondo dados e
+                                funcionalidades de forma controlada e padronizada.
+                            </p>
+                            <p>
+                                Quando falamos "interface" já vem logo na cabeça as interfaces gráficas, esses erros são
+                                comuns para quem está começando a entrar no mundo da web, a área da programação possui
+                                uma sopa de letrinhas absurda, então, para não ocorrer confusões vamos destacar o que
+                                uma API não é:
+                            </p>
+
+                            <ul>
+                                <li>
+                                    <strong>1. Uma api não é um banco de dados:</strong> Uma API
+                                    <strong>acessa</strong> um banco de dados, mas ela não é o banco de dados. Api,
+                                    normalmente não armazenam dados, ela age como um
+                                    <strong>intermediário</strong> entre o cliente e a fonte de dados.
+                                </li>
+                                <br />
+
+                                <li>
+                                    <strong>2. Uma API não é uma interface gráfica (UI):</strong> API significa
+                                    Interface de Programação, não Interface de Usuário. Ela não tem botões, telas nem
+                                    layouts — quem interage com ela são outros programas, não pessoas diretamente.
+                                </li>
+                                <br />
+
+                                <li>
+                                    <strong>3. Uma API não é um servidor web:</strong> Esse é um erro
+                                    <strong>muito comum</strong>, vejo muitos programadores falando "äpi é o servidor da
+                                    aplicação", isso está completamenta <strong>errado</strong>. O servidor (Express,
+                                    Django, Laravel e etc) é quem <strong>hospeda</strong> a API e processa as
+                                    requisições. A API é o conjunto de regras e endpoints implementados
+                                    <strong>dentro</strong> desse servidor.
+                                </li>
+                                <br />
+
+                                <li>
+                                    <strong>4. Uma API não é automaticamente REST:</strong> Esse é um erro
+                                    <strong>clássico</strong>, REST é um entre vários estilos de arquiteturas de API,
+                                    existem outros como: SOAP, GraphQL, gRPC e etc... Cada um definem suas regras para a
+                                    interface de comunicação. REST é o estilo mais popular e mais adotado no mercado,
+                                    por isso, muita gente confunde pensando que api e rest são conceitos equivalentes.
+                                </li>
+                                <br />
+
+                                <li>
+                                    <strong>5. API não é backend:</strong> A API faz <strong>parte</strong> do teu
+                                    backend, mas ela não representa o teu backend. A API é uma camada responsável expor
+                                    dados e funcionalidades do teu backend. A API sozinha não serve pra nada, ela
+                                    precisa de um backend e ou uma fonte de dados para expor.
+                                </li>
+
+                                <br />
+
+                                <li>
+                                    <strong>6. Nem toda API é web:</strong> Nem toda api é web, ou seja, nem toda api
+                                    utiliza o HTTP para comunicação, existem Apis de sistemas locais, APIs que permitem
+                                    a comunicação entre aplicações e o sistema operacional, sem usar rede.
+                                </li>
+                                <br />
+                            </ul>
+
+                            <p>
+                                Removendo essas confusões de conceitos no meio do caminho, podemos visualizar o destino
+                                com mais clareza, uma API não é nada mais que uma interface de comunicação entre
+                                softwares.
+                            </p>
+
+                            <p>Agora, exemplos reais do que é uma API:</p>
+
+                            <pre><code>
++----------------------------------------------------------------------------------------------+
+| TIPO DE API                  | EXEMPLOS                               | DESCRIÇÃO            |
+|------------------------------|----------------------------------------|----------------------|
+| 🌐 Web (REST ou HTTP)        | GitHub, OpenWeather, Stripe, Spotify,  | APIs acessadas via   |
+|                              | Google Maps                            | internet, trocam     |
+|                              |                                        | dados em JSON via    |
+|                              |                                        | HTTP (REST, GraphQL) |
+|------------------------------|----------------------------------------|----------------------|
+| 🧩 Sistema (locais)          | Win32 (Windows), POSIX (Linux),        | Interfaces entre     |
+|                              | Android SDK, Cocoa (macOS)             | apps e o sistema     |
+|                              |                                        | operacional. Não     |
+|                              |                                        | usam HTTP.           |
+|------------------------------|----------------------------------------|----------------------|
+| 💻 Biblioteca (linguagens)   | DOM (JavaScript), os (Python), fs      | APIs usadas dentro   |
+|                              | (Node.js)                              | do código para       |
+|                              |                                        | acessar recursos ou  |
+|                              |                                        | funções prontas.     |
+|------------------------------|----------------------------------------|----------------------|
+| 🤖 Hardware                  | DirectX, OpenGL, Vulkan, Bluetooth     | APIs que permitem    |
+|                              |                                        | apps se comunicarem  |
+|                              |                                        | com hardware.        |
++----------------------------------------------------------------------------------------------+</code></pre>
                         </div>
                     </section>
 
