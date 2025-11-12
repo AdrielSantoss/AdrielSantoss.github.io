@@ -207,6 +207,33 @@
 |                              |                                        | com hardware.        |
 +----------------------------------------------------------------------------------------------+</code></pre>
                         </div>
+
+                        <div id="api-rest" class="blog-text">
+                            <h1 class="h4 portfolio-title">O que é uma API REST</h1>
+
+                            <p>
+                                Uma api rest é um tipo especifico de api baseado no protocolo HTTP. Rest — sigla para
+                                Representational State Transfer — É um estilo de arquitetura criado por
+                                <a href="https://github.com/royfielding" target="_blank" class="blog-link"
+                                    >Roy Fielding</a
+                                >
+                                em 2000.
+                            </p>
+
+                            <p>
+                                Uma API REST usa os recursos da web para representar entidades do sistema, como
+                                usuários, produtos, pedidos, etc. Cada recurso é acessado por meio de uma
+                                <strong>URL</strong> (Uniform Resource Locator), e as operações sobre esses recursos são
+                                feitas através dos <strong>métodos</strong> HTTP.
+                            </p>
+
+                            <p>
+                                Resumidamente, uma api rest funciona atráves de <strong>request</strong> e
+                                <strong>response</strong>. Sendo request uma chamada HTTP feita pelo cliente, e response
+                                sendo a resposta do servidor. O formato de dado mais comum nessa comunicação é o
+                                <strong>JSON</strong>.
+                            </p>
+                        </div>
                     </section>
 
                     <section class="working-in-progress"></section>
@@ -223,7 +250,7 @@
             const sections = [
                 { id: 'intro', label: 'Introdução' },
                 { id: 'api', label: 'O que é uma API' },
-                { id: 'api', label: 'O que é REST' }
+                { id: 'api-rest', label: 'O que é uma API REST' }
             ];
 
             loadSideBarBlog(sections);
