@@ -217,22 +217,154 @@
                                 <a href="https://github.com/royfielding" target="_blank" class="blog-link"
                                     >Roy Fielding</a
                                 >
-                                em 2000.
+                                em 2000, na sua
+                                <a
+                                    href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >tese de doutorado.</a
+                                >
                             </p>
 
                             <p>
-                                Uma API REST usa os recursos da web para representar entidades do sistema, como
-                                usuários, produtos, pedidos, etc. Cada recurso é acessado por meio de uma
-                                <strong>URL</strong> (Uniform Resource Locator), e as operações sobre esses recursos são
-                                feitas através dos <strong>métodos</strong> HTTP.
+                                No final da década de 1990, <strong>Roy Fielding</strong> fazia parte do grupo
+                                responsável por padronizar o protocolo <strong>HTTP</strong> e projetar a arquitetura da
+                                Web. Ele foi um dos principais autores da versão 1.1 do HTTP. Essa época representava o
+                                início da Web moderna, e a comunicação entre sistemas na internet ainda era
+                                inconsistente — cada aplicação tinha seu próprio estilo de API. Fielding percebeu que,
+                                para a Web continuar evoluindo, seria necessário definir princípios arquiteturais claros
+                                e universais.
                             </p>
 
                             <p>
-                                Resumidamente, uma api rest funciona atráves de <strong>request</strong> e
-                                <strong>response</strong>. Sendo request uma chamada HTTP feita pelo cliente, e response
-                                sendo a resposta do servidor. O formato de dado mais comum nessa comunicação é o
-                                <strong>JSON</strong>.
+                                Em seus estudos, Roy Fielding analisou por que a Web (baseada em <strong>HTTP</strong>,
+                                <strong>URLs</strong> e <strong>HTML</strong>) conseguia escalar para milhões de
+                                usuários, enquanto outras arquiteturas falhavam. A partir dessas observações, ele
+                                definiu um conjunto de princípios arquiteturais que explicavam o sucesso da Web — e
+                                chamou esse estilo de <strong>REST</strong>.
                             </p>
+
+                            <p>
+                                Uma <strong>API REST</strong> utiliza os recursos da Web para representar entidades do
+                                sistema, como usuários, produtos, pedidos, entre outros. Cada recurso é acessado por
+                                meio de uma <strong>URL</strong> (Uniform Resource Locator), e as operações sobre esses
+                                recursos são realizadas através dos <strong>métodos HTTP</strong>.
+                            </p>
+
+                            <p>
+                                Resumidamente, uma API REST funciona por meio de
+                                <strong>requisições</strong> (<em>requests</em>) e
+                                <strong>respostas</strong> (<em>responses</em>). A <em>request</em> é uma chamada HTTP
+                                feita pelo cliente, e a <em>response</em> é a resposta do servidor. O formato de dados
+                                mais comum nessa comunicação é o <strong>JSON</strong> (<em
+                                    >JavaScript Object Notation</em
+                                >).
+                            </p>
+
+                            <p>
+                                O <strong>REST</strong> foi um dos principais motivos da popularização do
+                                <strong>JSON</strong>. Antes dele, o padrão dominante era o <strong>SOAP</strong>, que
+                                utilizava <strong>XML</strong> para troca de dados. Comparado ao JSON, o XML é mais
+                                <strong>pesado</strong> — tanto em tamanho quanto em processamento —, pois exige um
+                                <em>parsing</em> mais complexo, além de aumentar o tamanho do texto com suas múltiplas
+                                tags, tornando o conteúdo mais verboso e de leitura difícil para humanos.
+                            </p>
+
+                            <p>
+                                O JSON resolveu todos esses problemas e, desde então, tornou-se o
+                                <code>content-type</code> padrão nas APIs REST. No entanto, é importante destacar que o
+                                JSON não surgiu junto com o REST. Ele foi criado por
+                                <strong>Douglas Crockford</strong> e surgiu integrado ao <strong>JavaScript</strong>,
+                                como uma alternativa mais simples e eficiente ao XML. Com o tempo, acabou sendo adotado
+                                naturalmente pelas APIs REST devido à sua leveza e praticidade.
+                            </p>
+
+                            <p>
+                                A arquitetura <strong>SOAP</strong> (<em>Simple Object Access Protocol</em>) surgiu
+                                inicialmente como uma boa ideia em 1998, mas com o tempo acabou se tornando uma
+                                <strong>gambiarra completamente inviável</strong>. O SOAP foi uma evolução do protocolo
+                                <strong>XML-RPC</strong> (<em>Remote Procedure Call</em> usando XML), criado por
+                                <strong>Dave Winer</strong> no mesmo ano. O objetivo do XML-RPC era permitir que um
+                                servidor executasse funções em outro servidor, enviando parâmetros em XML e recebendo
+                                respostas também em XML — tudo isso utilizando o HTTP como transporte.
+                            </p>
+
+                            <p>
+                                Ainda em 1998, a <strong>Microsoft</strong> e a <strong>IBM</strong> começaram a
+                                colaborar na evolução do XML-RPC, dando origem ao SOAP. O objetivo era criar um padrão
+                                mais formal, extensível e corporativo para a comunicação entre sistemas. Assim, o SOAP
+                                incorporou recursos como <strong>tipagem forte</strong> (baseada em XSD),
+                                <strong>suporte a headers</strong> (para autenticação, transações, etc.),
+                                <strong>extensibilidade</strong> (permitindo adicionar metadados sem quebrar o formato)
+                                e <strong>adesão aos padrões do W3C</strong>.
+                            </p>
+
+                            <p>
+                                Tudo isso parecia uma boa ideia no início, mas desmoronou rápido. O SOAP acabou se
+                                tornando muito mais complicado do que precisava ser. Para fazer uma requisição simples
+                                era necessário lidar com estruturas XML enormes, envelopes, cabeçalhos e esquemas (XSD).
+                                Além disso, o SOAP exigia o uso de ferramentas específicas para gerar código,
+                                interpretar WSDLs (descrições de serviço) e lidar com as regras do protocolo — o que
+                                tornava tudo lento, burocrático e difícil de manter.
+                            </p>
+
+                            <p>
+                                Por exemplo, veja como seria uma requisição simples apenas para buscar as informações de
+                                um usuário usando o SOAP:
+                            </p>
+
+                            <pre><code class="language-xml">
+POST /UserService HTTP/1.1
+Host: example.com
+Content-Type: text/xml; charset=utf-8
+SOAPAction: "getUser"
+
+&lt;soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+  &lt;soap:Header/&gt;
+  &lt;soap:Body&gt;
+    &lt;getUserRequest xmlns="http://example.com/user"&gt;
+      &lt;userId&gt;123&lt;/userId&gt;
+    &lt;/getUserRequest&gt;
+  &lt;/soap:Body&gt;
+&lt;/soap:Envelope&gt;
+</code></pre>
+
+                            <p>Agora compare com uma requisição REST que faz exatamente a mesma coisa:</p>
+
+                            <pre><code class="language-http">
+GET /users/123 HTTP/1.1
+Host: example.com
+Accept: application/json
+</code></pre>
+
+                            <p>E a resposta do servidor REST seria bem mais simples e legível:</p>
+
+                            <pre><code class="language-json">
+{
+  "id": 123,
+  "nome": "Adriel",
+  "email": "adriel@example.com"
+}
+</code></pre>
+
+                            <p>
+                                Essa diferença de simplicidade é o principal motivo da queda do SOAP e da popularização
+                                do REST. Enquanto o SOAP exigia XML pesado, contratos WSDL e múltiplas camadas de
+                                abstração, o REST usa os recursos nativos da Web (HTTP, URLs e JSON), tornando o
+                                desenvolvimento muito mais leve, rápido e acessível.
+                            </p>
+
+                            <p>
+                                O SOUP não foi feito para a web moderna, essa arquitetura não respeita os métodos HTTP
+                                (GET, POST, PUT, DELETE), utiliza sempre POST nas requisições — tratando o http apenas
+                                como um túnel de transporte, é totalmente incompativel com caches HTTP e navegadores. Já
+                                a arquitetura REST, não tenta reinventar a roda, ela engloba todos esses recursos do
+                                protocolo HTTP — Talvez isso se deve ao fato do criador do Rest ser um dos prioncipais
+                                fundadores da versão 1.1 do protoclo http.
+                            </p>
+                        </div>
+                        <div id="api-rest-func" class="blog-text">
+                            <h1 class="h4 portfolio-title">Como uma API REST funciona</h1>
                         </div>
                     </section>
 
@@ -250,7 +382,8 @@
             const sections = [
                 { id: 'intro', label: 'Introdução' },
                 { id: 'api', label: 'O que é uma API' },
-                { id: 'api-rest', label: 'O que é uma API REST' }
+                { id: 'api-rest', label: 'O que é uma API REST' },
+                { id: 'api-rest-func', label: 'Como uma API REST funciona' }
             ];
 
             loadSideBarBlog(sections);
