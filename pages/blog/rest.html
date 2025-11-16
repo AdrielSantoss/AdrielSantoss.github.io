@@ -359,12 +359,109 @@ Accept: application/json
                                 (GET, POST, PUT, DELETE), utiliza sempre POST nas requisições — tratando o http apenas
                                 como um túnel de transporte, é totalmente incompativel com caches HTTP e navegadores. Já
                                 a arquitetura REST, não tenta reinventar a roda, ela engloba todos esses recursos do
-                                protocolo HTTP — Talvez isso se deve ao fato do criador do Rest ser um dos prioncipais
+                                protocolo HTTP — Talvez isso se deve ao fato do criador do Rest ser um dos principais
                                 fundadores da versão 1.1 do protoclo http.
                             </p>
                         </div>
-                        <div id="api-rest-func" class="blog-text">
-                            <h1 class="h4 portfolio-title">Como uma API REST funciona</h1>
+                        <div id="stateless-vs-stateful" class="blog-text">
+                            <h1 class="h4 portfolio-title">Stateless vS Stateful</h1>
+                            <p>
+                                Uma das principais características da arquitetura REST é o conceito de
+                                <strong>stateless</strong>. Isso significa que o servidor não armazena nenhuma
+                                informação sobre o estado da sessão do cliente entre as requisições.
+                            </p>
+
+                            <p>
+                                Em uma arquitetura <strong>stateful</strong>, o servidor precisa manter informações de
+                                sessão do usuário — como dados de autenticação ou contexto da interação. Geralmente
+                                essas sessões são armazenadas em memória ou em bancos de dados rápidos, como o Redis.
+                                Assim, a cada requisição, o servidor consulta o estado previamente salvo para
+                                identificar o usuário e continuar o fluxo.
+                            </p>
+
+                            <p>
+                                Já em uma API <strong>stateless</strong>, cada requisição deve conter todas as
+                                informações necessárias para ser processada: autenticação, parâmetros, contexto, entre
+                                outros. Um exemplo comum é o uso de <strong>tokens JWT</strong>, onde o cliente envia o
+                                token a cada chamada, permitindo que o servidor valide a requisição sem precisar manter
+                                qualquer estado entre uma interação e outra.
+                            </p>
+
+                            <p>
+                                Atualmente, é muito mais recomendável implementar uma aplicação
+                                <strong>stateless</strong> do que <strong>stateful</strong>. Essa preferência se deve a
+                                vários fatores, tais como:
+                            </p>
+
+                            <ul>
+                                <li>
+                                    <strong>1. Escalabilidade muito mais fácil:</strong> Como o servidor não mantém
+                                    informações de sessão, qualquer requisição pode ser atendida por qualquer instância
+                                    do backend. Isso facilita o balanceamento de carga, auto-escalonamento e a
+                                    distribuição da aplicação em múltiplos servidores (microserviços).
+                                </li>
+                                <br />
+                                <li>
+                                    <strong>2. Redução de complexidade:</strong> Em sistemas stateless não é necessário
+                                    sincronizar sessões, manter caches de estado ou usar bancos como Redis apenas para
+                                    armazenar informações temporárias dos usuários. O servidor apenas processa
+                                    requisições, tornando o sistema mais simples e robusto.
+                                </li>
+                                <br />
+                                <li>
+                                    <strong>3. Maior tolerância a falhas:</strong> Se uma instância cair, nenhuma sessão
+                                    é perdida e outra instância pode assumir imediatamente as requisições. Isso aumenta
+                                    a disponibilidade e a resiliência do sistema.
+                                </li>
+                                <br />
+                                <li>
+                                    <strong>4. Melhor desempenho em alto tráfego:</strong> Cada requisição é processada
+                                    de forma independente, sem necessidade de consultar bancos de sessão ou memória
+                                    compartilhada. Isso reduz a latência e melhora a performance.
+                                </li>
+                                <br />
+                            </ul>
+
+                            <p>
+                                Existem vários motivos pelos quais uma API <strong>stateless</strong> é muito mais
+                                vantajosa do que uma API <strong>stateful</strong>. No entanto, ainda há muitos backends
+                                web legados, especialmente aqueles baseados em <strong>MVC</strong>, que funcionam de
+                                forma totalmente <strong>stateful</strong>. Nesse tipo de aplicação, o servidor costuma
+                                controlar praticamente tudo: renderização de HTML, gerenciamento do fluxo da aplicação,
+                                autenticação baseada em sessão e outras responsabilidades centrais.
+                            </p>
+
+                            <p>
+                                Uma observação importante sobre os termos: quando dizemos que um
+                                <strong>servidor</strong> é stateful, isso automaticamente significa que a
+                                <strong>API</strong> também é stateful. Embora servidor e API sejam conceitos
+                                diferentes, eles estão diretamente conectados — se o servidor mantém estado entre
+                                requisições, a API inevitavelmente deixará de ser stateless.
+                            </p>
+
+                            <p>
+                                O próprio protocolo <strong>HTTP</strong> é stateless por natureza. Mas óbvio, nem tudo
+                                é tão simples... Existem algunas cenários especificos onde implementar uma aplicação web
+                                <strong>stateless</strong> não é o ideal.
+                            </p>
+                            <p>
+                                Aplicações que necessitam de atualização em tempo real normalmente são
+                                <strong>stateful</strong> com o uso de <strong>WebSockets</strong>.
+                            </p>
+
+                            <p>
+                                Outros exemplos clássicos de cenários stateful na Web incluem logins baseados em sessão,
+                                fluxos de múltiplas etapas (wizards) e sistemas legados que dependem de sessões no
+                                servidor.
+                            </p>
+
+                            <p>
+                                Resumidamente, em grande parte das situações — provavelmente mais de 90% — um
+                                desenvolvedor web lidará com aplicações <strong>stateless</strong> em vez de
+                                <strong>stateful</strong>. Ainda assim, tudo depende do contexto. Compreender a
+                                diferença entre esses dois modelos é essencial para entender o funcionamento da Web
+                                moderna e a arquitetura REST.
+                            </p>
                         </div>
                     </section>
 
@@ -383,7 +480,7 @@ Accept: application/json
                 { id: 'intro', label: 'Introdução' },
                 { id: 'api', label: 'O que é uma API' },
                 { id: 'api-rest', label: 'O que é uma API REST' },
-                { id: 'api-rest-func', label: 'Como uma API REST funciona' }
+                { id: 'stateless-vs-stateful', label: 'Stateless vs Stateful' }
             ];
 
             loadSideBarBlog(sections);
