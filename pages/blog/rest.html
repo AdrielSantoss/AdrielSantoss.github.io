@@ -463,6 +463,24 @@ Accept: application/json
                                 moderna e a arquitetura REST.
                             </p>
                         </div>
+
+                        <div id="get" class="blog-text">
+                            <h1 class="h4 portfolio-title">GET</h1>
+
+                            <p>
+                                Agora vou demonstrar os recursos do REST na prática em uma api NODE com typescript,
+                                utilizando o framework <strong>Fastify</strong> e as demais bibliotecas já mencionadas.
+                            </p>
+                            <p>
+                                Vou me concentrar mais na parte da api, ignorando coisas como banco de dados, ORMS e
+                                etc.
+                            </p>
+                            <p>
+                                Uma api rest é uma arquitetura orientada a recurso, portanto, para acessar um
+                                determinado recurso (registros de usuários por exemplo), é necessário fazer uma chamada
+                                HTTP para uma URL especifica.
+                            </p>
+                        </div>
                     </section>
 
                     <section class="working-in-progress"></section>
@@ -480,7 +498,15 @@ Accept: application/json
                 { id: 'intro', label: 'Introdução' },
                 { id: 'api', label: 'O que é uma API' },
                 { id: 'api-rest', label: 'O que é uma API REST' },
-                { id: 'stateless-vs-stateful', label: 'Stateless vs Stateful' }
+                { id: 'stateless-vs-stateful', label: 'Stateless vs Stateful' },
+                { id: 'get', label: 'GET' },
+                { id: 'post', label: 'POST' },
+                { id: 'put', label: 'PUT/PATCH' },
+                { id: 'delete', label: 'DELETE' },
+                { id: 'auth', label: 'Autenticação' },
+                { id: 'tests', label: 'Testes automatizados' },
+                { id: 'conclusion', label: 'Conclusão' },
+                { id: 'refs', label: 'Referências' }
             ];
 
             loadSideBarBlog(sections);
