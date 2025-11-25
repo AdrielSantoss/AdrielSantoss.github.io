@@ -545,9 +545,47 @@ app.get(
                             </p>
 
                             <p>
-                                Portanto, dentro de uma URL não existe tipagem; tudo é texto puro. É no framework
-                                utilizado para criar a API que você define o tipo do parâmetro e configura validações de
-                                tipagem e outras regras de negócio.
+                                Em termos conceituais, em uma URL absolutamente tudo é representado como texto. Isso
+                                acontece porque a URL é apenas uma <strong>string codificada</strong> que o navegador
+                                envia ao servidor. Mesmo que você escreva valores que parecem numéricos, como
+                                <code>/usuarios/10</code> ou <code>/produtos/29.90</code>, eles ainda chegam para a API
+                                como texto puro. Por exemplo, a URL <code>/calcular/2/3</code> envia os valores
+                                <code>"2"</code> e <code>"3"</code> (como strings), e somente depois o framework
+                                converte esses dados para <code>number</code>, <code>float</code>,
+                                <code>boolean</code> ou qualquer outro tipo que você tenha definido.
+                            </p>
+                            <p>
+                                Outro exemplo: se você enviar um nome com espaço, como
+                                <code>/usuarios/joao silva</code>, o navegador transforma isso em
+                                <code>/usuarios/joao%20silva</code>, que também é apenas texto codificado. Portanto, a
+                                URL por si só não entende tipos — ela transporta apenas strings, e cabe à API
+                                interpretar, validar e converter para o tipo apropriado.
+                            </p>
+
+                            <p>
+                                Sobre boas práticas, recomenda-se que rotas sejam sempre nomeadas no
+                                <strong>plural</strong> quando representam coleções (ex.: <code>/usuarios</code>,
+                                <code>/produtos</code>), e que route params sejam escritos no singular, representando um
+                                item específico da coleção (ex.: <code>/usuarios/:id</code>).
+                            </p>
+
+                            <p>
+                                Um "erro" muito comum em iniciante, é criar uma rota no singular quando a mesma possui
+                                um route param. Exemplo:
+                            </p>
+
+                            <pre><code>
+https://app.io/usuarios     → URL do recurso "usuarios"
+https://app.io/usuario/12   → URL do recurso "usuarios" com ID 12 (singular, prática incomum)
+    </code></pre>
+
+                            <p>
+                                Isso não é um erro critico, ou algo que vai prejudicar sua API REST. Essas regras de
+                                boas práticas não foram definidas por alguém em especifico, não existe na tese de Roy
+                                Fielding um capitulo sobre "regras de nomeclaturas e mapeamentos" ou algo assim, isso
+                                tudo é um conjunto de convenções amplamente aceitas pela comunidade REST ao longo dos
+                                anos. Quando falamos de arquitetura de software, quanto mais seguimos dentro desses
+                                padrões, melhor será a qualidade geral da API.
                             </p>
                         </div>
                     </section>
