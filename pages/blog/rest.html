@@ -587,6 +587,63 @@ https://app.io/usuario/12   → URL do recurso "usuarios" com ID 12 (singular, p
                                 anos. Quando falamos de arquitetura REST, quanto mais seguimos dentro desses padrões,
                                 melhor será a qualidade geral do código da API.
                             </p>
+
+                            <h1 class="h4 portfolio-title">GET - Query Params</h1>
+
+                            <p>
+                                Outra forma de enviar parâmetros em uma requisição GET é usando
+                                <strong>query params</strong>. A principal diferença entre query params e route params
+                                está na <strong>obrigatoriedade</strong>. Route params fazem parte da estrutura da URL,
+                                portanto são obrigatórios. Já os query params são opcionais por natureza — eles só se
+                                tornam obrigatórios se você aplicar uma validação manual no seu backend.
+                            </p>
+
+                            <p>
+                                Query params permitem enviar múltiplos parâmetros com diferentes finalidades, como
+                                filtros, paginação, ordenação, busca textual, entre outros. Por exemplo:
+                            </p>
+
+                            <pre><code>
+https://app.io/usuarios?nome=adriel&orderby=idade
+→ URL do recurso "usuarios", filtrando pelo nome "adriel" e ordenando por "idade".
+</code></pre>
+
+                            <p>
+                                Diferentemente dos route params, que identificam um recurso específico, os query params
+                                não alteram a identidade do recurso, apenas modificam a forma como o recurso será
+                                retornado — por exemplo, filtrando, ordenando ou paginando os resultados. Essa diferença
+                                é importante para a consistência do design de APIs REST.
+                            </p>
+
+                            <p>
+                                Já me deparei com algumas aplicações trafegando tokens, senhas e outras informações
+                                sensiveis por query params. Obviamente isso é uma prática <strong>ruim</strong> — para
+                                dizer o minimo. URLs podem vazar em: históricos, logs de servidor, analytics, cache do
+                                navegador e etc. Query params serve para compartilhar informações opcionais cujo o
+                                objetivo é refinar, filtrar ou alterar a resposta.
+                            </p>
+
+                            <p>Em query params é possivel compartilhar listas, os principais padrões são:</p>
+
+                            <pre><code>
+a) Repetindo a chave
+
+?categoria=acao&categoria=rpg&categoria=terror
+
+
+b) Listas separadas por vírgula
+
+?categoria=acao,rpg,terror
+
+
+c) Arrays com sintaxe
+
+?categoria[]=acao&categoria[]=rpg</code></pre>
+
+                            <p>
+                                Mas cuidado, evite transformar URLS em um payload de dados gigante. Browsers normalmente
+                                suportam aproximadamente <strong>2000 caracteres</strong>.
+                            </p>
                         </div>
                     </section>
 
