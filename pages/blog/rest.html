@@ -476,9 +476,78 @@ Accept: application/json
                                 etc.
                             </p>
                             <p>
-                                Uma api rest é uma arquitetura orientada a recurso, portanto, para acessar um
-                                determinado recurso (registros de usuários por exemplo), é necessário fazer uma chamada
-                                HTTP para uma URL especifica.
+                                Uma API REST segue uma arquitetura orientada a recursos. Isso significa que, para
+                                acessar um determinado recurso (como registros de usuários, por exemplo), é necessário
+                                fazer uma chamada HTTP para uma URL específica.
+                            </p>
+
+                            <p>Exemplo de uma API com alguns endpoints:</p>
+
+                            <pre><code class="language-json">
+https://app.io/usuarios      → URL do recurso "usuarios"
+https://app.io/usuarios/12   → URL do recurso "usuarios" com ID 12
+https://app.io/boardgames    → URL do recurso "boardgames"
+</code></pre>
+
+                            <p>
+                                Para obter esses recursos em formato JSON, basta realizar uma requisição HTTP com o
+                                verbo <strong>GET</strong>.
+                            </p>
+
+                            <h1 class="h4 portfolio-title">GET - Route Params</h1>
+
+                            <p>
+                                Note a diferença entre a primeira e a segunda URL: a primeira retorna
+                                <strong>todos</strong> os usuários do banco de dados (ou de qualquer outra fonte que a
+                                API consulte), enquanto a segunda retorna apenas um usuário específico. Essa é a forma
+                                mais comum de filtrar um recurso específico na API, utilizando um
+                                <strong>Route Param</strong>.
+                            </p>
+
+                            <p>
+                                Route params, como o próprio nome sugere, são parâmetros
+                                <strong>obrigatórios</strong> da rota e aparecem na própria URL. Em uma URL, tudo é
+                                sempre tratado como <strong>texto</strong>; ou seja, não existe tipagem na URL em si. A
+                                conversão do valor para um tipo específico (como número, boolean, etc.) é
+                                responsabilidade do framework da API.
+                            </p>
+
+                            <p>Veja este exemplo:</p>
+
+                            <details>
+                                <summary>Declarando uma rota com Node.js e Fastify</summary>
+                                <p><code>app</code> é a instância da API utilizando Fastify.</p>
+                                <pre><code>
+app.get(
+    '/usuarios/:id',
+    {
+        schema: {
+            params: {
+                type: 'object',
+                properties: {
+                    id: { type: 'number', minimum: 0 }
+                },
+                required: ['id']
+            }
+        }
+    },
+    async (request, reply) => userController.getUsuarioById(request, reply)
+);
+    </code></pre>
+                            </details>
+
+                            <p>
+                                No código acima, estou declarando uma rota e definindo o tipo do parâmetro
+                                <code>:id</code> para que o <strong>Fastify</strong> faça a conversão e validação.
+                                Também foi definida uma regra (<code>minimum: 0</code>), e o próprio Fastify realizará a
+                                validação automaticamente, retornando uma exceção <strong>400</strong>
+                                caso a regra seja violada.
+                            </p>
+
+                            <p>
+                                Portanto, dentro de uma URL não existe tipagem; tudo é texto puro. É no framework
+                                utilizado para criar a API que você define o tipo do parâmetro e configura validações de
+                                tipagem e outras regras de negócio.
                             </p>
                         </div>
                     </section>
