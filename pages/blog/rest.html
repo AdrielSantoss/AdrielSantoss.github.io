@@ -626,23 +626,61 @@ https://app.io/usuarios?nome=adriel&orderby=idade
                             <p>Em query params é possivel compartilhar listas, os principais padrões são:</p>
 
                             <pre><code>
-a) Repetindo a chave
+a) Repetindo a chave:
 
 ?categoria=acao&categoria=rpg&categoria=terror
 
 
-b) Listas separadas por vírgula
+b) Listas separadas por vírgula:
 
 ?categoria=acao,rpg,terror
 
 
-c) Arrays com sintaxe
+c) Arrays com sintaxe:
 
 ?categoria[]=acao&categoria[]=rpg</code></pre>
 
                             <p>
-                                Mas cuidado, evite transformar URLS em um payload de dados gigante. Browsers normalmente
-                                suportam aproximadamente <strong>2000 caracteres</strong>.
+                                Mas cuidado, evite transformar URLS em um payload com enorme quantidade de informação.
+                                Browsers normalmente suportam aproximadamente <strong>2000 caracteres</strong>.
+                            </p>
+
+                            <p>
+                                Outra prática comum em query params são os operadores explícitos como
+                                <code>gte</code> (maior ou igual), <code>lte</code> (menor ou igual),
+                                <code>ne</code> (diferente) ou <code>in</code>. Um formato bastante usado é o estilo
+                                inspirado em
+                                <a
+                                    href="https://www.mongodb.com/pt-br/docs/manual/reference/mql/query-predicates/comparison"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >MongoDB</a
+                                >: <code>?preco[gte]=100&amp;preco[lte]=300</code>. APIs mais simples usam convenções
+                                como <code>?minPreco=100&amp;maxPreco=300</code>. Exemplos:
+                            </p>
+
+                            <pre><code>
+/usuarios?idade=30                    → igualdade
+/usuarios?idade[gte]=18               → maior ou igual a 18
+/usuarios?idade[lte]=65               → menor ou igual a 65
+/produtos?preco[gte]=10&preco[lte]=50 → intervalo
+</code></pre>
+
+                            <p>
+                                É importante ressaltar que <strong>query params</strong> e
+                                <strong>route params</strong> não são funcionalidades criadas pela arquitetura REST. Na
+                                verdade, eles fazem parte da própria especificação de URLs definida pelas RFCs que
+                                padronizam a Web. Os <em>route params</em> são apenas trechos variáveis do caminho
+                                (path) da URL, definidos pela aplicação, enquanto os <em>query params</em> são
+                                parâmetros opcionais definidos pela
+                                <a
+                                    href="https://datatracker.ietf.org/doc/html/rfc3986"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >RFC 3986</a
+                                >
+                                para transmitir dados na parte após o caractere <code>?</code>. Portanto, REST apenas
+                                utiliza esses recursos já existentes na arquitetura da Web, mas não os define.
                             </p>
                         </div>
                     </section>
