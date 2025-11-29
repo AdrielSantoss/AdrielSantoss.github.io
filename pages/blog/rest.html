@@ -721,6 +721,77 @@ app.get(
     async (request, reply) => userController.getUsuarios(request, reply)
 );</code></pre>
                             </details>
+
+                            <h1 class="h4 portfolio-title">GET - Paginação</h1>
+
+                            <p>
+                                A paginação é uma técnica usada para <strong>controlar</strong> a quantidade de dados
+                                retornados em uma requisição. Sem ela, uma endpoint poderia enviar milhares de registros
+                                de uma só vez, o que causaria diversos problemas: lentidão no servidor, uso excessivo de
+                                banda, respostas muito grandes e um custo de processamento do payload muito alto no
+                                client.
+                            </p>
+
+                            <p>
+                                Existem várias estratégias de paginação, mas as mais comuns são:
+                                <strong>Offset Pagination</strong> e <strong>Keyset Pagination</strong>.
+                            </p>
+
+                            <p>
+                                Na <strong>offset pagination</strong>, o servidor pula um conjunto de registros (offset)
+                                e retorna um número fixo de itens (limit). offset e limit, são definidos como
+                                <strong>query params</strong>. O parâmetro <strong>page</strong> determina qual
+                                <strong>página</strong> de resultados será retornada, enquanto
+                                <strong>limit</strong> define a <strong>quantidade</strong> de itens por página.
+                            </p>
+
+                            <p><strong>Exemplo de URL com paginação:</strong></p>
+
+                            <pre><code >GET https://api.exemplo.com/usuarios?page=2&limit=10
+</code></pre>
+
+                            <p>Nesse caso, a API retornaria a segunda página contendo até 10 usuários por página.</p>
+
+                            <p>
+                                Vale ressaltar que a paginação não é um recurso obrigatório para a endpoint funcionar.
+                                Ou seja, caso o client não envie os parâmetros de paginação para a API, ela deve assumir
+                                valores padrão, como por exemplo: <code>offset: 0</code> e <code>limit: 50</code>.
+                            </p>
+
+                            <p>
+                                A paginação não entra em conflito com os demais parâmetros da query; portanto, a mesma
+                                endpoint pode conter simultaneamente paginação e filtros.
+                            </p>
+
+                            <p>
+                                A fórmula para obter exatamente a página especificada pelo usuário é a seguinte:
+                                <code>(page - 1) * limit</code>. Após calcular esse valor, basta limitar o resultado
+                                pela quantidade definida em <code>limit</code>.
+                            </p>
+
+                            <p>Veja um exemplo prático dessa fórmula aplicada no ORM Prisma:</p>
+
+                            <code>
+                                <pre>
+async getUsuarios(page: number, limit: number) {
+    return await prisma.usuario.findMany({
+        skip: (page - 1) * limit, // pulando (page - 1) páginas
+        take: limit,              // obtendo apenas a quantidade definida em limit
+    });
+}
+</pre
+                                >
+                            </code>
+
+                            <br />
+
+                            <p>
+                                A principal desvantagem dessa estratégia é a queda de desempenho em tabelas com grande
+                                volume de dados. Um valor muito alto de <code>offset</code> pode tornar o processamento
+                                lento, pois o banco precisa percorrer muitos registros antes de retornar os resultados.
+                                Essa abordagem é recomendada para datasets pequenos ou médios, oferecendo boa precisão
+                                de busca para o client.
+                            </p>
                         </div>
                     </section>
 
