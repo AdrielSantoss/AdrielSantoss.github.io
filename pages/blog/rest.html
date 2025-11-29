@@ -529,7 +529,7 @@ https://app.io/boardgames    → URL do recurso "boardgames"
                             <p>Veja este exemplo:</p>
 
                             <details>
-                                <summary>Declarando uma rota com Node.js e Fastify</summary>
+                                <summary>Declarando uma endpoint com Node.js e Fastify</summary>
                                 <p><code>app</code> é a instância da API utilizando Fastify.</p>
                                 <pre><code>
 app.get(
@@ -696,6 +696,31 @@ c) Arrays com sintaxe:
                                 para transmitir dados na parte após o caractere <code>?</code>. Portanto, REST apenas
                                 utiliza esses recursos já existentes na arquitetura da Web, mas não os define.
                             </p>
+
+                            <details>
+                                <summary>Declarando um endpoint com query params</summary>
+                                <pre><code>
+app.get(
+    '/usuarios',
+    {
+        schema: {
+            querystring: {
+                type: 'object',
+                properties: {
+                    page: { type: 'integer', minimum: 1, default: 1 },
+                    limit: {
+                        type: 'integer',
+                        minimum: 1,
+                        maximum: 10,
+                        default: 10,
+                    },
+                },
+            },
+        },
+    },
+    async (request, reply) => userController.getUsuarios(request, reply)
+);</code></pre>
+                            </details>
                         </div>
                     </section>
 
