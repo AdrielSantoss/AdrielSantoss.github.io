@@ -467,6 +467,9 @@ Accept: application/json
                         <div id="get" class="blog-text">
                             <h1 class="h4 portfolio-title">GET</h1>
 
+                            <!-- Adicionar aqui explicação sobre endpoints, URLS, URIS e etc -->
+                            <!-- Explicar sobre controllers e etc -->
+
                             <p>
                                 Agora vou demonstrar os recursos do REST na prática em uma api NODE com typescript,
                                 utilizando o framework <strong>Fastify</strong> e as demais bibliotecas já mencionadas.
@@ -475,13 +478,24 @@ Accept: application/json
                                 Vou me concentrar mais na parte da api, ignorando coisas como banco de dados, ORMS e
                                 etc.
                             </p>
+
                             <p>
                                 Uma API REST segue uma arquitetura orientada a recursos. Isso significa que, para
                                 acessar um determinado recurso (como registros de usuários, por exemplo), é necessário
-                                fazer uma chamada HTTP para uma URL específica.
+                                fazer uma chamada HTTP para uma URI específica.
                             </p>
 
-                            <p>Exemplo de uma API com alguns endpoints:</p>
+                            <p>
+                                Com o fastify vou criar as <strong>endpoints</strong> da API. Um endpoint é um ponto de
+                                entrada da API, definido pela combinação entre um método HTTP e uma URI específica. A
+                                URI (Uniform Resource Identifier) é o identificador que aponta para um recurso — como
+                                <code>/users</code>, <code>/products/10</code> ou <code>/auth/login</code>. Cada
+                                endpoint da API possui sua própria URI, que indica ao cliente exatamente qual recurso
+                                está sendo acessado ou qual ação será executada. Em conjunto, método + URI determinam o
+                                comportamento do endpoint e como a aplicação irá responder a cada requisição.
+                            </p>
+
+                            <p>Exemplo de uma API com alguns endpoints (cada linha exibe a URI da endpoint):</p>
 
                             <pre><code class="language-json">
 https://app.io/usuarios      → URL do recurso "usuarios"
