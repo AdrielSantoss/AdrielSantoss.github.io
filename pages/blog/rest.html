@@ -972,27 +972,126 @@ async getBoardgames(createdAt: Date | undefined, limit: number) {
                             <h1 class="h4 portfolio-title">GET - Caching</h1>
 
                             <p>
-                                Vou tentar não prolongar muito a explicação sobre cache, pois esse tema é amplo, e
-                                merece ser discutido em um artigo a parte.
-                            </p>
-                            <p>
-                                Existem várias formas de implementar cache em uma aplicação web, o mais comum é a
-                                estratégia de <strong>cache aside</strong> — normalmente utilizando um banco de dados
-                                como <a href="https://redis.io" target="_blank" class="blog-link">Redis</a>.
+                                Cache é um recurso utilizado para melhorar o desempenho da aplicação, reduzindo o número
+                                de acessos ao banco de dados e acelerando o tempo de resposta das requisições.
                             </p>
 
                             <p>
-                                Mas o próprio protocolo http já fornece recursos de caching, então, além de lidar com o
-                                caching nas camadas internas do servidor com Redis, também podemos incluir o
+                                Essa funcionalidade consiste em armazenar os dados requisitados em um banco de dados em
+                                <strong>memória</strong>. O mais comum é usar o
+                                <a href="https://redis.io" target="_blank" class="blog-link">Redis</a>, devido à sua
+                                alta performance e popularidade. Assim, quando os mesmos dados são requisitados
+                                novamente, a aplicação consulta o cache em memória em vez do banco de dados.
+                            </p>
+
+                            <p>
+                                O armazenamento em memória é essencial porque o acesso a dados na memória é muito mais
+                                rápido do que em disco. Isso torna o uso de cache uma solução eficiente para acelerar
+                                chamadas frequentes de dados.
+                            </p>
+
+                            <p>Veja um exemplo do fluxo <strong>normal</strong> de uma chamada GET sem cache:</p>
+
+                            <pre><code>
+Cliente envia requisição GET → Servidor recebe a requisição → Servidor consulta o banco de dados → Banco retorna os dados → Servidor envia a resposta ao cliente
+</code></pre>
+
+                            <p>Agora, veja como o fluxo muda quando o cache está ativo:</p>
+
+                            <pre><code>
+Cliente envia requisição GET → Servidor verifica se os dados estão no cache (Redis) 
+  → Se os dados estiverem no cache → Servidor retorna os dados diretamente ao cliente
+  → Se não estiverem no cache → Servidor consulta o banco de dados → Banco retorna os dados → Servidor armazena os dados no cache → Servidor envia a resposta ao cliente
+</code></pre>
+
+                            <p>
+                                Perceba que o servidor consulta primeiro no cache, e somente se necessário consulta o
+                                banco de dados, esse é a funcionade <strong>base</strong> da maioria das estratégias de
+                                cache eficientes.
+                            </p>
+
+                            <p>
+                                Existem várias formas de implementar cache em uma aplicação web, e a mais comum é a
+                                estratégia de
+                                <strong>cache-aside</strong>, cujo fluxo foi descrito acima.
+                            </p>
+
+                            <p>
+                                No entanto, o próprio protocolo HTTP já fornece mecanismos de caching. Assim, além de
+                                gerenciar o cache nas camadas internas do servidor utilizando Redis, também podemos
+                                utilizar o
                                 <a
                                     href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Headers/Cache-Control"
                                     target="_blank"
                                     class="blog-link"
-                                    >cache-control</a
+                                    >Cache-Control</a
                                 >
-                                do http para lidar com o cache na camada da API — As API's rest modernas, utilizam a
-                                estratégia de caching aside com a combinação de: Redis + CACHE-CONTROL (http).
+                                para controlar o cache na camada da API. As APIs REST modernas geralmente combinam essas
+                                estratégias:
+                                <strong>Redis + Cache-Control (HTTP)</strong>.
                             </p>
+
+                            <p>
+                                É importante entender a diferença entre essas duas abordagens, pois, apesar de
+                                frequentemente usadas juntas, elas são conceitos distintos. O
+                                <strong>cache-aside</strong> é uma estratégia do lado do servidor, que utiliza um banco
+                                de dados em memória como Redis ou Memcached para acelerar respostas. Essa solução é
+                                <strong>estritamente do servidor</strong> e não envolve o cliente.
+                            </p>
+
+                            <p>
+                                Já o <strong>cache HTTP</strong> envolve o cliente de forma ativa. Nesse caso, os
+                                navegadores, proxies ou CDNs podem armazenar as respostas das requisições e
+                                reutilizá-las em chamadas futuras. O cabeçalho <code>Cache-Control</code> permite
+                                configurar regras como:
+                            </p>
+
+                            <ul>
+                                <li>
+                                    <strong>max-age</strong>: tempo em segundos que a resposta pode ser considerada
+                                    válida.
+                                </li>
+                                <br />
+                                <li>
+                                    <strong>public/private</strong>: define se a resposta pode ser armazenada por caches
+                                    compartilhados (CDNs) ou apenas pelo navegador do cliente.
+                                </li>
+                                <br />
+                                <li>
+                                    <strong>no-cache/no-store</strong>: instruções para que a resposta não seja
+                                    reutilizada ou armazenada.
+                                </li>
+                                <br />
+                            </ul>
+
+                            <p>
+                                Combinando essas duas estratégias — cache-aside para o servidor e cache HTTP para o
+                                cliente — é possível construir APIs REST modernas que respondem rapidamente e reduzem
+                                significativamente a carga no banco de dados.
+                            </p>
+
+                            <p>
+                                Mas, na prática, cerca de 90% das vezes os desenvolvedores web lidam apenas com o
+                                <strong>cache-aside</strong>, no lado do servidor. Já os mecanismos de
+                                <strong>cache HTTP</strong> são mais indicados para serem gerenciados pelo cliente ou
+                                por camadas intermediárias, como CDNs e proxies, através de cabeçalhos como
+                                <code>Cache-Control</code> e <code>ETag</code>. Tentar implementar a leitura de cache
+                                HTTP manualmente na sua API não é recomendado, pois esses mecanismos já são
+                                interpretados automaticamente por navegadores e CDNs, tornando desnecessária a lógica
+                                adicional no servidor.
+                            </p>
+
+                            <p>
+                                Outro conceito importante de gerenciamento de cache é a
+                                <strong>invalidação de cache</strong>, isto é, dados que outrora eram úteis já estão
+                                defazados e precisam ser removidos/invalidados para que novos entrem no lugar.
+                            </p>
+
+                            <p>Para entender isso visualize o seguinte cenário:</p>
+
+                            <pre><code>
+                                
+                            </code></pre>
                         </div>
                     </section>
 
@@ -1016,7 +1115,6 @@ async getBoardgames(createdAt: Date | undefined, limit: number) {
                 { id: 'post', label: 'POST' },
                 { id: 'put', label: 'PUT/PATCH' },
                 { id: 'delete', label: 'DELETE' },
-                { id: 'mvc', label: 'MVC + organização' },
                 { id: 'errors', label: 'Tratamento de exceções' },
                 { id: 'auth', label: 'Autenticação' },
                 { id: 'tests', label: 'Testes automatizados' },
