@@ -968,6 +968,31 @@ async getBoardgames(createdAt: Date | undefined, limit: number) {
                                 Normalmente, a estratégia mais utilizada é a keyset pagination, por ser melhor em termos
                                 de perfomance.
                             </p>
+
+                            <h1 class="h4 portfolio-title">GET - Caching</h1>
+
+                            <p>
+                                Vou tentar não prolongar muito a explicação sobre cache, pois esse tema é amplo, e
+                                merece ser discutido em um artigo a parte.
+                            </p>
+                            <p>
+                                Existem várias formas de implementar cache em uma aplicação web, o mais comum é a
+                                estratégia de <strong>cache aside</strong> — normalmente utilizando um banco de dados
+                                como <a href="https://redis.io" target="_blank" class="blog-link">Redis</a>.
+                            </p>
+
+                            <p>
+                                Mas o próprio protocolo http já fornece recursos de caching, então, além de lidar com o
+                                caching nas camadas internas do servidor com Redis, também podemos incluir o
+                                <a
+                                    href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Headers/Cache-Control"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >cache-control</a
+                                >
+                                do http para lidar com o cache na camada da API — As API's rest modernas, utilizam a
+                                estratégia de caching aside com a combinação de: Redis + CACHE-CONTROL (http).
+                            </p>
                         </div>
                     </section>
 
