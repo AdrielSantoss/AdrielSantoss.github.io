@@ -922,7 +922,52 @@ async getUsuarios(page: number, limit: number) {
                                 indexada, como id, created_at ou outra coluna monotonicamente crescente.
                             </p>
 
-                            <p>Essa estratégia, implica em</p>
+                            <p>Veja esse exemplo de keyset pagination:</p>
+
+                            <pre><code>
+Endpoint:
+GET /items?limit=10
+
+Response:
+{
+  "items": [...],
+  "nextCursor": "2025-01-10T14:03:22Z"
+}
+
+Próximo request:
+GET /items?limit=10&cursor=2025-01-10T14:03:22Z
+
+Query no backend:
+SELECT *
+FROM items
+WHERE created_at > :cursor
+ORDER BY created_at ASC
+LIMIT 10;
+
+Exemplo com ORM:
+async getBoardgames(createdAt: Date | undefined, limit: number) {
+    return await prisma.boardgame.findMany({
+        where: {
+            createdAt: {
+                gte: createdAt,
+            },
+        },
+        take: limit + 1,
+    });
+}
+</code></pre>
+
+                            <p>
+                                Perceba que a consulta é feita considerando apenas os dados criados após a última chave
+                                recebida (<code>created_at > :cursor</code>). Com isso, evita-se o problema de
+                                performance do offset pagination: nenhuma informação desnecessária é percorrida ou
+                                ignorada manualmente (skip), tornando a paginação muito mais eficiente.
+                            </p>
+
+                            <p>
+                                Normalmente, a estratégia mais utilizada é a keyset pagination, por ser melhor em termos
+                                de perfomance.
+                            </p>
                         </div>
                     </section>
 
