@@ -12,7 +12,7 @@
             <div class="main-content">
                 <article>
                     <section>
-                        <h1 class="h4 portfolio-title">Entendendo a Arquitetura REST</h1>
+                        <h1 class="h4 portfolio-title">Entendendo Apis, Rest e Restful</h1>
 
                         <div>
                             <small style="color: white">10/11/2025</small> -
@@ -79,16 +79,16 @@
                                 Na verdade isso é um processo natural: bibliotecas surgem, se popularizam, e depois de
                                 um tempo morrem, perdem espaço para uma nova biblioteca que dominou a área. Por isso, eu
                                 não gosto de escrever sobre bibliotecas e frameworks, pois esse conteúdo costuma se
-                                <strong>defazar</strong> muito rápido. Nesse blog, o objetivo é falar sobre conceitos de
-                                arquitetura REST, o foco não é as novas bibliotecas, elas foram apenas o gatilho que me
-                                motivou a fazer esse projeto/estudo.
+                                <strong>defazar</strong> muito rápido. Nesse blog, o objetivo é falar sobre conceitos do
+                                estilo arquitetural REST, o foco não é as novas bibliotecas, elas foram apenas o gatilho
+                                que me motivou a fazer esse projeto/estudo.
                             </p>
 
                             <p>
                                 A comunidade JavaScript/Node é extremamente ativa — as tecnologias evoluem rápido e, na
                                 maioria das vezes, para melhor. Por isso, recentemente decidi revisitar meus
-                                conhecimentos de arquitetura REST na prática, criando um servidor HTTP com Node +
-                                TypeScript + Fastify + Prisma + Vitest, entre outras ferramentas.
+                                conhecimentos de REST na prática, criando um servidor HTTP com Node + TypeScript +
+                                Fastify + Prisma + Vitest, entre outras ferramentas.
                             </p>
 
                             <p>
@@ -212,8 +212,9 @@
                             <h1 class="h4 portfolio-title">O que é uma API REST</h1>
 
                             <p>
-                                Uma api rest é um tipo especifico de api baseado no protocolo HTTP. Rest — sigla para
-                                Representational State Transfer — É um estilo de arquitetura criado por
+                                Uma API REST é um tipo específico de API baseada no protocolo HTTP e fundamentada na
+                                arquitetura cliente-servidor. REST — sigla para Representational State Transfer — é um
+                                estilo de arquitetura criado por
                                 <a href="https://github.com/royfielding" target="_blank" class="blog-link"
                                     >Roy Fielding</a
                                 >
@@ -224,6 +225,17 @@
                                     class="blog-link"
                                     >tese de doutorado.</a
                                 >
+                            </p>
+
+                            <p>
+                                Embora o termo “arquitetura REST” seja comum no mercado, tecnicamente REST
+                                <strong>não é uma arquitetura em si</strong> , mas sim um
+                                <strong>estilo arquitetural</strong> composto por restrições aplicadas sobre uma
+                                arquitetura cliente-servidor. Ele orienta o design de sistemas distribuídos, mas não
+                                define por completo a arquitetura de uma aplicação. Entenda que arquitetura é o projeto
+                                e um estilo arquitetural são as regras definidas para construir esse projeto — Rest é
+                                exatamente isso, um conjunto de regras que orientam a criação de uma aplicação
+                                cliente-servidor.
                             </p>
 
                             <p>
@@ -280,8 +292,8 @@
                             </p>
 
                             <p>
-                                A arquitetura <strong>SOAP</strong> (<em>Simple Object Access Protocol</em>) surgiu
-                                inicialmente como uma boa ideia em 1998, mas com o tempo acabou se tornando uma
+                                O estilo arquitetural <strong>SOAP</strong> (<em>Simple Object Access Protocol</em>)
+                                surgiu inicialmente como uma boa ideia em 1998, mas com o tempo acabou se tornando uma
                                 <strong>gambiarra completamente inviável</strong>. O SOAP foi uma evolução do protocolo
                                 <strong>XML-RPC</strong> (<em>Remote Procedure Call</em> usando XML), criado por
                                 <strong>Dave Winer</strong> no mesmo ano. O objetivo do XML-RPC era permitir que um
@@ -358,15 +370,15 @@ Accept: application/json
                                 O SOUP não foi feito para a web moderna, essa arquitetura não respeita os métodos HTTP
                                 (GET, POST, PUT, DELETE), utiliza sempre POST nas requisições — tratando o http apenas
                                 como um túnel de transporte, é totalmente incompativel com caches HTTP e navegadores. Já
-                                a arquitetura REST, não tenta reinventar a roda, ela engloba todos esses recursos do
-                                protocolo HTTP — Talvez isso se deve ao fato do criador do Rest ser um dos principais
-                                fundadores da versão 1.1 do protoclo http.
+                                REST, não tenta reinventar a roda, ela engloba todos esses recursos do protocolo HTTP —
+                                Talvez isso se deve ao fato do criador do Rest ser um dos principais fundadores da
+                                versão 1.1 do protoclo http.
                             </p>
                         </div>
                         <div id="stateless-vs-stateful" class="blog-text">
                             <h1 class="h4 portfolio-title">Stateless vS Stateful</h1>
                             <p>
-                                Uma das principais características da arquitetura REST é o conceito de
+                                Uma das principais características do REST é o conceito de
                                 <strong>stateless</strong>. Isso significa que o servidor não armazena nenhuma
                                 informação sobre o estado da sessão do cliente entre as requisições.
                             </p>
@@ -460,7 +472,7 @@ Accept: application/json
                                 desenvolvedor web lidará com aplicações <strong>stateless</strong> em vez de
                                 <strong>stateful</strong>. Ainda assim, tudo depende do contexto. Compreender a
                                 diferença entre esses dois modelos é essencial para entender o funcionamento da Web
-                                moderna e a arquitetura REST.
+                                moderna e REST.
                             </p>
                         </div>
 
@@ -480,9 +492,9 @@ Accept: application/json
                             </p>
 
                             <p>
-                                Uma API REST segue uma arquitetura orientada a recursos. Isso significa que, para
-                                acessar um determinado recurso (como registros de usuários, por exemplo), é necessário
-                                fazer uma chamada HTTP para uma URI específica.
+                                Uma API REST é orientada a recursos. Isso significa que, para acessar um determinado
+                                recurso (como registros de usuários, por exemplo), é necessário fazer uma chamada HTTP
+                                para uma URI específica.
                             </p>
 
                             <p>
@@ -598,8 +610,8 @@ https://app.io/usuario/12   → URL do recurso "usuarios" com ID 12 (singular, p
                                 boas práticas não foram definidas por alguém em especifico, não existe na tese de Roy
                                 Fielding um capitulo sobre "regras de nomeclaturas e mapeamentos" ou algo assim, isso
                                 tudo é um conjunto de convenções amplamente aceitas pela comunidade REST ao longo dos
-                                anos. Quando falamos de arquitetura REST, quanto mais seguimos dentro desses padrões,
-                                melhor será a qualidade geral do código da API.
+                                anos. Quando falamos de REST, quanto mais seguimos dentro desses padrões, melhor será a
+                                qualidade geral do código da API.
                             </p>
 
                             <h1 class="h4 portfolio-title">GET - Query Params</h1>
@@ -682,9 +694,9 @@ c) Arrays com sintaxe:
 
                             <p>
                                 É importante ressaltar que <strong>query params</strong> e
-                                <strong>route params</strong> não são funcionalidades criadas pela arquitetura REST. Na
-                                verdade, eles fazem parte da própria especificação de URLs definida pelas RFCs que
-                                padronizam a Web. Os <em>route params</em> são apenas trechos variáveis do caminho
+                                <strong>route params</strong> não são funcionalidades criadas pelo estilo arquitetural
+                                REST. Na verdade, eles fazem parte da própria especificação de URLs definida pelas RFCs
+                                que padronizam a Web. Os <em>route params</em> são apenas trechos variáveis do caminho
                                 (path) da URL, definidos pela aplicação, enquanto os <em>query params</em> são
                                 parâmetros opcionais definidos pela
                                 <a
@@ -792,6 +804,125 @@ async getUsuarios(page: number, limit: number) {
                                 Essa abordagem é recomendada para datasets pequenos ou médios, oferecendo boa precisão
                                 de busca para o client.
                             </p>
+
+                            <p>Veja o fluxo completo da criação de uma paginação em uma API node com fastify:</p>
+
+                            <details>
+                                <summary>Declarando a endpoint /usuarios com os parâmetros "page" e "limit"</summary>
+                                <pre><code>
+app.get(
+    '/usuarios',
+    {
+        schema: {
+            querystring: {
+                type: 'object',
+                properties: {
+                    page: { type: 'integer', minimum: 1, default: 1 },
+                    limit: {
+                        type: 'integer',
+                        minimum: 1,
+                        maximum: 10,
+                        default: 10,
+                    },
+                },
+            },
+        },
+    },
+    async (request, reply) => userController.getUsuarios(request, reply)
+);</code></pre>
+                            </details>
+
+                            <details>
+                                <summary>Declarando o método getUsuarios() em UsuarioController.ts</summary>
+                                <pre><code>
+async getUsuarios(
+    request: FastifyRequest,
+    reply: FastifyReply
+): Promise&lt;UsuariosDto | undefined&gt; {
+    try {
+        const queryParams = request.query as {
+            page?: string;
+            limit?: string;
+        };
+
+        return reply.send(
+            await this.usuarioService.getUsuarios(
+                Number(queryParams.page),
+                Number(queryParams.limit)
+            )
+        );
+    } catch (error) {
+        this.throwResponseException(error, reply);
+    }
+}
+</code></pre>
+                            </details>
+
+                            <details>
+                                <summary>Declarando o método getUsuarios() em UsuarioService.ts</summary>
+                                <p>
+                                    Além da paginação, implementei o <code>lookahead</code> que é uma propriedade que
+                                    sinaliza para o client a existência da próxima página (hasNextPage).
+                                </p>
+                                <pre><code>
+async getUsuarios(
+    page: number,
+    limit: number
+): Promise&lt;UsuariosDto | null&gt; {
+    try {
+        // Offset pagination with lookahead
+        const usuarios = await this.usuarioRepository.getUsuarios(
+            page,
+            limit
+        );
+        const hasNextPage = usuarios.length == limit + 1;
+
+        usuarios.pop();
+
+        const usuariosDto = {
+            data: usuarios,
+            meta: {
+                page,
+                limit,
+                hasNextPage: hasNextPage,
+            },
+        } as UsuariosDto;
+
+        return usuariosDto;
+    } catch (error) {
+        console.error('Erro interno ao consultar os usuários.', error);
+
+        throw new InternalError();
+    }
+}
+</code></pre>
+                            </details>
+
+                            <details>
+                                <summary>Declarando o método getUsuarios() em UsuarioRepository.ts</summary>
+                                <p>
+                                    Aqui, é onde aplicamos a "fórmula" da paginação, skipando os elementos e retornando
+                                    apenas os especificados pelos parâmetros da paginação.
+                                </p>
+                                <pre><code>
+async getUsuarios(page: number, limit: number) {
+    return await prisma.usuario.findMany({
+        skip: (page - 1) * limit,
+        take: limit + 1,
+    });
+}
+</code></pre>
+                            </details>
+
+                            <p>
+                                A outra estratégia de paginação popular em API REST é o
+                                <strong>Keyset Pagination</strong> (também chamada de <i>Cursor based pagination</i>).
+                                Essa estratégia consistem em navegar entre dos dados utilizando uma
+                                <strong>chave de referência</strong> — normalmente o valor de uma coluna ordenada e
+                                indexada, como id, created_at ou outra coluna monotonicamente crescente.
+                            </p>
+
+                            <p>Essa estratégia, implica em</p>
                         </div>
                     </section>
 
@@ -815,6 +946,8 @@ async getUsuarios(page: number, limit: number) {
                 { id: 'post', label: 'POST' },
                 { id: 'put', label: 'PUT/PATCH' },
                 { id: 'delete', label: 'DELETE' },
+                { id: 'mvc', label: 'MVC + organização' },
+                { id: 'errors', label: 'Tratamento de exceções' },
                 { id: 'auth', label: 'Autenticação' },
                 { id: 'tests', label: 'Testes automatizados' },
                 { id: 'conclusion', label: 'Conclusão' },
