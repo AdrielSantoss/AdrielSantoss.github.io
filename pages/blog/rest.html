@@ -220,7 +220,7 @@
                                 >
                                 em 2000, na sua
                                 <a
-                                    href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm"
+                                    href="https://roy.gbiv.com/pubs/dissertation/fielding_dissertation.pdf?utm_source=chatgpt.com"
                                     target="_blank"
                                     class="blog-link"
                                     >tese de doutorado.</a
@@ -1143,6 +1143,53 @@ Esse fluxo mostra claramente:
                                 este artigo excessivamente longo e desviaria do foco principal, por isso abordei apenas
                                 o <strong>básico</strong> que todo programador backend deve saber sobre caching.
                             </p>
+
+                            <h1 class="h4 portfolio-title">GET - HATEOAS / Hypermedia</h1>
+
+                            <p>
+                                Uma das ideias mais interessantes do REST original é que um cliente nunca deveria
+                                “adivinhar” quais ações são possíveis sobre um recurso; em vez disso, a própria resposta
+                                do servidor deveria incluir links navegáveis que descrevem o que pode ser feito a
+                                seguir. Esse conceito é chamado de
+                                <strong>HATEOAS (Hypermedia As The Engine Of Application State).</strong>
+                            </p>
+
+                            <p>
+                                Na prática, isso significa que a resposta de um GET pode funcionar como uma pequena
+                                interface navegável, muito parecida com um documento HTML, mas usando JSON. Cada recurso
+                                retorna não só os dados, mas também metadados sobre como continuar a interação.
+                            </p>
+
+                            <p>Exemplo simples:</p>
+
+                            <pre><code>
+{
+  "id": 42,
+  "title": "Pedido nº 42",
+  "status": "Awaiting Payment",
+  "links": [
+    { "rel": "self", "href": "/orders/42" },
+    { "rel": "customer", "href": "/orders/42/customer" },
+    { "rel": "pay", "href": "/orders/42/pay" }
+  ]
+}</code></pre>
+
+                            <p>
+                                O cliente não precisa conhecer previamente a rota de pagamento ― a própria API entrega
+                                esse caminho de forma explícita e padronizada. Na teoria, isso permitiria que um cliente
+                                genérico navegasse por qualquer API REST, assim como um navegador faz com páginas web.
+                            </p>
+
+                            <p>
+                                Embora esse conceito possa ser aplicado a qualquer método HTTP, ele costuma aparecer com
+                                mais frequência em <strong>GET</strong>. Na prática, porém, muitos desenvolvedores
+                                acabam não implementando esse recurso — e, em diversos casos, nem chegam a conhecer sua
+                                existência. Um HATEOAS bem estruturado reduz a necessidade de documentação extensa e
+                                cria uma comunicação mais direta entre cliente e servidor. Isso elimina comunicações
+                                humanas do tipo: “Ei, qual era mesmo o endpoint que retorna os dados do cliente
+                                relacionado ao pagamento?”, pois a própria resposta da API já aponta os próximos
+                                caminhos possíveis.
+                            </p>
                         </div>
                     </section>
 
@@ -1167,8 +1214,7 @@ Esse fluxo mostra claramente:
                 { id: 'put', label: 'PUT/PATCH' },
                 { id: 'delete', label: 'DELETE' },
                 { id: 'errors', label: 'Tratamento de exceções' },
-                { id: 'auth', label: 'Autenticação' },
-                { id: 'tests', label: 'Testes automatizados' },
+                { id: 'auth', label: 'Autentic automatizados' },
                 { id: 'conclusion', label: 'Conclusão' },
                 { id: 'refs', label: 'Referências' }
             ];
