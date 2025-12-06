@@ -977,6 +977,11 @@ async getBoardgames(createdAt: Date | undefined, limit: number) {
                             </p>
 
                             <p>
+                                Esse tema é extenso, para falar de maneira completa precisaria de um artigo somente
+                                dedicado a este tema, mas aqui vou apenas resumir um pouco dos conceitos e práticas.
+                            </p>
+
+                            <p>
                                 Essa funcionalidade consiste em armazenar os dados requisitados em um banco de dados em
                                 <strong>memória</strong>. O mais comum é usar o
                                 <a href="https://redis.io" target="_blank" class="blog-link">Redis</a>, devido à sua
@@ -1006,8 +1011,8 @@ Cliente envia requisição GET → Servidor verifica se os dados estão no cache
 
                             <p>
                                 Perceba que o servidor consulta primeiro no cache, e somente se necessário consulta o
-                                banco de dados, esse é a funcionade <strong>base</strong> da maioria das estratégias de
-                                cache eficientes.
+                                banco de dados, esse é a funcionalidade <strong>base</strong> da maioria das estratégias
+                                de cache eficientes.
                             </p>
 
                             <p>
@@ -1090,8 +1095,54 @@ Cliente envia requisição GET → Servidor verifica se os dados estão no cache
                             <p>Para entender isso visualize o seguinte cenário:</p>
 
                             <pre><code>
-                                
-                            </code></pre>
+1. O cliente faz um GET /produtos/42
+   - A requisição passa pelo cache.
+   - Como existe um registro armazenado, o cache retorna a versão atual (mas antiga) do produto.
+   - O cliente recebe os dados em milissegundos.
+
+2. Um administrador atualiza o produto 42 no painel interno (ex.: altera preço de R$ 99 → R$ 89).
+   - A API grava o novo valor no banco de dados.
+   - Porém, o mecanismo de cache ainda possui a versão antiga.
+   - Nenhuma invalidação foi disparada automaticamente.
+
+3. O mesmo cliente faz outro GET /produtos/42 alguns segundos depois.
+   - O cache continua retornando a versão antiga (preço R$ 99).
+   - Do ponto de vista do cliente, o produto “parece” não ter sido atualizado.
+
+4. Minutos depois, o TTL (Time To Live) do cache expira.
+   - O cache marca o item como *stale* (obsoleto).
+   - Na próxima requisição, o cache verifica que está expirado.
+   - Ele encaminha a solicitação ao servidor para obter a versão mais recente.
+
+5. O cliente faz um novo GET /produtos/42.
+   - O cache detecta os dados como expirados.
+   - A API retorna o preço correto (R$ 89).
+   - O cache finalmente atualiza seu valor com a versão mais recente.
+
+Esse fluxo mostra claramente:
+- como dados úteis podem se tornar rapidamente obsoletos;
+- como o cliente continua recebendo informações antigas até que ocorra invalidação ou expiração;
+- a importância de mecanismos ativos de *cache invalidation* (ETags, versionamento, mensagens de evento etc.).</code></pre>
+                            <br />
+
+                            <p>
+                                Em soluções modernas, ferramentas como Redis e Memcached já oferecem mecanismos nativos
+                                de <strong>TTL (Time to Live)</strong>, permitindo que itens armazenados expirem
+                                automaticamente após um período definido.
+                            </p>
+                            <p>
+                                Além do TTL, existem outras estratégias para lidar com dados inválidos. Algumas
+                                abordagens optam por <strong>atualizar o cache</strong> em vez de removê-lo
+                                completamente, enquanto outras combinam atualização e remoção conforme o cenário. Ainda
+                                assim, o uso de TTL continua sendo a técnica mais simples e amplamente adotada para
+                                garantir a expiração automática de informações.
+                            </p>
+                            <p>
+                                Esses são apenas os fundamentos do tema. O universo de caching é bastante amplo, repleto
+                                de conceitos, padrões e estratégias diferentes. Explorar tudo em profundidade deixaria
+                                este artigo excessivamente longo e desviaria do foco principal, por isso abordei apenas
+                                o <strong>básico</strong> que todo programador backend deve saber sobre caching.
+                            </p>
                         </div>
                     </section>
 
