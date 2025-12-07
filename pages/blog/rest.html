@@ -93,7 +93,24 @@
 
                             <p>
                                 Além de relembrar conceitos, quero aproveitar essa oportunidade para pesquisar e
-                                aprender coisas novas.
+                                aprender coisas novas sobre desenvolvimento de APIs REST.
+                            </p>
+
+                            <p>
+                                É importante destacar que muitos dos conceitos que vou apresentar aqui não pertencem
+                                diretamente ao estilo arquitetural REST, mas fazem parte do próprio protocolo HTTP. Como
+                                REST se apoia totalmente no HTTP (e falarei disso mais adiante), torna-se impossível
+                                explicar REST sem revisitar alguns fundamentos essenciais do protocolo. Por isso,
+                                recomendo fortemente que <strong>qualquer pessoa</strong> que pretenda estudar APIs
+                                comece entendendo primeiro o funcionamento do protocolo HTTP. (Em um futuro próximo,
+                                provavelmente farei um estudo detalhado sobre o protocolo HTTP).
+                            </p>
+
+                            <p>
+                                Nesse artigo vou adentrar em muitos temas densos, como: caching, autenticação,
+                                permissões e etc. Mas a idéia é fazer um geralzão do básico que todo desenvolvedor web
+                                deve saber sobre esses temas. Cada tema complexo desses merece um artigo separado, se eu
+                                concentrar tudo aqui, viraria um livro e o artigo fugiria do propósito de REST.
                             </p>
                         </div>
 
@@ -209,7 +226,7 @@
                         </div>
 
                         <div id="api-rest" class="blog-text">
-                            <h1 class="h4 portfolio-title">O que é uma API REST</h1>
+                            <h1 class="h4 portfolio-title">O que é uma API REST/RESTFUL</h1>
 
                             <p>
                                 Uma API REST é um tipo específico de API baseada no protocolo HTTP e fundamentada na
@@ -1190,6 +1207,15 @@ Esse fluxo mostra claramente:
                                 relacionado ao pagamento?”, pois a própria resposta da API já aponta os próximos
                                 caminhos possíveis.
                             </p>
+
+                            <h1 class="h4 portfolio-title">GET - Streams / Downloads</h1>
+
+                            <p>
+                                Outro ponto interessante — e pouco explorado — é que o GET não serve apenas para
+                                retornar JSON “fechado”. Ele também é o método mais adequado para conteúdos grandes,
+                                fluxos contínuos e transferências parciais, porque é seguro, idempotente e facilmente
+                                otimizado por navegadores, proxies e CDNs.
+                            </p>
                         </div>
                     </section>
 
@@ -1207,14 +1233,14 @@ Esse fluxo mostra claramente:
             const sections = [
                 { id: 'intro', label: 'Introdução' },
                 { id: 'api', label: 'O que é uma API' },
-                { id: 'api-rest', label: 'O que é uma API REST' },
+                { id: 'api-rest', label: 'O que é uma API REST/RESTFUL' },
                 { id: 'stateless-vs-stateful', label: 'Stateless vs Stateful' },
                 { id: 'get', label: 'GET' },
                 { id: 'post', label: 'POST' },
                 { id: 'put', label: 'PUT/PATCH' },
                 { id: 'delete', label: 'DELETE' },
                 { id: 'errors', label: 'Tratamento de exceções' },
-                { id: 'auth', label: 'Autentic automatizados' },
+                { id: 'auth', label: 'CORS e Autenticação' },
                 { id: 'conclusion', label: 'Conclusão' },
                 { id: 'refs', label: 'Referências' }
             ];
