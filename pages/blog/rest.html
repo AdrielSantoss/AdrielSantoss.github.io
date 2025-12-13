@@ -496,9 +496,6 @@ Accept: application/json
                         <div id="get" class="blog-text">
                             <h1 class="h4 portfolio-title">GET</h1>
 
-                            <!-- Adicionar aqui explicação sobre endpoints, URLS, URIS e etc -->
-                            <!-- Explicar sobre controllers e etc -->
-
                             <p>
                                 Agora vou demonstrar os recursos do REST na prática em uma api NODE com typescript,
                                 utilizando o framework <strong>Fastify</strong> e as demais bibliotecas já mencionadas.
@@ -1310,6 +1307,41 @@ async getBoardgameRulebook(): Promise&lt;ReadStream | undefined&gt; {
                                 de vídeo. Quando o tipo exato do arquivo não é conhecido ou não deve ser interpretado
                                 automaticamente pelo cliente, utilize o tipo genérico
                                 <code>application/octet-stream</code>, que representa um fluxo arbitrário de bytes.
+                            </p>
+                        </div>
+                        <div id="post" class="blog-text">
+                            <h1 class="h4 portfolio-title">POST</h1>
+
+                            <p>
+                                O objetivo do método <strong>POST</strong> é <strong>enviar dados</strong> ao servidor.
+                                Diferentemente do <strong>GET</strong>, em que o cliente solicita uma representação de
+                                um recurso, no POST o cliente já possui a informação e a transmite ao servidor para que
+                                ela seja processada.
+                            </p>
+
+                            <p>
+                                Aqui, iniciantes se confundam com o fato de o POST também retornar uma resposta. Assim
+                                como o GET — e qualquer outro método HTTP — o POST sempre possui uma
+                                <strong>response</strong>, normalmente em formato JSON. Essa característica, porém, leva
+                                a um erro conceitual frequente: utilizar POST para <em>obter</em> dados do servidor.
+                                Embora isso funcione tecnicamente, está longe de ser a abordagem correta. O POST não
+                                deve ser usado como mecanismo de consulta; seu papel principal é a criação ou submissão
+                                de dados no servidor, sendo normalmente associado a operações de <em>INSERT</em>.
+                            </p>
+
+                            <p>
+                                Também vale ressaltar que <strong>muitos</strong> dos conceitos apresentados no tópico
+                                anterior sobre o <strong>GET</strong> — como <em>query params</em>,
+                                <em>route params</em>, paginação e hypermedia — podem ser utilizados normalmente em
+                                requisições <strong>POST</strong>, ainda que alguns desses recursos sejam mais comuns no
+                                contexto de GET. A principal diferença semântica entre POST e GET no HTTP é que, no
+                                primeiro, é permitido o envio de um payload no <strong>body</strong> da requisição,
+                                enquanto no segundo o corpo da requisição não é utilizado para esse fim.
+                            </p>
+
+                            <p>
+                                Assim como fiz no tópico sobre práticas comuns do GET, vou descrever as situações e
+                                práticas comuns de POST que um programador web backend lida diariamente.
                             </p>
                         </div>
                     </section>
