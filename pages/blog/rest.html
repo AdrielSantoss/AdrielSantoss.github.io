@@ -1216,6 +1216,101 @@ Esse fluxo mostra claramente:
                                 fluxos contínuos e transferências parciais, porque é seguro, idempotente e facilmente
                                 otimizado por navegadores, proxies e CDNs.
                             </p>
+
+                            <p>
+                                Trafegar arquivos é uma prática comum em aplicações web modernas: PDFs, imagens, vídeos,
+                                backups, relatórios e binários em geral. Em todos esses casos, o protocolo HTTP é
+                                utilizado para enviar os dados como um stream, ou seja, a conexão HTTP é estabelecida e
+                                os dados do arquivo são transmitidos de forma progressiva, em partes, enquanto o cliente
+                                os consome. Muitos programadores web se enganam ao pensar que ao declarar um GET com:
+                                <em>content-type: application/pdf</em>, o PDF será enviado de uma única vez, isso não
+                                existe.
+                            </p>
+
+                            <p>
+                                Todo download de arquivo utilizando o protocolo HTTP se baseia na ideia de
+                                <strong>transferência progressiva de dados</strong>, onde o conteúdo é entregue como um
+                                fluxo contínuo de bytes ao cliente. Em muitos cenários — especialmente para arquivos
+                                grandes — essa transferência pode ser otimizada por meio da estratégia
+                                <strong>Range-based transfer</strong>, que permite solicitar apenas partes específicas
+                                de um recurso.
+                            </p>
+
+                            <p>
+                                Um exemplo muito conhecido — e fácil de observar na prática — são os vídeos do YouTube.
+                                Embora um vídeo seja, conceitualmente, um arquivo, seus dados não são transferidos de
+                                uma única vez. Em vez disso, o conteúdo é trafegado como um
+                                <strong>stream de dados</strong>, sendo consumido progressivamente pelo cliente. Esse
+                                comportamento pode ser observado diretamente na ferramenta de desenvolvedor do
+                                navegador, na aba <em>Network</em>.
+                            </p>
+
+                            <p>
+                                Durante a reprodução, é possível perceber sucessivas requisições ao endpoint
+                                <code>/videoplayback</code>. Essas requisições ocorrem ao longo do tempo e carregam os
+                                dados de vídeo e áudio necessários para manter o buffer do player preenchido:
+                            </p>
+
+                            <div class="item item-diagrama">
+                                <div class="item-description">
+                                    <small><i>Clique para expandir</i></small>
+                                </div>
+                                <img
+                                    src="../../assets/images/blog/rest/videoplaybacks.png"
+                                    class="img-expanded"
+                                    style="width: 100%"
+                                />
+                            </div>
+                            <br />
+                            <p>
+                                Existem uma prática horrível, muito adotada — Principalmente com arquivos de imagens —
+                                que consiste em converter arquivos binários para Base64 e incluí-los dentro de um JSON.
+                                Além de poluir o payload e dificultar o cache, essa conversão aumenta o tamanho real do
+                                conteúdo em aproximadamente
+                                <strong>33%</strong>. Sempre<strong>prefira HTTP streaming</strong> para a transferência
+                                de arquivos binários.
+                            </p>
+
+                            <p>
+                                Quando o servidor conhece previamente o tamanho total do conteúdo a ser enviado, ele
+                                pode informar esse valor por meio do header <code>Content-Length</code>. Nesse cenário,
+                                o cliente sabe exatamente quantos bytes esperar e pode gerenciar melhor o progresso do
+                                download, exibir barras de progresso e otimizar o uso de memória. Por outro lado, quando
+                                o tamanho do conteúdo não é conhecido no momento em que a resposta é iniciada — como em
+                                streams, geração dinâmica de arquivos ou leitura progressiva de dados — o HTTP utiliza a
+                                transferência em partes (<em>Transfer-Encoding: chunked</em>, no header), na qual os
+                                dados são enviados em blocos sucessivos enquanto a conexão permanece aberta, sem a
+                                necessidade de informar o tamanho total antecipadamente.
+                            </p>
+
+                            <p>
+                                Mas, no dia a dia, você não precisa se preocupar com essas propriedades no header ao
+                                transferir um arquivo, os próprios frameworks web já fazem isso por você, ou seja, ao
+                                retornar algo como:
+                            </p>
+
+                            <pre><code>
+async getBoardgameRulebook(): Promise&lt;ReadStream | undefined&gt; {
+    return fs.createReadStream(
+        path.join(__dirname, '..', 'assets', 'rulebook-example.pdf')
+    );
+}</code></pre>
+
+                            <p>
+                                O própio FASTIFY vai se encarregar de incluir: <em>Transfer-Encoding: chunked</em> e
+                                <em>Content-Length</em> no headers da requisição.
+                            </p>
+
+                            <p>
+                                E claro… sempre informe o <em>Content-Type</em> corretamente. Esse header indica ao
+                                cliente como os bytes recebidos devem ser interpretados. Por exemplo,
+                                <code>application/json</code>, <code>text/html</code> para páginas web,
+                                <code>image/png</code> ou <code>image/jpeg</code> para imagens,
+                                <code>application/pdf</code> para documentos PDF e <code>video/mp4</code> para conteúdos
+                                de vídeo. Quando o tipo exato do arquivo não é conhecido ou não deve ser interpretado
+                                automaticamente pelo cliente, utilize o tipo genérico
+                                <code>application/octet-stream</code>, que representa um fluxo arbitrário de bytes.
+                            </p>
                         </div>
                     </section>
 
