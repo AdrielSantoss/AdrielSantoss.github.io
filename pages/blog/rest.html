@@ -1264,8 +1264,8 @@ Esse fluxo mostra claramente:
                                 que consiste em converter arquivos binários para Base64 e incluí-los dentro de um JSON.
                                 Além de poluir o payload e dificultar o cache, essa conversão aumenta o tamanho real do
                                 conteúdo em aproximadamente
-                                <strong>33%</strong>. Sempre<strong>prefira HTTP streaming</strong> para a transferência
-                                de arquivos binários.
+                                <strong>33%</strong>. Sempre <strong>prefira HTTP streaming</strong> para a
+                                transferência de arquivos binários.
                             </p>
 
                             <p>
@@ -1343,6 +1343,183 @@ async getBoardgameRulebook(): Promise&lt;ReadStream | undefined&gt; {
                                 Assim como fiz no tópico sobre práticas comuns do GET, vou descrever as situações e
                                 práticas comuns de POST que um programador web backend lida diariamente.
                             </p>
+
+                            <h1 class="h4 portfolio-title">POST - Mapeamento e validação de dados</h1>
+
+                            <p>
+                                Quando o cliente envia dados no corpo da requisição, esses dados devem ser
+                                <strong>mapeados</strong> e <strong>validados</strong>. O protocolo HTTP não realiza
+                                nenhum tipo de validação e mapeamento, ele apenas transporta os dados. A
+                                responsabilidade de converter o corpo em objetos ou classes no servidor fica a cargo do
+                                framework web (no meu caso, o Fastify).
+                            </p>
+
+                            <p>
+                                Sobre mapeamento, existem diversas bibliotecas que fazem o
+                                <strong>parsing do corpo da requisição</strong> em um <strong>DTO</strong> (Data
+                                Transfer Object). No caso do Fastify, a biblioteca padrão para isso é o
+                                <a href="https://ajv.js.org" target="_blank" class="blog-link">AJV</a>.
+                            </p>
+
+                            <p>
+                                Uma boa biblioteca de parsing de API web não fornece apenas o
+                                <strong>mapeamento</strong> (transformar JSON em uma classe), mas também recursos de
+                                <strong>validação</strong> de dados. Esses recursos permitem validar regras como tipo de
+                                dados, valores mínimos e máximos para dados numéricos, campos obrigatórios, entre
+                                outros. Quando a biblioteca de parsing é totalmente integrada ao framework da API, essas
+                                validações já retornam erros HTTP da família 400 sempre que algum dado enviado pelo
+                                cliente não corresponde às regras estipuladas no mapeamento.
+                            </p>
+
+                            <p>
+                                Para entender melhor veja, esse mapeamento de dados da enpoint
+                                <code>/usuario</code> para criação de um novo usuário no fastify:
+                            </p>
+
+                            <pre>
+                                <code>
+app.post(
+    '/usuarios',
+    {
+        schema: {
+            body: {
+                type: 'object',
+                required: ['email'],
+                properties: {
+                    nome: { type: 'string' },
+                    email: { type: 'string' },
+                },
+            },
+        },
+    },
+    async (request, reply) => userController.createUsuario(request, reply)
+);</code></pre>
+
+                            <br />
+                            <p>
+                                Perceba, que eu consigo definir o <strong>tipo</strong> das propriedades, e definir a
+                                obrigatóriedade, atráves da propriedade <code>required</code>. Se o cliente, enviar um
+                                valor númerico no <code>nome</code>, o AJV avisa o fastify que uma regra não foi
+                                cumprida, e o próprio fastify se encarrega de retornar um erro <code>400</code> para o
+                                cliente. Tudo automático, não foi necessário validar manualmente dentro dos meus métodos
+                                controller ou service.
+                            </p>
+
+                            <p>
+                                Todo framework web moderno, já fornece esse tipo de mapeamento e validação com retorno
+                                de exceção automático. Definitivamente não é uma boa prática validar corpo de requisição
+                                manualmente. Sendo assim o desenvolvedor deve apenas se preocupar com as validações que
+                                são necessárias, as validações que envolvem as regras de negócio do sistema.
+                            </p>
+
+                            <p>
+                                Após definir o <code>schema</code> do body da requisição na endpoinnt POST
+                                <code>/usuario</code>, eu criei uma interface <strong>DTO</strong> que mapeia as
+                                propriedades desse schema, veja:
+                            </p>
+
+                            <pre><code>
+export interface UsuarioDto {
+    nome: string | null | undefined;
+    email: string;
+    created?: boolean | undefined;
+}</code></pre>
+
+                            <p>
+                                Utilizo essa interface na minha controller e service, veja esse exemplo em
+                                <code>usuarioController</code>:
+                            </p>
+
+                            <pre><code>
+async createUsuario(
+    request: FastifyRequest,
+    reply: FastifyReply
+): Promise&lt;undefined&gt; {
+    try {
+        const newUsuario = request.body as UsuarioDto;
+
+        const usuario = await this.usuarioService.createUsuario(newUsuario);
+
+        return reply.code(usuario?.created ? 201 : 200).send(usuario);
+    } catch (error) {
+        this.throwResponseException(error, reply);
+    }
+}</code></pre>
+
+                            <p>
+                                <code>request.body</code> é recebido como um <code>any</code>, mas eu forço a tipagem
+                                para <code>UsuarioDto</code>. Utilizar DTOs é uma boa prática em métodos POST. Entenda
+                                DTO como uma classe "burra", que não possui nenhuma funcionalidade, apenas define as
+                                propriedades e seus tipos. O próprio nome já sugere que é uma classe apenas para
+                                transferencia de dados (Data Transfer Objects).
+                            </p>
+
+                            <p>
+                                É importante comentar sobre DTOs, pois programadores iniciantes tendem a utilizar a
+                                <strong>mesma</strong> classe de Model do ORM para mapear os dados na controller. Esse é
+                                um erro muito comum. Para entender melhor, veja as duas classes abaixo:
+                            </p>
+
+                            <p>
+                                Interface TypeScript que define o modelo da tabela <strong>USUÁRIO</strong>, utilizada
+                                pelo ORM:
+                            </p>
+                            <pre><code>
+export interface UsuarioModel {
+    id: number;
+    nome: string;
+    email: string;
+    senha: string;
+    criadoEm: Date;
+    atualizadoEm: Date;
+}
+</code></pre>
+
+                            <p>
+                                Interface TypeScript que define o DTO para o POST, utilizado na criação de um novo
+                                usuário:
+                            </p>
+                            <pre><code>
+export interface UsuarioDto {
+    nome: string;
+    email: string;
+    senha: string;
+}
+</code></pre>
+
+                            <p>
+                                Perceba que as duas interfaces possuem algumas propriedades semelhantes, mas o DTO não
+                                inclui campos como <code>id</code>, <code>criadoEm</code> ou <code>atualizadoEm</code>.
+                                À primeira vista, pode parecer que não faz sentido criar um
+                                <strong>UsuarioDto</strong> e que seria mais simples usar diretamente o
+                                <strong>UsuarioModel</strong> na controller. No entanto, isso é um erro comum de
+                                programadores iniciantes.
+                            </p>
+
+                            <p>
+                                Separar Model e DTO faz sentido por vários motivos: o DTO define exatamente o que a API
+                                espera receber ou enviar, protegendo campos sensíveis como senhas ou IDs de serem
+                                modificados diretamente pelo cliente. Além disso, facilita a validação e o mapeamento de
+                                dados, mantém a camada de persistência desacoplada da camada de apresentação e torna o
+                                código mais seguro, previsível e fácil de manter. Essa prática é especialmente
+                                importante em APIs REST ou GraphQL, onde o contrato de dados precisa ser claro e
+                                consistente.
+                            </p>
+
+                            <p>
+                                Para simplificar: <strong>não misture camadas.</strong> Models fazem parte da camada de
+                                banco de dados e do servidor, e devem ser utilizados apenas nas classes responsáveis
+                                pela persistência, como os <code>repositories</code>. Nunca devem ser usados diretamente
+                                na camada de API, como nos métodos da <code>controller</code>. Mais adiante, abordarei
+                                com mais detalhes o conceito de camadas e reforçarei a importância de manter cada
+                                responsabilidade separada.
+                            </p>
+
+                            <h1 class="h4 portfolio-title">POST - Processamento assíncrono</h1>
+
+                            <h1 class="h4 portfolio-title">POST - Upload / Multipart</h1>
+
+                            <h1 class="h4 portfolio-title">POST - Idempotência</h1>
                         </div>
                     </section>
 
