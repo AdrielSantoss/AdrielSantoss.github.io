@@ -1517,6 +1517,43 @@ export interface UsuarioDto {
 
                             <h1 class="h4 portfolio-title">POST - Processamento assíncrono</h1>
 
+                            <p>
+                                APIs modernas utilizam <strong>async/await</strong> porque a maior parte do
+                                processamento envolve operações de <em>I/O</em>, como acesso a banco de dados, leitura
+                                de arquivos e chamadas para outros serviços. Essas operações são inerentemente lentas
+                                quando comparadas à execução de código em memória, e executá-las de forma síncrona
+                                bloquearia o servidor. O uso de processamento assíncrono permite que a aplicação
+                                continue atendendo outras requisições enquanto aguarda a conclusão dessas operações.
+                            </p>
+
+                            <p>
+                                Pensamento clássico: "Se eu usar async/await, posso fazer qualquer coisa dentro dos
+                                métodos da endpoint.". Esse pensamento está completamente errado, async/await
+                                <strong>não paraleliza CPU</strong> ele apenas libera a thread enquanto espera I/O, ele
+                                não resolve problemas causados por tarefas computacionalmente pesadas. Operações
+                                intensivas de CPU, como cálculos complexos, compressão de dados ou loops extensos,
+                                continuam sendo executadas de forma síncrona dentro da thread de execução.
+                            </p>
+
+                            <p>
+                                Para resolver esse problema e evitar o <strong>bloqueio do event loop</strong> no
+                                Node.js, é comum adotar a estratégia de <strong>filas de processamento</strong>. Nesse
+                                modelo, a API limita-se a receber e validar a requisição, delegando a execução de
+                                tarefas pesadas para processos em segundo plano. Dessa forma, o servidor HTTP permanece
+                                responsivo, enquanto o processamento é realizado de maneira assíncrona e desacoplada do
+                                ciclo de vida da requisição.
+                            </p>
+
+                            <p>
+                                Esse tipo de problema ocorre principalmente quando estamos lidando com sistemas de envio
+                                de e-mails, mensagens e etc. Para entender, visualize esse fluxo que não possui fila de
+                                processamento:
+                            </p>
+
+                            <pre><code></code></pre>
+
+                            <p></p>
+
                             <h1 class="h4 portfolio-title">POST - Upload / Multipart</h1>
 
                             <h1 class="h4 portfolio-title">POST - Idempotência</h1>
