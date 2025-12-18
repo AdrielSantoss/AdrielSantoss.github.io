@@ -1546,13 +1546,209 @@ export interface UsuarioDto {
 
                             <p>
                                 Esse tipo de problema ocorre principalmente quando estamos lidando com sistemas de envio
-                                de e-mails, mensagens e etc. Para entender, visualize esse fluxo que não possui fila de
-                                processamento:
+                                de e-mails, mensagens e etc. Para entender, visualize esse fluxo que
+                                <strong>não</strong>
+                                possui fila de processamento:
                             </p>
 
-                            <pre><code></code></pre>
+                            <pre><code>
+Cliente
+   |
+   v
+API recebe a requisição
+   |
+   v
+API processa toda a lógica (envio de e-mail)
+   |
+   v
+API aguarda o serviço de e-mail responder
+   |
+   v
+Resposta enviada ao cliente (200 OK ou erro)
+</code></pre>
 
-                            <p></p>
+                            <p>
+                                Nesse cenário, o cliente precisa aguardar todo o processamento terminar. Caso o serviço
+                                de e-mail esteja lento ou indisponível, a requisição ficará bloqueada, aumentando o
+                                tempo de resposta e a chance de falhas.
+                            </p>
+
+                            <p>
+                                Agora veja o mesmo fluxo utilizando uma
+                                <strong>fila de processamento (REST + Queue)</strong>:
+                            </p>
+
+                            <pre><code>
+Cliente
+   |
+   v
+API recebe a requisição
+   |
+   v
+API valida os dados
+   |
+   v
+API adiciona a mensagem na fila
+   |
+   v
+Resposta imediata ao cliente (202 Accepted)
+
+-------------------------
+
+Worker / Consumidor
+   |
+   v
+Lê mensagem da fila
+   |
+   v
+Processa a lógica (envio de e-mail)
+   |
+   v
+Comunica o serviço externo
+   |
+   v
+Finaliza o processamento
+</code></pre>
+
+                            <p>
+                                Com a fila, a API responde rapidamente ao cliente, delegando o trabalho pesado para um
+                                <em>worker</em>. Isso torna o sistema mais resiliente, escalável e desacoplado, evitando
+                                que falhas ou lentidão em serviços externos impactem diretamente o usuário final.
+                            </p>
+
+                            <p>
+                                Segue abaixo o fluxo que implementei de uma criação de boardgames em lote. Utilize a
+                                biblioteca
+                                <a href="https://github.com/taskforcesh/bullmq" class="blog-link" target="_blank"
+                                    >BullMQ</a
+                                >
+                                para criação de queues no node.
+                            </p>
+
+                            <details>
+                                <summary>Declarando a endpoint /boardgames/:usuarioId/batch</summary>
+                                <pre><code>
+ app.post(
+        '/boardgames/:usuarioId/batch',
+        {
+            schema: {
+                params: {
+                    type: 'object',
+                    required: ['usuarioId'],
+                    properties: {
+                        usuarioId: { type: 'number', minimum: 0 },
+                    },
+                },
+                body: {
+                    type: 'array',
+                    minItems: 1,
+                    items: {
+                        type: 'object',
+                        required: ['nome', 'descricao', 'complexidade'],
+                        properties: {
+                            nome: { type: 'string' },
+                            descricao: { type: 'string' },
+                            complexidade: { type: 'number' },
+                            idade: { type: 'number' },
+                            tempo: { type: 'number' },
+                            ano: { type: 'number' },
+                        },
+                    },
+                },
+                headers: {
+                    type: 'object',
+                    required: ['idempotencykey'],
+                    properties: {
+                        idempotencykey: { type: 'string' },
+                    },
+                },
+            },
+        },
+        async (request, reply) =>
+            boardgameController.createBoardgamesBatch(request, reply)
+    );</code></pre>
+                            </details>
+                            <details>
+                                <summary>Controller retornando 202 e adicionando lista na fila.</summary>
+                                <pre><code>
+    async createBoardgamesBatch(
+        request: FastifyRequest,
+        reply: FastifyReply
+    ): Promise&gt;undefined&lt; {
+        try {
+            const boardgames = request.body as BoardgameDto[];
+            const { usuarioId } = request.params as { usuarioId: number };
+
+            await boardgameQueue.add(
+                'create-boardgames',
+                {
+                    boardgames,
+                    usuarioId,
+                },
+                {
+                    removeOnComplete: true,
+                    removeOnFail: false,
+                }
+            );
+
+            return reply.code(202).send({
+                message: 'Boardgames enfileirado para processamento',
+            });
+        } catch (error) {
+            this.throwResponseException(error, reply);
+        }
+    }</code></pre>
+                            </details>
+                            <details>
+                                <summary>Declarando fila e worker para processar a lista de boardgames.</summary>
+                                <pre><code>
+import { Queue } from 'bullmq';
+
+import { Worker, Job } from 'bullmq';
+import { BoardgameDto } from '../models/boardgameDto';
+import { bullRedisOptions } from '../database/redisConnections';
+import { Boardgame } from '@prisma/client';
+import { prisma } from '../database/prismaClient';
+
+export const boardgameQueue = new Queue('boardgame-queue');
+
+interface CreateBoardgamesJob {
+    boardgames: BoardgameDto[];
+    usuarioId: number;
+}
+
+export const boardgameWorker = new Worker(
+    'boardgame-queue',
+    async (job: Job&gt;CreateBoardgamesJob&lt;) => {
+        if (job.name === 'create-boardgames') {
+            const { boardgames, usuarioId } = job.data;
+
+            let boardgamesModel: Boardgame[] = [];
+
+            for (const newBoardgame of boardgames) {
+                boardgamesModel.push(&gt;Boardgame&lt;{
+                    nome: newBoardgame.nome,
+                    descricao: newBoardgame.descricao,
+                    complexidade: newBoardgame.complexidade,
+                    ano: newBoardgame.ano ?? 0,
+                    idade: newBoardgame.idade,
+                    tempo: newBoardgame.tempo,
+                    usuarioId: usuarioId,
+                });
+            }
+
+            prisma.boardgame.createMany({
+                data: boardgamesModel,
+            });
+        }
+    },
+    {
+        connection: bullRedisOptions,
+        concurrency: 5,
+    }
+);
+</code></pre>
+                            </details>
 
                             <h1 class="h4 portfolio-title">POST - Upload / Multipart</h1>
 
