@@ -1779,7 +1779,102 @@ export const boardgameWorker = new Worker(
 
                             <h1 class="h4 portfolio-title">POST - Upload / Multipart</h1>
 
-                            <p></p>
+                            <p>
+                                Para upload de arquivos, pode-se utilizar trafegar apenas os dados do arquivo, basta
+                                declarar uma endpoint com <code>content-type/pdf</code> (caso seja um arquivo PDF). ou
+                                então um <code>octet-stream</code>, que é um content-type "coringa", que não especifica
+                                o tipo do arquivo, é utilizado apenas para trefegar bytes.
+                            </p>
+
+                            <p>
+                                Mas existe um <em>Content-Type</em> interessante, pouco utilizado e muitas vezes mal
+                                compreendido, que é o <code>multipart/form-data</code>. Com esse formato é possível
+                                enviar dados binários + metadados na mesma requisição, como no caso do cadastro de um
+                                produto ou boardgame, onde informações como nome, descrição e preço são enviadas junto
+                                com a <strong>imagem</strong> associada ao item.
+                            </p>
+
+                            <p>Para simplificar, eu costumo pensar assim:</p>
+
+                            <pre><code>
+Preciso enviar apenas um arquivo
+→ application/pdf, image/png, image/jpeg ou application/octet-stream
+
+Preciso enviar apenas dados estruturados (texto, números, booleanos)
+→ application/json
+
+Preciso enviar arquivo + dados
+→ multipart/form-data
+</code></pre>
+                            <br />
+
+                            <p>
+                                Vamos entender um pouco sobre
+                                <code>multipart/form-data</code>: é um formato de codificação de requisições HTTP
+                                definido pelo padrão MIME, usado quando precisamos enviar múltiplos tipos de dados no
+                                corpo da mesma requisição.
+                            </p>
+
+                            <p>
+                                Em vez de enviar tudo como um único bloco (como no application/json), o corpo da
+                                requisição é dividido em partes independentes (parts), cada uma contendo: seus próprios
+                                headers seu próprio conteúdo. Essas partes são separadas por um boundary.
+                            </p>
+
+                            <p>
+                                JSON não foi feito para trafegar arquivos, soluções toscas como converter em BASE64 (Já
+                                discutido no tópico GET - STREAM) não funcionam bem. JSON é um formato textual que foi
+                                criado para representar dados estruturados legíveis, não para transportar dados binários
+                                brutos.
+                            </p>
+
+                            <p>
+                                Por isso, multipart resolve o problema, pois o formato multipart suporta
+                                <strong>http streaming</strong>, ou seja, o arquivo é lido em
+                                <strong>chunks de rede</strong>, e não é necessário carregar todo o binário em memória.
+                                o servidor processa os dados enquanto recebe. Isso é essencial para uploads grandes e
+                                torna a API mais escalável.
+                            </p>
+
+                            <p>
+                                Veja esse exemplo de corpo multipart de um arquivo de imagem (apenas uma representação
+                                visual, no body tudo isso é enviado em binário):
+                            </p>
+
+                            <pre><code>
+------WebKitFormBoundaryXyZ123
+Content-Disposition: form-data; name="title"
+
+Capa do Boardgame
+------WebKitFormBoundaryXyZ123
+Content-Disposition: form-data; name="image"; filename="cover.png"
+Content-Type: image/png
+
+&lt;bytes binários da imagem&gt;
+------WebKitFormBoundaryXyZ123--
+</code></pre>
+                            <br />
+                            <p>
+                                No exemplo acima, o
+                                <strong>boundary</strong> (<code>------WebKitFormBoundaryXyZ123</code>) é um delimitador
+                                utilizado para separar cada parte do corpo da requisição
+                                <code>multipart/form-data</code>. Ele é definido no header <code>Content-Type</code> da
+                                requisição e indica onde uma parte começa e termina.
+                            </p>
+
+                            <p>
+                                Cada parte do corpo contém seus próprios <strong>headers</strong>, como
+                                <code>Content-Disposition</code> e <code>Content-Type</code>. Esses headers descrevem os
+                                metadados daquela parte específica, informando, por exemplo, o nome do campo do
+                                formulário, o nome do arquivo e o tipo do conteúdo enviado.
+                            </p>
+
+                            <p>
+                                Já o <strong>conteúdo</strong> corresponde aos dados propriamente ditos daquela parte.
+                                No caso de campos de texto, trata-se do valor textual enviado; no caso de arquivos, são
+                                os bytes binários do arquivo. Todo esse conteúdo é transmitido como um fluxo de bytes,
+                                sendo interpretado pelo servidor de acordo com as regras do formato multipart.
+                            </p>
 
                             <h1 class="h4 portfolio-title">POST - Idempotência</h1>
                         </div>
