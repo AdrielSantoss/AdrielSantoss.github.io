@@ -1876,7 +1876,165 @@ Content-Type: image/png
                                 sendo interpretado pelo servidor de acordo com as regras do formato multipart.
                             </p>
 
+                            <p>
+                                Em resumo, o multipart/form-data não é apenas um formato para upload de arquivos, mas um
+                                mecanismo que permite transportar diferentes tipos de dados de forma eficiente, segura e
+                                compatível com streaming, sendo a escolha ideal quando arquivos e metadados precisam
+                                coexistir na mesma requisição.
+                            </p>
+
                             <h1 class="h4 portfolio-title">POST - Idempotência</h1>
+
+                            <p>
+                                Uma operação é idempotente quando executá-la uma ou várias vezes produz o
+                                <strong>mesmo efeito</strong>
+                                final no servidor.
+                            </p>
+
+                            <p>
+                                Em resumo: Repetir a mesma requisição não altera o resultado após a primeira execução
+                                bem-sucedida. Exemplo genérico:
+                            </p>
+                            <pre><code>
+Executar 1 vez → estado final X 
+Executar 10 vezes → continua estado final X</code></pre>
+                            <br />
+
+                            <p>
+                                Por padrão, métodos do tipo POST não são idempotentes. O método POST normalmente é usado
+                                para criação de recursos, e cada chamada tende a gerar um novo efeito colateral:
+                            </p>
+                            <pre><code>
+POST /orders
+
+Se chamado duas vezes:
+1 vez → Pedido #101 criado
+
+2 vex → Pedido #102 criado
+
+➡️ Dois efeitos distintos → não idempotente
+
+</code></pre>
+                            <br />
+
+                            <p>
+                                É possivel tornar o POST idempotente, desde que a aplicação implemente esse
+                                comportamento explicitamente na api. Entenda que tornar um POST idempotente não é só uma
+                                boa prática, mas sim uma <strong>solução de um problema </strong> de duplicidade de
+                                operação.
+                            </p>
+                            <p>
+                                Nem todo POST necessita de idempotência, cada caso deve ser analisado. Mas no geral a
+                                idepotencia deve ser implementada quando a operação não pode ser
+                                <strong>duplicada</strong>, principalmente quando é uma operação critica, como por
+                                exemplo uma API de pagamentos ou criação de pedidos.
+                            </p>
+
+                            <p>
+                                Idempotência resolve principalmente problemas causados por repetições involuntárias de
+                                requisições, como o um cliente que está duplicando request, usuário que clica diversas
+                                vezes no button "submit" do formulário, uma comunicação http que se perdeu e o
+                                http-client possui retry automático, e etc.
+                            </p>
+
+                            <p>
+                                O padrão mais utilizado para implementar idempotência em API REST é a estratégia de
+                                <strong>chave de idempotência</strong>.
+                            </p>
+
+                            <p>
+                                Essa estratégia consiste em o cliente gerar uma chave única (chamada de
+                                <code>idempotency-key</code>) e envia-la como metadado da requisição.
+                            </p>
+
+                            <p>
+                                Normalmente essa chave é um <strong>UUID</strong>, é obrigatória, e deve ser enviada no
+                                <strong>HEADERS</strong> da requisição, pois é um metadado. Quando essa informação não é
+                                enviada, a API retorna <code>400</code> ou <code>422</code> para o client.
+                            </p>
+
+                            <p>Segue o fluxo dessa estratégia é assim:</p>
+
+                            <pre><code>
+POST /orders
+Headers:
+  Idempotency-Key: 8f1a2c9e-...
+
+Funcionamento típico:
+
+1. Cliente gera um UUID e envia no header Idempotency-Key.
+
+2. A API verifica se essa chave já foi utilizada.
+
+3. Se a chave NÃO existir:
+   - Processa a requisição
+   - Persiste o resultado associado à chave
+   - Retorna a resposta ao cliente
+
+4. Se a chave JÁ existir:
+   - Não executa a operação novamente
+   - Retorna exatamente o mesmo resultado da primeira execução
+</code></pre>
+
+                            <br />
+
+                            <p>
+                                Para que o servidor retorne o resultado da primeira execução, é necessário armazenar
+                                essa <code>Idempotency-Key</code> junto com o resultado.
+                            </p>
+                            <p>
+                                Normalmente esse armazenamento é feito em um banco de dados de rápido acesso e que
+                                possua funcionalidade de TTL, pois idempotency-key é uma informação que deve ser
+                                descartada depois de um tempo, como um Redis ou Memcached.
+                            </p>
+                            <p>
+                                No meu caso, optei por utiliar redis. Com redis o fluxo do exemplo, mais detalhado é
+                                assim:
+                            </p>
+                            <pre><code>
+POST /orders
+Headers:
+  Idempotency-Key: 8f1a2c9e-...
+
+Funcionamento típico:
+
+1. A API recebe a requisição e extrai o header Idempotency-Key.
+
+2. A API consulta o Redis usando a chave de idempotência:
+   - GET idempotency:8f1a2c9e-...
+
+3. Caso a chave NÃO exista:
+   - Cria um registro no Redis com status "processing"
+   - Define um TTL para essa chave
+   - Executa a lógica principal (ex: criação do pedido)
+   - Ao final, atualiza o registro com:
+     - status: "completed"
+     - response: payload da resposta
+     - http_status: 201
+
+4. Caso a chave JÁ exista:
+   - A API NÃO executa a lógica novamente
+   - Retorna exatamente a mesma resposta armazenada
+     (mesmo status HTTP e mesmo payload)
+
+5. Após o tempo definido no TTL:
+   - A chave é automaticamente removida do Redis
+   - A operação pode ser executada novamente com uma nova Idempotency-Key
+</code></pre>
+
+                            <p>
+                                É importante entender que idempotência não é um recurso do HTTP ou uma regra do REST.
+                                idempotência, é considerado um <strong>contrato</strong> entre a api e o cliente, ou
+                                seja, uma regra definida entre ambas as partes para garantir que uma operação não seja
+                                duplicada.
+                            </p>
+
+                            <p>
+                                Segue abaixo a implementação de um fluxo de criação de um boardgame, que implementa
+                                chave de idempotência.
+                            </p>
+
+                            <h1 class="h4 portfolio-title">POST - Webhook</h1>
                         </div>
                     </section>
 
@@ -1898,10 +2056,10 @@ Content-Type: image/png
                 { id: 'stateless-vs-stateful', label: 'Stateless vs Stateful' },
                 { id: 'get', label: 'GET' },
                 { id: 'post', label: 'POST' },
-                { id: 'put', label: 'PUT/PATCH' },
-                { id: 'delete', label: 'DELETE' },
-                { id: 'errors', label: 'Tratamento de exceções' },
+                { id: 'put', label: 'PUT/PATCH/DELETE' },
+                { id: 'errors', label: 'Responses e exceções' },
                 { id: 'auth', label: 'CORS e Autenticação' },
+                { id: 'version-log', label: 'Versionamento e Monitoramento' },
                 { id: 'conclusion', label: 'Conclusão' },
                 { id: 'refs', label: 'Referências' }
             ];
