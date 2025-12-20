@@ -1617,12 +1617,39 @@ Finaliza o processamento
                             </p>
 
                             <p>
-                                Segue abaixo o fluxo que implementei de uma criação de boardgames em lote. Utilize a
-                                biblioteca
+                                Nos últimos anos, tornou-se popular o uso de aplicações de <strong>mensageria</strong>,
+                                como <strong>RabbitMQ</strong>. É importante entender a diferença entre fila de
+                                processamento e mensageria: Embora ambos os conceitos permitam processamento assíncrono,
+                                filas de processamento e mensageria possuem objetivos diferentes. A fila de
+                                processamento é utilizada para delegar a execução de tarefas a um <em>worker</em>,
+                                geralmente dentro do mesmo sistema, garantindo que operações custosas sejam processadas
+                                em segundo plano sem bloquear a requisição HTTP. Já a mensageria tem como foco a
+                                comunicação entre serviços, onde eventos ou mensagens são publicados para um broker e
+                                consumidos por um ou mais sistemas de forma desacoplada, sendo muito comum em
+                                arquiteturas de microserviços.
+                            </p>
+
+                            <p>
+                                Ou seja, se a sua tarefa é implementar um processamento assíncrono, sem depender de
+                                outros serviços, tais como: processamento pesado no banco de dados, geração de
+                                relatório, envio de emails, tarefas que podem falhar e precisar de retry, entre outros
+                                cenários, a escolha mais adequada é utilizar uma fila de processamento.
+                            </p>
+
+                            <p>
+                                Já a mensageria é mais indicada quando há a necessidade de comunicação entre sistemas ou
+                                serviços distintos, onde um evento precisa ser propagado para que outros serviços reajam
+                                a ele. Esse modelo é comum em arquiteturas de microserviços, permitindo maior
+                                desacoplamento, escalabilidade e independência entre os consumidores da mensagem.
+                            </p>
+
+                            <p>
+                                Segue abaixo o fluxo que implementei de uma criação de boardgames em lote utilizando
+                                fila de processamento. Utilize a biblioteca
                                 <a href="https://github.com/taskforcesh/bullmq" class="blog-link" target="_blank"
                                     >BullMQ</a
                                 >
-                                para criação de queues no node.
+                                para criação de queues e workers no node.
                             </p>
 
                             <details>
@@ -1751,6 +1778,8 @@ export const boardgameWorker = new Worker(
                             </details>
 
                             <h1 class="h4 portfolio-title">POST - Upload / Multipart</h1>
+
+                            <p></p>
 
                             <h1 class="h4 portfolio-title">POST - Idempotência</h1>
                         </div>
