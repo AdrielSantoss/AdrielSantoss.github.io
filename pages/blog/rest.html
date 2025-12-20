@@ -1927,7 +1927,7 @@ Se chamado duas vezes:
                                 Nem todo POST necessita de idempotência, cada caso deve ser analisado. Mas no geral a
                                 idepotencia deve ser implementada quando a operação não pode ser
                                 <strong>duplicada</strong>, principalmente quando é uma operação critica, como por
-                                exemplo uma API de pagamentos ou criação de pedidos.
+                                exemplo uma API de pagamentos, criação de pedidos e etc.
                             </p>
 
                             <p>
@@ -1988,7 +1988,7 @@ Funcionamento típico:
                                 descartada depois de um tempo, como um Redis ou Memcached.
                             </p>
                             <p>
-                                No meu caso, optei por utiliar redis. Com redis o fluxo do exemplo, mais detalhado é
+                                No meu caso, optei por utilizar redis. Com redis o fluxo do exemplo, mais detalhado é
                                 assim:
                             </p>
                             <pre><code>
@@ -2033,6 +2033,237 @@ Funcionamento típico:
                                 Segue abaixo a implementação de um fluxo de criação de um boardgame, que implementa
                                 chave de idempotência.
                             </p>
+
+                            <details>
+                                <summary>Declarando endpoint com obrigatoriedade da idepotencyKey.</summary>
+                                <pre><code>
+app.post(
+        '/boardgames',
+        {
+            schema: {
+                params: {
+                    type: 'object',
+                    required: ['usuarioId'],
+                    properties: {
+                        usuarioId: { type: 'number', minimum: 0 },
+                    },
+                },
+                body: {
+                    type: 'array',
+                    minItems: 1,
+                    items: {
+                        type: 'object',
+                        required: ['nome', 'descricao', 'complexidade'],
+                        properties: {
+                            nome: { type: 'string' },
+                            descricao: { type: 'string' },
+                            complexidade: { type: 'number' },
+                            idade: { type: 'number' },
+                            tempo: { type: 'number' },
+                            ano: { type: 'number' },
+                        },
+                    },
+                },
+                headers: {
+                    type: 'object',
+                    required: ['idempotencykey'],
+                    properties: {
+                        idempotencykey: { type: 'string' },
+                    },
+                },
+            },
+        },
+        async (request, reply) =>
+            boardgameController.createBoardgame(request, reply)
+    );
+</code></pre>
+                            </details>
+                            <details>
+                                <summary>Declarando createBoardgame() em boardgameController.ts.</summary>
+                                <p>
+                                    Perceba que eu retorno <code>201</code> caso o boardgame seja criado, e
+                                    <code>200</code> caso o boardgame já exista e foi detectado pela chave idempotencia.
+                                </p>
+                                <pre><code>
+    async createBoardgame(
+        request: FastifyRequest,
+        reply: FastifyReply
+    ): Promise&gt;undefined&lt; {
+        try {
+            const newBoardgame = request.body as BoardgameDto;
+            const idempotencykey = request.headers.idempotencykey as string;
+            const { usuarioId } = request.params as { usuarioId: number };
+
+            const Boardgame = await this.boardgameService.createBoardgame(
+                newBoardgame,
+                usuarioId,
+                idempotencykey
+            );
+
+            return reply.code(Boardgame?.created ? 201 : 200).send(Boardgame);
+        } catch (error) {
+            this.throwResponseException(error, reply);
+        }
+    }
+</code></pre>
+                            </details>
+                            <details>
+                                <summary>Declarando createBoardgame() em boardgameService.ts.</summary>
+                                <pre><code>
+    async createBoardgame(
+        newBoardgame: BoardgameDto,
+        usuarioId: number,
+        idempotencyKey: string
+    ): Promise&gt;BoardgameDto&lt; {
+        try {
+            let id: string | null = null;
+
+            if (idempotencyKey) {
+                id = await this.BoardgameRepository.getBoardgameIdempotencyKey(
+                    idempotencyKey
+                );
+            }
+
+            if (id !== null) {
+                const getBoardgame =
+                    await this.BoardgameRepository.getBoardgameById(Number(id));
+
+                return {
+                    nome: getBoardgame!.nome,
+                    descricao: getBoardgame!.descricao,
+                    ano: getBoardgame!.ano,
+                    complexidade: getBoardgame!.complexidade,
+                    idade: getBoardgame!.idade,
+                    tempo: getBoardgame!.tempo,
+                } as BoardgameDto;
+            }
+
+            const boardgame = await this.BoardgameRepository.createBoardgame(
+                newBoardgame,
+                usuarioId
+            );
+
+            await this.BoardgameRepository.createBoardgameIdempotencyKey(
+                boardgame.id,
+                idempotencyKey
+            );
+
+            return {
+                ...boardgame,
+                created: true,
+            } as BoardgameDto;
+        } catch (error: unknown) {
+            if (
+                error instanceof PrismaClientKnownRequestError &&
+                error.code === 'P2002'
+            ) {
+                throw new DuplicateBoardgameError();
+            }
+
+            console.error('Erro interno ao criar o boardgame:', error);
+            throw new InternalError();
+        }
+    }
+</code></pre>
+                            </details>
+
+                            <details>
+                                <summary>Declarando métodos do Redis e Prisma.</summary>
+
+                                <pre>
+                                    <code>
+// Prefixo das chaves de idempotencia                                        
+const idempotencyKeyPrefix: string = 'idempotency:';
+const idempotencyBoardgameIdPrefix: string = 'idempotency:boardgame:';
+                                        
+// Leitura de chave de idempotencia                                        
+async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
+    return await redis.get(`${idempotencyKeyPrefix}${key}`);
+}</code></pre>
+
+                                <pre>
+                                    <code>
+// Armazenando chave de idempotencia + id do boardgame criado na operação                                      
+    async createBoardgameIdempotencyKey(
+        id: number,
+        key: string
+    ): Promise&gt;undefined&lt; {
+        const idempotencyKey = `${idempotencyKeyPrefix}${key}`;
+        const reverseIndex = `${idempotencyBoardgameIdPrefix}${id}`;
+
+        await redis.set(idempotencyKey, id, {
+            expiration: {
+                type: 'EX',
+                value: 3600,
+            },
+        });
+        await redis.set(reverseIndex, idempotencyKey, {
+            expiration: {
+                type: 'EX',
+                value: 3600,
+            },
+        });
+    }
+</code></pre>
+
+                                <pre>
+                                    <code>
+// Armazenando chave de idempotencia + id do boardgame criado na operação                                      
+    async createBoardgameIdempotencyKey(
+        id: number,
+        key: string
+    ): Promise&gt;undefined&lt; {
+        const idempotencyKey = `${idempotencyKeyPrefix}${key}`;
+        const reverseIndex = `${idempotencyBoardgameIdPrefix}${id}`;
+
+        await redis.set(idempotencyKey, id, {
+            expiration: {
+                type: 'EX',
+                value: 3600,
+            },
+        });
+        await redis.set(reverseIndex, idempotencyKey, {
+            expiration: {
+                type: 'EX',
+                value: 3600,
+            },
+        });
+    }
+</code></pre>
+
+                                <pre>
+                                    <code>
+// Obtendo boardgame pelo id (esse método será utilizado dentro do createBoardgame caso exista a chave idempotencia)                                 
+    async getBoardgameById(id: number): Promise&gt;Boardgame | null&lt; {
+        return await prisma.boardgame.findUnique({
+            where: {
+                id: Number(id),
+            },
+        });
+    }
+</code></pre>
+
+                                <pre>
+                                    <code>
+// Criando boardgame
+    async createBoardgame(
+        newBoardgame: BoardgameDto,
+        usuarioId: number
+    ): Promise&gt;Boardgame&lt; {
+        return await prisma.boardgame.create({
+            data: {
+                nome: newBoardgame.nome,
+                descricao: newBoardgame.descricao,
+                complexidade: newBoardgame.complexidade,
+                ano: newBoardgame.ano,
+                idade: newBoardgame.idade,
+                tempo: newBoardgame.tempo,
+                usuarioId: usuarioId,
+            },
+        });
+    }
+</code></pre>
+                            </details>
 
                             <h1 class="h4 portfolio-title">POST - Webhook</h1>
                         </div>
