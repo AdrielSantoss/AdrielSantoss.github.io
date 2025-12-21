@@ -33,7 +33,6 @@
                             <small class="tag">Fastify</small>
                             <small class="tag">Prisma</small>
                             <small class="tag">ORM</small>
-                            <small class="tag">Teste automatizado</small>
                         </div>
                     </section>
 
@@ -1777,6 +1776,68 @@ export const boardgameWorker = new Worker(
 </code></pre>
                             </details>
 
+                            <h1 class="h4 portfolio-title">POST - Webhook</h1>
+
+                            <p>
+                                Outro recurso fortemente ligado ao tema de processamento assíncrono são os
+                                <strong>webhooks</strong> — não confundir com <strong>WebSockets</strong>, pois são
+                                conceitos completamente diferentes.
+                            </p>
+
+                            <p>
+                                Um webhook é um <strong>mecanismo de notificação baseado em eventos</strong>, no qual um
+                                sistema envia automaticamente uma requisição HTTP para outro sistema quando algo
+                                acontece. O webhook pode ser entendido como o oposto do <strong>polling HTTP</strong>.
+                            </p>
+
+                            <p>
+                                Entenda <strong>webhook</strong> como: “me avisa quando acontecer”.<br />
+                                Entenda <strong>polling</strong> como: “vou te perguntar a cada 5 segundos se algo
+                                aconteceu”.
+                            </p>
+
+                            <p>
+                                Faz sentido utilizar webhooks quando é necessário disparar um evento assíncrono em outra
+                                aplicação, como por exemplo: pagamento aprovado ou reprovado, confirmação de e-mail de
+                                um usuário, finalização de um processamento em background, entre outros.
+                            </p>
+
+                            <p>
+                                Na prática, um webhook é apenas uma chamada HTTP para <strong>outra API</strong>, sendo
+                                predominantemente utilizado para comunicação <strong>backend → backend</strong>,
+                                normalmente em cenários de integração entre sistemas, como: Gateway de pagamento →
+                                e-commerce. Webhooks não são pensados para comunicação direta com frontend.
+                            </p>
+
+                            <p>
+                                Webhooks quase sempre são implementados utilizando endpoints do tipo
+                                <strong>POST</strong>. Embora seja tecnicamente possível utilizar outros métodos HTTP,
+                                na prática isso raramente faz sentido.
+                            </p>
+
+                            <p>
+                                Por ser amplamente utilizado em integrações entre APIs, muitos desenvolvedores acabam
+                                atribuindo aos webhooks uma complexidade que <strong>não existe</strong>. Um webhook é
+                                <strong>apenas</strong> uma chamada HTTP para outra API, sinalizando que algo aconteceu
+                                — nada além disso.
+                            </p>
+
+                            <p>
+                                Existem alguns artigos que defendem o uso de polling HTTP, mas particularmente, eu não
+                                gosto dessa prática. Além de consumir muita banda desnecessária, para realizar as
+                                chamadas http constantes, também consome processamento, pois cada request trafega dados
+                                de autenticação, permissão e etc, que precisa ser processado. E eu considero algo muito
+                                feio de implementar, todas as vezes que implementei polling http, foi por que o serviço
+                                que eu estava integrando me
+                                <strong>obrigou</strong> a usar polling, isto é, ele não liberava um webhook para minha
+                                aplicação se comunicar.
+                            </p>
+
+                            <p>
+                                A minha opinião é: Para notificação de eventos entre API's, prefira webhook sempre que
+                                possível, evite polling http ao máximo.
+                            </p>
+
                             <h1 class="h4 portfolio-title">POST - Upload / Multipart</h1>
 
                             <p>
@@ -2168,7 +2229,7 @@ app.post(
                             </details>
 
                             <details>
-                                <summary>Declarando métodos do Redis e Prisma.</summary>
+                                <summary>Declarando métodos do Redis e Prisma no boardgameRepository.</summary>
 
                                 <pre>
                                     <code>
@@ -2264,8 +2325,6 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
     }
 </code></pre>
                             </details>
-
-                            <h1 class="h4 portfolio-title">POST - Webhook</h1>
                         </div>
                     </section>
 
