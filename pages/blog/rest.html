@@ -2326,6 +2326,92 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
 </code></pre>
                             </details>
                         </div>
+
+                        <div id="put-patch-delete" class="blog-text">
+                            <h1 class="h4 portfolio-title">PUT / PATCH / DELETE</h1>
+
+                            <p>
+                                Decidi agrupar os métodos <strong>PUT</strong>, <strong>PATCH</strong> e
+                                <strong>DELETE</strong> em um único tópico, pois eles não possuem mecanismos específicos
+                                tão complexos quanto GET ou POST. Ou seja, nesses método não costuma ser comum
+                                mecanismos como idempotencia, caching, content-negociation e etc. Ainda assim, são
+                                métodos fundamentais e merecem destaque, com o objetivo de esclarecer suas
+                                funcionalidades, diferenças e boas práticas de uso, concluindo assim os cinco métodos
+                                HTTP mais utilizados em APIs REST.
+                            </p>
+
+                            <p>
+                                Começando pelo <strong>PUT</strong>, esse método HTTP tem como objetivo
+                                <strong>alterar um recurso já existente</strong>. Seu uso ideal consiste em enviar
+                                <strong>toda a representação do recurso</strong> no corpo da requisição para que a
+                                atualização seja realizada.
+                            </p>
+
+                            <p>
+                                Para ficar mais claro, imagine um endpoint <code>PUT /usuarios/:id</code>, responsável
+                                por modificar os dados de um usuário na base de dados. Nesse caso, todas as informações
+                                do usuário devem ser enviadas no payload, como <code>email</code>,
+                                <code>username</code>, <code>foto</code>, entre outras. Ou seja, o PUT representa uma
+                                <strong>atualização completa</strong> do recurso.
+                            </p>
+
+                            <p>
+                                Já o <strong>PATCH</strong> possui um propósito diferente. Um endpoint do tipo PATCH
+                                indica que apenas algumas <strong>propriedades específicas</strong> do recurso serão
+                                atualizadas. Enquanto o PUT realiza uma atualização <strong>completa</strong>, o PATCH
+                                representa uma atualização <strong>parcial</strong>. Por exemplo, se existir um endpoint
+                                destinado exclusivamente à atualização da <code>foto</code> do usuário, o método PATCH é
+                                o mais indicado, pois não há necessidade de enviar todas as demais informações, como
+                                email ou username.
+                            </p>
+
+                            <p>
+                                Na prática, é comum ver o PUT sendo utilizado de forma imprecisa sempre que o objetivo é
+                                alterar um recurso. Para evitar esse tipo de ambiguidade, costumo utilizar a seguinte
+                                pergunta como regra prática:
+                                <strong
+                                    >é necessário enviar toda a representação do recurso para realizar essa
+                                    atualização?</strong
+                                >
+                                Se a resposta for sim, o PUT é a melhor escolha; caso contrário, o PATCH tende a ser
+                                mais adequado.
+                            </p>
+
+                            <p>
+                                Vale ressaltar que é uma boa prática retornar o dado atualizado depois que a alteração
+                                foi concluida com sucesso em um PUT ou PATCH. Assim o frontend (ou quem estiver
+                                consumindo), já receberá no response a informação em seu estado final.
+                            </p>
+
+                            <p>
+                                Por fim, temos o método <strong>DELETE</strong>, cujo objetivo é remover um recurso do
+                                servidor. Assim como o PUT, o DELETE atua sobre um recurso específico, geralmente
+                                identificado por um <code>id</code> na URL, como em <code>DELETE /usuarios/:id</code>.
+                            </p>
+
+                            <p>
+                                Quando um DELETE é executado com sucesso, espera-se que o recurso não esteja mais
+                                disponível para futuras consultas. Em APIs REST, é comum que esse método retorne um
+                                <code>204 No Content</code>, indicando que a operação foi realizada corretamente, mas
+                                sem a necessidade de retornar um corpo na resposta.
+                            </p>
+
+                            <p>
+                                Conceitualmente, o DELETE é considerado um método <strong>idempotente</strong> (assim
+                                como o PUT, PATCH e GET). Isso significa que múltiplas requisições DELETE para o mesmo
+                                recurso produzem o mesmo efeito final: o recurso deixa de existir. Caso o recurso já
+                                tenha sido removido, a API pode retornar um <code>404 Not Found</code> ou simplesmente
+                                manter o <code>204</code>, dependendo da estratégia adotada.
+                            </p>
+
+                            <p>
+                                É importante destacar que, na prática, o DELETE nem sempre representa uma remoção física
+                                do dado. Em muitos cenários, especialmente quando há requisitos de auditoria ou
+                                histórico, utiliza-se o conceito de
+                                <strong>soft delete</strong>, onde o recurso é apenas marcado como inativo, permanecendo
+                                armazenado na base de dados, mas indisponível para uso normal da API.
+                            </p>
+                        </div>
                     </section>
 
                     <section class="working-in-progress"></section>
@@ -2346,8 +2432,8 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
                 { id: 'stateless-vs-stateful', label: 'Stateless vs Stateful' },
                 { id: 'get', label: 'GET' },
                 { id: 'post', label: 'POST' },
-                { id: 'put', label: 'PUT/PATCH/DELETE' },
-                { id: 'errors', label: 'Responses e exceções' },
+                { id: 'put-patch-delete', label: 'PUT/PATCH/DELETE' },
+                { id: 'errors', label: 'Responses e exceções' }, // aqui, falar de content-negociation
                 { id: 'auth', label: 'CORS e Autenticação' },
                 { id: 'version-log', label: 'Versionamento e Monitoramento' },
                 { id: 'conclusion', label: 'Conclusão' },
