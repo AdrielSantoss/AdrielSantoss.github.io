@@ -2412,6 +2412,42 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
                                 armazenado na base de dados, mas indisponível para uso normal da API.
                             </p>
                         </div>
+
+                        <div id="errors-responses" class="blog-text">
+                            <h1 class="h4 portfolio-title">Responses e exceções</h1>
+
+                            <p>
+                                Nesse tópico vou discutir algo que muitos iniciantes negligenciam, o RESPONSE, vou
+                                descrever tanto quando a api retorna sucesso, quanto ocorre erro.
+                            </p>
+
+                            <p>
+                                O resumo desse tópico em duas palavras é: <strong>previsibilidade</strong> e
+                                <strong>segurança</strong>. Vejo muitos iniciantes ignorando completamente os códigos de
+                                retorno http — inclusive, vejo muitas api's implementando tabela de código de erros
+                                personalizados. Simplesmente não consigo entender qual é a dificuldade de utilizar
+                                corretamente os
+                                <a
+                                    href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status"
+                                    target="_blank"
+                                    class="blog-link"
+                                >
+                                    códigos status de respostas HTTP.</a
+                                >
+                            </p>
+
+                            <p>
+                                De forma geral, independente do endpoint, o formato do response deve ser previsivel, um
+                                padrão deve ser definido e utilizado de forma consistente, algo como
+                            </p>
+
+                            <pre><code>
+{
+  "data": {...},
+  "meta": {...},
+  "errors": []
+}</code></pre>
+                        </div>
                     </section>
 
                     <section class="working-in-progress"></section>
@@ -2433,7 +2469,7 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
                 { id: 'get', label: 'GET' },
                 { id: 'post', label: 'POST' },
                 { id: 'put-patch-delete', label: 'PUT/PATCH/DELETE' },
-                { id: 'errors', label: 'Responses e exceções' }, // aqui, falar de content-negociation
+                { id: 'errors-responses', label: 'Responses e exceções' }, // aqui, falar de content-negociation
                 { id: 'auth', label: 'CORS e Autenticação' },
                 { id: 'version-log', label: 'Versionamento e Monitoramento' },
                 { id: 'conclusion', label: 'Conclusão' },
