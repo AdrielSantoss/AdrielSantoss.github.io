@@ -2417,28 +2417,31 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
                             <h1 class="h4 portfolio-title">Responses e exceções</h1>
 
                             <p>
-                                Nesse tópico vou discutir algo que muitos iniciantes negligenciam, o RESPONSE, vou
-                                descrever tanto quando a api retorna sucesso, quanto ocorre erro.
+                                Neste tópico vou abordar uma coisa que iniciantes costumam negligenciar: o
+                                <strong>response</strong>
+                                da API. A ideia aqui é discutir tanto os cenários de sucesso quanto os de erro, e como
+                                essas respostas devem ser estruturadas.
                             </p>
 
                             <p>
-                                O resumo desse tópico em duas palavras é: <strong>previsibilidade</strong> e
-                                <strong>segurança</strong>. Vejo muitos iniciantes ignorando completamente os códigos de
-                                retorno http — inclusive, vejo muitas api's implementando tabela de código de erros
-                                personalizados. Simplesmente não consigo entender qual é a dificuldade de utilizar
-                                corretamente os
+                                Se eu tivesse que resumir este tópico em duas palavras, seriam:
+                                <strong>previsibilidade</strong> e <strong>segurança</strong>. É muito comum ver APIs
+                                ignorando completamente os códigos de status HTTP ou, pior ainda, implementando tabelas
+                                próprias de códigos de erro. Particularmente, não entendo quem faz isso, já que o
+                                protocolo HTTP já define de forma clara e padronizada os
                                 <a
                                     href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status"
                                     target="_blank"
                                     class="blog-link"
                                 >
-                                    códigos status de respostas HTTP.</a
-                                >
+                                    códigos de status de resposta HTTP </a
+                                >, amplamente conhecidos e suportados por qualquer cliente.
                             </p>
 
                             <p>
-                                De forma geral, independente do endpoint, o formato do response deve ser previsivel, um
-                                padrão deve ser definido e utilizado de forma consistente, algo como
+                                Independentemente do endpoint, o formato do response deve ser
+                                <strong>previsível</strong>. Um padrão precisa ser definido e aplicado de forma
+                                consistente em toda a API, por exemplo:
                             </p>
 
                             <pre><code>
@@ -2446,7 +2449,112 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
   "data": {...},
   "meta": {...},
   "errors": []
-}</code></pre>
+}
+</code></pre>
+
+                            <p>
+                                Além disso, o código de status HTTP deve ser coerente com o payload retornado. Em
+                                cenários de sucesso, utilize a família <strong>2xx</strong> e não retorne erros. Para
+                                falhas causadas pelo cliente, utilize códigos <strong>4xx</strong> acompanhados de
+                                mensagens claras e objetivas, indicando exatamente o que está errado. Já em erros
+                                internos ou inesperados, utilize a família <strong>5xx</strong>, retornando uma mensagem
+                                genérica o suficiente para não comprometer a segurança da aplicação.
+                            </p>
+
+                            <p>De forma geral, os códigos de status mais comuns e utilizados são:</p>
+
+                            <pre><code>
+2xx – Sucesso
+
+    200 OK → resposta padrão
+
+    201 Created → recurso criado (normalmente com header Location)
+
+    204 No Content → sucesso sem body
+
+4xx – Erro do cliente
+
+    400 Bad Request → payload inválido
+
+    401 Unauthorized → não autenticado
+
+    403 Forbidden → autenticado, mas sem permissão
+
+    404 Not Found → recurso não encontrado
+
+    409 Conflict → conflito de estado (ex: duplicidade)
+
+    422 Unprocessable Entity → erro de validação semântica
+
+5xx – Erro do servidor
+
+    500 Internal Server Error
+
+    503 Service Unavailable 
+</code></pre>
+
+                            <p>
+                                Ao longo da minha trajetória no desenvolvimento web, percebi que muitas APIs em
+                                produção, em situações de erro <strong>500</strong>, acabam retornando para o cliente a
+                                <strong>stacktrace</strong> completa da exceção. Isso é considerado uma falha de
+                                segurança <strong>grave</strong>.
+                            </p>
+
+                            <p>
+                                A stacktrace expõe detalhes internos da aplicação, como nomes de classes, métodos,
+                                pacotes e, em alguns casos, até erros de SQL contendo nomes de tabelas e colunas. Esse
+                                tipo de informação é um verdadeiro prato cheio para um atacante, pois a API acaba
+                                entregando um “mapa” da sua estrutura interna. Stacktraces devem ser registradas apenas
+                                em <strong>logs internos</strong>, com acesso restrito à equipe responsável.
+                            </p>
+
+                            <p>
+                                Além disso, ao revelar nomes de arquivos e estruturas internas, muitas vezes é possível
+                                identificar o framework web utilizado e até mesmo sua versão. Com essa informação em
+                                mãos, um atacante pode pesquisar e explorar vulnerabilidades conhecidas associadas
+                                àquela versão específica do framework ou de bibliotecas utilizadas. Por isso,
+                                <strong>nunca</strong> retorne mensagens de erro internas para o cliente.
+                            </p>
+
+                            <p>
+                                Felizmente, muitos frameworks web já oferecem mecanismos padrão para evitar o retorno de
+                                stacktraces em ambientes de produção — o Fastify é um bom exemplo. No entanto, até onde
+                                sei, o Express não oferece essa proteção de forma nativa. Em caso de dúvida, implemente
+                                um <strong>error handler</strong> global e faça o mapeamento adequado dos erros da sua
+                                API, garantindo respostas seguras e padronizadas.
+                            </p>
+                            <p>
+                                Grande parte dos erros da família <strong>4xx</strong> ocorre durante a validação das
+                                <strong>DTOs</strong> enviadas pelo cliente. Em muitos casos, esses erros são tratados e
+                                retornados automaticamente pelo próprio framework, o que costuma ser uma excelente
+                                prática. Frameworks web maduros prezam por respostas de erro claras e padronizadas,
+                                informando exatamente <em>qual campo está inválido</em> e
+                                <em>qual regra de validação foi violada</em>, facilitando o tratamento do erro por quem
+                                consome a API. A seguir, veja um exemplo de resposta de erro gerada automaticamente pelo
+                                <strong>Fastify</strong> durante a validação de um payload:
+                            </p>
+
+                            <pre><code>
+{
+  "statusCode": 400,
+  "code": "FST_ERR_VALIDATION",
+  "error": "Bad Request",
+  "message": "body/email must match format \"email\""
+}    
+</code></pre>
+
+                            <p>
+                                Esse tipo de resposta torna o consumo da API mais previsível e reduz a necessidade de
+                                lógica adicional no backend para tratamento de validações simples, além de oferecer
+                                feedback imediato e preciso para o cliente.
+                            </p>
+
+                            <p>
+                                Em resumo, para tornar os responses da sua API REST previsivel, defina e utilize um
+                                padrão de response, utilize os códigos de status http para respostas de forma coerente.
+                                E para tornar sua API segura, crie hanglers para mapear os errps da api, evitando
+                                retorno de informação sensivel quando erros internos ocorrerem.
+                            </p>
                         </div>
                     </section>
 
