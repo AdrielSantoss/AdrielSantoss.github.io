@@ -2414,6 +2414,53 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
                                 armazenado na base de dados, mas indisponível para uso normal da API.
                             </p>
                         </div>
+                        <div id="cors" class="blog-text">
+                            <h1 class="h4 portfolio-title">OPTIONS e CORS</h1>
+
+                            <p>
+                                Existe um método HTTP que é amplamente utilizado pelos navegadores para a validação
+                                automática de <strong>CORS</strong>: o <code>OPTIONS</code>.
+                            </p>
+
+                            <p>
+                                Vamos por partes. O método <code>OPTIONS</code> tem como objetivo informar quais
+                                operações são permitidas para um determinado recurso. Em outras palavras, ele permite
+                                que o cliente verifique se uma determinada requisição HTTP pode ou não ser realizada.
+                            </p>
+
+                            <p>
+                                Por exemplo, antes de executar uma requisição
+                                <code>GET /users</code>, o navegador pode realizar previamente uma chamada
+                                <code>OPTIONS /users</code>. Se essa chamada retornar um status <strong>2xx</strong> e
+                                os cabeçalhos esperados, significa que a requisição real está autorizada a ser enviada.
+                            </p>
+
+                            <p>
+                                Na prática, o método <code>OPTIONS</code> raramente é implementado de forma explícita em
+                                APIs REST. Na maioria dos casos, ele é tratado automaticamente pelo servidor ou pelo
+                                framework web, existindo principalmente para dar suporte aos mecanismos de segurança do
+                                navegador.
+                            </p>
+
+                            <p>
+                                Já o <strong>CORS</strong> (Cross-Origin Resource Sharing) é uma política de segurança
+                                imposta pelos navegadores. Se você desenvolve aplicações web, é muito provável que já
+                                tenha se deparado com erros relacionados a CORS.
+                            </p>
+
+                            <p>
+                                Essa política é nativa dos navegadores e também está presente nos clientes HTTP
+                                utilizados por frameworks SPA, como Angular, React e Vue. É importante destacar que
+                                <strong>CORS não existe em comunicações backend-to-backend</strong>. Ou seja, uma API
+                                consumindo outra API não sofre qualquer restrição de CORS.
+                            </p>
+
+                            <p>
+                                O CORS existe para impedir que o JavaScript processe respostas de APIs que não foram
+                                explicitamente autorizadas pelo servidor, protegendo o usuário contra acessos indevidos
+                                a recursos de outras origens.
+                            </p>
+                        </div>
 
                         <div id="errors-responses" class="blog-text">
                             <h1 class="h4 portfolio-title">Responses e erros</h1>
