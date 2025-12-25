@@ -2516,6 +2516,14 @@ https://api.exemplo.com:443/users/10?active=true
                             </p>
 
                             <p>
+                                Vale ressaltar, que a imensa maioria das aplicações da WEB, atuam sobre a politica
+                                <strong>Same-Origin</strong>. Durante muitos anos (e ainda hoje em muitos casos), o
+                                frontend e backend eram servidos: do mesmo domínio e da mesma origin. Essa é a
+                                arquitetura clássica da web. Nesse cenário, não existe CORS (navegador entende que é uma
+                                comunicação segura), assim a comunicação http se torna mais direta e simples.
+                            </p>
+
+                            <p>
                                 <strong>Cross-Origin:</strong> ocorre quando a requisição é feita para uma
                                 <strong>origin diferente</strong> da aplicação que está rodando no navegador. Basta que
                                 um dos elementos da origin (protocolo, domínio ou porta) seja diferente para que a
@@ -2547,15 +2555,8 @@ https://api.exemplo.com:443/users/10?active=true
                             <p>
                                 A requisição <strong>preflight</strong> é uma requisição HTTP do tipo
                                 <code>OPTIONS</code>, cujo objetivo é verificar se o navegador está autorizado a
-                                realizar a requisição real (por exemplo, <code>GET</code>, <code>POST</code>,
-                                <code>PUT</code>, etc.) para um determinado endpoint.
-                            </p>
-
-                            <p>
-                                Caso a requisição <code>OPTIONS</code> retorne um status de sucesso
-                                (<strong>2xx</strong>) e contenha os cabeçalhos de CORS adequados, o navegador prossegue
-                                com a requisição real. Caso contrário, a requisição principal
-                                <strong>não é enviada</strong>.
+                                realizar a requisição real de acordo com as regras do CORS. É aqui que o méotdo
+                                <code>OPTIONS</code> comentado anteriormente, entra em ação.
                             </p>
 
                             <p>
@@ -2586,7 +2587,78 @@ Access-Control-Request-Headers: Content-Type
 
                             <p>
                                 Se a API responder permitindo essa origin, método e headers, o navegador então enviará a
-                                requisição real <code>POST /users</code>.
+                                requisição real <code>POST /users</code>. É possivel observar tanto o request preflight
+                                (OPTIONS) quanto o request real, na aba "network" no console de desenvolvedor do
+                                navegador.
+                            </p>
+
+                            <p>
+                                Entendido o funcionamento do CORS e do PREFLIGHT do lado do frontend, chegamos à parte
+                                mais importante deste artigo: o papel da API nesse processo. É a API que define
+                                explicitamente quais <strong>origins</strong>, métodos HTTP e headers estão autorizados
+                                a acessar seus recursos.
+                            </p>
+
+                            <p>
+                                Essas permissões são configuradas por meio dos headers de resposta
+                                <code>Access-Control-*</code>, que informam ao navegador se a comunicação Cross-Origin é
+                                permitida ou não. O navegador apenas aplica essas regras — ele não decide por conta
+                                própria.
+                            </p>
+
+                            <p>
+                                CORS é tratado na camada HTTP da API, antes da lógica de negócio e das controllers.
+                                Normalmente o framework da API, já possui recursos prontos para lidar com CORS, não é
+                                necessário, e muito menos recomendado, criar handlers ou interceptors manuais. Sempre
+                                pesquise e utilize bibliotecas do seu framework para lidar com CORS.
+                            </p>
+
+                            <p>
+                                No meu caso, utilizei a biblioteca
+                                <a href="https://github.com/fastify/fastify-cors" target="_blank" class="blog-link">
+                                    fastify/cors </a
+                                >, que é considerada um <strong>CORE PLUGIN</strong> do framework Fastify. Veja esse
+                                exemplo simples de uso:
+                            </p>
+
+                            <pre><code>
+fastify.register(require('@fastify/cors'), {
+  origin: 'https://meusite.com'
+});
+
+A partir desse momento, o Fastify passa a:
+
+1. Interceptar automaticamente requisições CORS
+2. Detecta Origin
+3. Detecta OPTIONS + Access-Control-Request-*
+4. Responder automaticamente o preflight </code></pre>
+
+                            <p>
+                                Todo novo origin que queira se comunicar a api, que seja diferente do origin do
+                                frontend, deve ser cadastrado manualmente na api. Uma péssima prática de
+                                iniciantes/amadores que deve ser evitada é liberar o CORS em uma API
+                                <strong>privada</strong> para <strong>qualquer origin</strong> , o famoso
+                                <strong>*</strong>, algo como:
+                            </p>
+
+                            <pre><code>
+// Péssima prática, NÃO FAZER EM API PRIVADA:                                
+fastify.register(require('@fastify/cors'), {
+  origin: '*'
+});</code></pre>
+
+                            <p>
+                                Nesse cenário o fastify retorna: <code>Access-Control-Allow-Origin: *</code>, qualquer
+                                origin é aceito (Na prática, está removendo a camada de segurança do navegador). Somente
+                                é aceitável fazer isso em APIs publicas, sem dados sensíveis.
+                            </p>
+
+                            <p>
+                                Em suma, CORS é uma politica de segurança que tenta garantir que o frontend se comunique
+                                com uma API reconhecida. Tentei apenas resumir o básico que todo programador WEB deve
+                                saber sobre CORS, mas para detalhar cenários e exemplos de vulnerabilidades que ocorrem
+                                quando não há proteção do CORS, mereceria um artigo próprio para o assunto de segurança
+                                da WEB.
                             </p>
                         </div>
 
@@ -2755,7 +2827,8 @@ Access-Control-Request-Headers: Content-Type
                 { id: 'post', label: 'POST' },
                 { id: 'put-patch-delete', label: 'PUT/PATCH/DELETE' },
                 { id: 'cors', label: 'OPTIONS e CORS' },
-                { id: 'auth', label: 'Autenticação vs Autorização' },
+                { id: 'auth', label: 'Autenticação e OAuth 2.0' },
+                { id: 'auth', label: 'Autorização vs Autenticação ' },
                 { id: 'https', label: 'HTTPS e Limites' },
                 { id: 'errors-responses', label: 'Response e erros' },
                 { id: 'version-log', label: 'Versionamento e Monitoramento' },
