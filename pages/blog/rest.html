@@ -2460,6 +2460,134 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
                                 explicitamente autorizadas pelo servidor, protegendo o usuário contra acessos indevidos
                                 a recursos de outras origens.
                             </p>
+
+                            <p>
+                                Agora que ja definimos CORS e OPTIONS, precisamos definir
+                                <strong>ORIGIN</strong> (origem). Origin é o identificador de onde uma requisição web se
+                                origina, definido pela combinação de três elementos: protocolo + domínio + porta.
+                            </p>
+
+                            <p>Veja exemplo:</p>
+
+                            <pre><code>
+https://app.exemplo.com
+
+protocolo: https;
+domínio: app.exemplo.com;
+porta: 80 (porta padrão)
+
+Outro exemplo:
+http://app.exemplo.com:443
+
+Este é um origin diferente do primeiro. Vamos comparar com o primeiro:
+protocolo: http; (Sem o S, sem TLS)
+domínio: app.exemplo.com; (é o mesmo)
+porta: 443 (Não utiliza a porta padrão)</code></pre>
+
+                            <p>
+                                Não confunda <strong>ORIGIN</strong> com <strong>URL</strong> — Erro comum de iniciante.
+                                Uma URL, é composta por ORIGIN + PATH, incluindo coisas como query params, route params
+                                e etc. Veja:
+                            </p>
+
+                            <pre><code>
+https://api.exemplo.com:443/users/10?active=true
+└─────── origin ──────────┘└── path/endpoint ──┘</code></pre>
+
+                            <p>
+                                Dito isso, quando um navegador se comunica com outras aplicações, essa comunicação pode
+                                ocorrer de duas formas distintas, de acordo com a <strong>origin</strong> envolvida:
+                                <strong>Same-Origin</strong> ou <strong>Cross-Origin</strong>.
+                            </p>
+
+                            <p>
+                                <strong>Same-Origin:</strong> ocorre quando a requisição é feita para a
+                                <strong>mesma origin</strong> da aplicação que está sendo executada no navegador. Para
+                                que duas URLs sejam consideradas da mesma origin, elas devem possuir o mesmo
+                                <strong>protocolo</strong>, <strong>domínio</strong> e <strong>porta</strong>. Exemplo:
+                            </p>
+
+                            <p>
+                                A aplicação está rodando em
+                                <code>https://meusite.com</code> e realiza uma requisição para
+                                <code>https://meusite.com/api/users</code>.<br />
+                                Nesse caso, a comunicação é considerada <strong>Same-Origin</strong>, pois todos os
+                                componentes da origin são iguais.
+                            </p>
+
+                            <p>
+                                <strong>Cross-Origin:</strong> ocorre quando a requisição é feita para uma
+                                <strong>origin diferente</strong> da aplicação que está rodando no navegador. Basta que
+                                um dos elementos da origin (protocolo, domínio ou porta) seja diferente para que a
+                                comunicação seja considerada cross-origin. Exemplo:
+                            </p>
+
+                            <p>
+                                <code>https://meusite.com</code> → <code>https://api.meusite.com/users</code> (domínio
+                                diferente)<br />
+                                <code>https://meusite.com</code> → <code>http://meusite.com/users</code> (protocolo
+                                diferente)<br />
+                                <code>https://meusite.com</code> → <code>https://meusite.com:8080/users</code>
+                                (porta diferente)
+                            </p>
+
+                            <p>
+                                Sempre que uma requisição é classificada como <strong>Cross-Origin</strong>, o navegador
+                                aplica as regras de <strong>CORS</strong> para decidir se a resposta pode ou não ser
+                                acessada pelo JavaScript da aplicação. Não existe CORS quando a politica é
+                                <strong>Same-Origin</strong>.
+                            </p>
+
+                            <p>
+                                Quando a comunicação é <strong>Cross-Origin</strong>, as validações de
+                                <strong>CORS</strong> entram em ação. Nesse cenário, o navegador (frontend) pode
+                                realizar automaticamente uma requisição chamada <strong>preflight</strong>.
+                            </p>
+
+                            <p>
+                                A requisição <strong>preflight</strong> é uma requisição HTTP do tipo
+                                <code>OPTIONS</code>, cujo objetivo é verificar se o navegador está autorizado a
+                                realizar a requisição real (por exemplo, <code>GET</code>, <code>POST</code>,
+                                <code>PUT</code>, etc.) para um determinado endpoint.
+                            </p>
+
+                            <p>
+                                Caso a requisição <code>OPTIONS</code> retorne um status de sucesso
+                                (<strong>2xx</strong>) e contenha os cabeçalhos de CORS adequados, o navegador prossegue
+                                com a requisição real. Caso contrário, a requisição principal
+                                <strong>não é enviada</strong>.
+                            </p>
+
+                            <p>
+                                As regras de CORS são definidas nos <strong>headers da resposta</strong>
+                                retornada pela API. Esses cabeçalhos seguem o padrão
+                                <code>Access-Control-*</code>. Os mais comuns são:
+                            </p>
+
+                            <pre><code>
+Access-Control-Allow-Origin: https://meusite.com
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+Access-Control-Allow-Headers: Content-Type, Authorization
+Access-Control-Allow-Credentials: true
+</code></pre>
+
+                            <p>
+                                Exemplo prático: antes de realizar uma requisição
+                                <code>POST /users</code> a partir do frontend, o navegador pode disparar
+                                automaticamente:
+                            </p>
+
+                            <pre><code>
+OPTIONS /users
+Origin: https://meusite.com
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: Content-Type
+</code></pre>
+
+                            <p>
+                                Se a API responder permitindo essa origin, método e headers, o navegador então enviará a
+                                requisição real <code>POST /users</code>.
+                            </p>
                         </div>
 
                         <div id="errors-responses" class="blog-text">
@@ -2627,8 +2755,9 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
                 { id: 'post', label: 'POST' },
                 { id: 'put-patch-delete', label: 'PUT/PATCH/DELETE' },
                 { id: 'cors', label: 'OPTIONS e CORS' },
+                { id: 'auth', label: 'Autenticação vs Autorização' },
+                { id: 'https', label: 'HTTPS e Limites' },
                 { id: 'errors-responses', label: 'Response e erros' },
-                { id: 'auth', label: 'Autenticação vs Autorização' }, //rate limiting
                 { id: 'version-log', label: 'Versionamento e Monitoramento' },
                 { id: 'conclusion', label: 'Conclusão' },
                 { id: 'refs', label: 'Referências' }
