@@ -2662,6 +2662,61 @@ fastify.register(require('@fastify/cors'), {
                             </p>
                         </div>
 
+                        <div id="auth" class="blog-text">
+                            <h1 class="h4 portfolio-title">Autenticação e OAuth 2.0</h1>
+
+                            <p>
+                                Este é um tópico cabeludo e cheio de detalhes, mas aqui vou resumir o
+                                <strong>básico</strong> que você precisa entender. Talvez, no futuro, eu escreva um
+                                artigo completo dedicado apenas a isso.
+                            </p>
+
+                            <p>
+                                Antes de tudo, é importante diferenciar <strong>autenticação</strong> e
+                                <strong>autorização</strong>. Uma forma simples de pensar nisso é:
+                            </p>
+
+                            <pre><code>
+Autenticação: Quem é você?
+Autorização: O que você pode fazer?
+
+Explicando:
+Autenticação: Confirma a identidade do usuário e permite o login.
+Autorização: Verifica as permissões do usuário logado.
+</code></pre>
+
+                            <p>
+                                No contexto de <strong>autenticação</strong> em APIs REST, existem basicamente
+                                <strong>três estratégias principais</strong>:
+                            </p>
+
+                            <ul>
+                                <li>
+                                    <strong>Basic Auth:</strong> Envia usuário e senha em cada requisição (geralmente
+                                    codificados em Base64). Essa é considerada uma estratégia defasado e insegura. Não é
+                                    recomendado para produção.
+                                </li>
+                                <br />
+                                <li>
+                                    <strong>API Key:</strong> Um token secreto que identifica o cliente ou a aplicação.
+                                </li>
+                                <br />
+                                <li>
+                                    <strong>OIDC (OpenID Connect):</strong> Uma camada de autenticação construída sobre
+                                    o protocolo OAuth 2.0, permitindo login seguro com tokens JWT.
+                                </li>
+                                <br />
+                            </ul>
+
+                            <p>
+                                Já quando falamos de <strong>autorização</strong>, o protocolo padrão é o
+                                <strong>OAuth 2.0</strong>. É comum iniciantes — e até desenvolvedores experientes —
+                                confundirem os termos: OAuth 2.0 não é um protocolo de autenticação, mas sim um
+                                protocolo de autorização, projetado para conceder acesso controlado a recursos sem expor
+                                credenciais (senha).
+                            </p>
+                        </div>
+
                         <div id="errors-responses" class="blog-text">
                             <h1 class="h4 portfolio-title">Responses e erros</h1>
 
@@ -2828,7 +2883,6 @@ fastify.register(require('@fastify/cors'), {
                 { id: 'put-patch-delete', label: 'PUT/PATCH/DELETE' },
                 { id: 'cors', label: 'OPTIONS e CORS' },
                 { id: 'auth', label: 'Autenticação e OAuth 2.0' },
-                { id: 'auth', label: 'Autorização vs Autenticação ' },
                 { id: 'https', label: 'HTTPS e Limites' },
                 { id: 'errors-responses', label: 'Response e erros' },
                 { id: 'version-log', label: 'Versionamento e Monitoramento' },
