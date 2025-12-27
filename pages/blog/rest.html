@@ -2754,7 +2754,7 @@ X-API-Key: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
                             </p>
 
                             <p>
-                                Mas voce deve estar se perguntando:
+                                Mas você deve estar se perguntando:
                                 <i>
                                     "Mas o body do request está vazio, e além disso, o objetivo dessa endpoint é OBTER o
                                     token de acesso, portanto, parece fazer muito mais sentido ser um GET invés de
@@ -2788,7 +2788,124 @@ X-API-Key: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
                                 protocolos mais tarde).
                             </p>
 
-                            <p>Ainda explicando sobre o exemplo do request: Perceba</p>
+                            <p>
+                                Perceba que a API KEY foi enviada sobre uma propriedade no headers nomeada de
+                                <strong>X-API-KEY</strong>. O prefixo "X-" é uma boa prática adotada para indicar algo
+                                que é <strong>non-standard</strong> (não padronizado). Esse prefixo é utilizado em
+                                propriedades que não fazem parte do padrão oficial do HTTP, ou seja, é algo customizado
+                                e personalizado da aplicação. Segue alguns exemplos clássicos de headers customizados:
+                            </p>
+
+                            <pre><code>X-API-Key
+X-Request-Id
+X-Correlation-Id
+X-Forwarded-For
+X-Powered-By</code></pre>
+
+                            <p>
+                                caso a autenticação seja bem sucedida, a API retorna um TOKEN JWT no response da chamada
+                                da endpoint
+                                <code>/api/auth/token</code>.
+                            </p>
+
+                            <p>
+                                Este token JWT (JSON Web Token) é um token assinado digitalmente que carrega informações
+                                (claims) relacionadas ao acesso à API — por isso, é comumente utilizado como access
+                                token. Na prática, esse token é enviado no header das requisições HTTP, geralmente por
+                                meio do cabeçalho <code>Authorization: Bearer</code>, com o objetivo de permitir que a
+                                API autorize a execução da operação solicitada. Dessa forma, o fluxo completo de
+                                comunicação ocorre da seguinte maneira:
+                            </p>
+
+                            <pre><code>
+AUTENTICAÇÃO:
+POST /api/auth/token
+Host: api.exemplo.com
+X-API-Key: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
+RESPONSE: abc123abc
+
+AUTORIZAÇÃO:
+GET /api/users/12
+Host: api.exemplo.com
+Authorization: abc123abc
+RESPONSE: UserObject
+
+GET /api/orders/15
+Host: api.exemplo.com
+Authorization: abc123abc
+RESPONSE: orderObject
+
+EXPLICAÇÃO:
+1. O primeiro passo de uma comunicação com uma api protegida, é sempre a autenticação. Nesse processo é gerado o access_token.
+2. Em seguida, para obter acesso aos recursos (user, products, orders e etc) é necessário enviar o token de AUTORIZAÇÃO (token JWT/acess_token).</code></pre>
+                            <br />
+                            <p>
+                                O JWT, foi criado em 2011/2012 por Michele Allen, Nat Sakimura e John Bradley. Em 2015,
+                                o JWT foi oficialmente padronizado como <strong>RFC 7519</strong>, pela IETF (Internet
+                                Engineering Task Force). O JWT surgiu para atender essa necessidade de um hash para
+                                autorização em api stateless. O conceito do JWT é muito simples:
+                                <i
+                                    >O token carrega as informações de autorização, e o servidor apenas valida a
+                                    assinatura.</i
+                                >
+                            </p>
+
+                            <p>
+                                Caso seja usado algum hash aleatório como token de autorização, por exemplo um Guid, a
+                                api necessitará <strong>consultar</strong> as permissões, tempo de expiração e demais
+                                informações atreladas a esse token em um banco de dados (além de custar um processamento
+                                e armazenamento desnecessário, isso vai contra o conceito de stateless). Com o JWT, não
+                                é necessário consultar informações em um banco de dados, pois o próprio JWT carrega as
+                                informações necessárias para a autorização.
+                            </p>
+
+                            <p>
+                                Existem outras formas de implementar essa estratégia de autenticação com API KEY, mas
+                                sendo sincero, essa é a melhor delas. Eu já me deparei com uma implementações super
+                                tosca, que consiste em SEMPRE enviar a api key, para ser autorizado nas endpoints. Mas
+                                essa estratégia é muito menos segura do que a solução com JWT. Em suma, nessa estratégia
+                                simplificada, se o client enviou a API KEY, ele possui passe livre na API. Nesse
+                                cenário, a API KEY está sendo enviada sempre em todo request, as chances da api key
+                                vazar aumentam significativamente.
+                            </p>
+
+                            <p>
+                                Nessa estratégia ruim de api key, não é necessário uma endpoint de autenticação como
+                                <code>/api/auth/token</code>, basta enviar a api key no headers
+                                <code>Authorization</code> e pronto, você possui acesso ao recurso.
+                            </p>
+
+                            <pre><code>
+// SOLUÇÃO NÃO RECOMENDADA
+
+GET /api/users/12
+Host: api.exemplo.com
+Authorization: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
+RESPONSE: UserObject
+
+GET /api/orders/15
+Host: api.exemplo.com
+Authorization: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
+RESPONSE: orderObject
+
+GET /api/orders/16
+Host: api.exemplo.com
+Authorization: abc
+RESPONSE: 401 Unauthorized.
+</code></pre>
+
+                            <p>
+                                Outra prática ruim, é enviar a api key e ou token JWT no BODY da requisição. O header é
+                                o <strong>local semântico correto</strong> para metadados de autenticação e autorização
+                                no HTTP. Body representa dados do recurso (payload), autenticação e autorização não
+                                fazem parte do recurso em si, mas do contexto de acesso a esse recurso, portanto, deve
+                                SEMPRE estar presente no HEADERS da requisição.
+                            </p>
+
+                            <p>
+                                Mas além de api key, existe uma outra forma mais segura (e mais recomendada) para
+                                autenticar e autorizar clients, essa estratégia é baseada 100% no protocolo OAuth 2.0.
+                            </p>
                         </div>
 
                         <div id="errors-responses" class="blog-text">
