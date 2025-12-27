@@ -2622,7 +2622,9 @@ Access-Control-Request-Headers: Content-Type
                             </p>
 
                             <pre><code>
-fastify.register(require('@fastify/cors'), {
+import cors from '@fastify/cors'
+
+fastify.register(cors, {
   origin: 'https://meusite.com'
 });
 
