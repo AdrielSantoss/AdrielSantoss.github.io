@@ -2905,7 +2905,20 @@ RESPONSE: 401 Unauthorized.
                             </p>
 
                             <p>
-                                Mas além de api key, existe uma outra forma mais segura (e mais recomendada) para
+                                E por fim, mais uma prática ruim e insegura: Declarar api key no frontend. Como dito
+                                acima, api key é uma estratégia para uso interno e restrito, e
+                                <strong>nunca</strong> deve ser inserido no javascript ou em qualquer lugar que o
+                                usuário tenha acesso. Entenda: <strong>frontend é terra do usuário</strong>.
+                            </p>
+
+                            <p>
+                                Api key e OAtuh com client credentials, só fazem sentido quando a comunicação é
+                                <strong>api-to-api</strong>, se o seu frontend precisa requisitar uma api, utilize
+                                estratégia como OIDC + OAuth 2.0. (explicarei sobre essa estratégia mais adiante).
+                            </p>
+
+                            <p>
+                                Mas, além de api key, existe uma outra forma mais segura (e mais recomendada) para
                                 autenticar e autorizar clients, essa estratégia é baseada 100% no protocolo OAuth 2.0.
                             </p>
                         </div>
