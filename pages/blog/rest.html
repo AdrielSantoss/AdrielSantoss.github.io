@@ -2685,36 +2685,110 @@ Autenticação: Confirma a identidade do usuário e permite o login.
 Autorização: Verifica as permissões do usuário logado.
 </code></pre>
 
-                            <p>
-                                No contexto de <strong>autenticação</strong> em APIs REST, existem basicamente
-                                <strong>três estratégias principais</strong>:
-                            </p>
-
-                            <ul>
-                                <li>
-                                    <strong>Basic Auth:</strong> Envia usuário e senha em cada requisição (geralmente
-                                    codificados em Base64). Essa é considerada uma estratégia defasado e insegura. Não é
-                                    recomendado para produção.
-                                </li>
-                                <br />
-                                <li>
-                                    <strong>API Key:</strong> Um token secreto que identifica o cliente ou a aplicação.
-                                </li>
-                                <br />
-                                <li>
-                                    <strong>OIDC (OpenID Connect):</strong> Uma camada de autenticação construída sobre
-                                    o protocolo OAuth 2.0, permitindo login seguro com tokens JWT.
-                                </li>
-                                <br />
-                            </ul>
+                            <p>Existem dois tipos principais de autenticação em APIs:</p>
 
                             <p>
-                                Já quando falamos de <strong>autorização</strong>, o protocolo padrão é o
-                                <strong>OAuth 2.0</strong>. É comum iniciantes — e até desenvolvedores experientes —
-                                confundirem os termos: OAuth 2.0 não é um protocolo de autenticação, mas sim um
-                                protocolo de autorização, projetado para conceder acesso controlado a recursos sem expor
-                                credenciais (senha).
+                                <strong>Autenticação de cliente (client authentication):</strong>
+                                Esse tipo de autenticação identifica uma <strong>aplicação</strong> ou
+                                <strong>serviço</strong>, e não um usuário humano específico. É utilizada principalmente
+                                em integrações entre sistemas (machine-to-machine), onde a API reconhece e valida a
+                                aplicação que está realizando a requisição.
                             </p>
+
+                            <p>
+                                <strong>Autenticação de usuário (user authentication):</strong>
+                                Esse tipo de autenticação envolve um <strong>usuário humano</strong>, com validação de
+                                credenciais e mecanismos de login, permitindo associar as requisições à identidade e às
+                                permissões do usuário.
+                            </p>
+
+                            <p>
+                                Para a <strong>autenticação de cliente</strong>, normalmente é utilizado duas
+                                estratégias: API KEY e OAuth 2.0.
+                            </p>
+
+                            <p>
+                                Para <strong>autenticação de usuário</strong>, é utilizado principalmente uma estratégia
+                                que é bem consolidada e segura: OPEN ID CONNECT (OIDC) + OAuth 2.0.
+                            </p>
+
+                            <h1 class="h4 portfolio-title">Autenticação e Autorização - API KEY e JWT</h1>
+
+                            <p>
+                                Vou começar desenvolvendo esse tópico pelo o assunto de API KEY. Esta é uma estratégia
+                                simples de
+                                <strong>autenticação</strong> de cliente, é reconhecida por sua praticidade e facilidade
+                                de implementação, por outro lado, não é tão segura quanto a estratégia baseada em
+                                <strong>OAuth 2.0</strong>.
+                            </p>
+
+                            <p>
+                                A estratégia de api key, consiste em gerar uma chave identificadora por cliente, e esta
+                                chave será utilizada para a autenticação. A ideia é bem simples: Se enviou a chave
+                                correta será autenticado, se a chave é inválida, retorna
+                                <strong>401</strong> (Unauthorized).
+                            </p>
+
+                            <p>
+                                O problema disso é que se a chave vazar, qualquer um pode realizar autenticação na api.
+                                Por isso, essa estratégia é comumente adotada em <strong>apis internas</strong> e com
+                                baixo risco de vazamento de dados. Essa não é uma estratégia recomendada para apis que
+                                protegem recursos criticos e importantes.
+                            </p>
+
+                            <p>
+                                Essas chaves costumam ser hashes, como: GUID, UUID v4, bytes aleatórios, etc. Elas são
+                                enviadas no <strong>header</strong> da requisição. Veja um exemplo:
+                            </p>
+
+                            <pre><code>POST /api/auth/token
+Host: api.exemplo.com
+X-API-Key: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
+</code></pre>
+
+                            <p>
+                                Perceba que foi definido o método <code>POST</code> para endpoint de autenticação. E
+                                isso não foi atoa. O método POST é considerado uma boa prática amplamente aceita quando
+                                o contexto é gerar o token de acesso (falarei sobre tokens mais a frente) no processo
+                                autenticação.
+                            </p>
+
+                            <p>
+                                Mas voce deve estar se perguntando:
+                                <i>
+                                    "Mas o body do request está vazio, e além disso, o objetivo dessa endpoint é OBTER o
+                                    token de acesso, portanto, parece fazer muito mais sentido ser um GET invés de
+                                    POST."</i
+                                >. Abaixo vou listar alguns motivos do porque a comunidade adotou POST invés de GET:
+                            </p>
+
+                            <p>
+                                <strong>Segurança:</strong> GET pode ir para logs, histórico de navegador e pode ser
+                                cacheado. — Não queremos associar uma endpoint sensivel a um método HTTP que pode ser
+                                cacheado e registrado em LOG.
+                            </p>
+
+                            <p>
+                                <strong>Semântica HTTP:</strong> Emissão de token JWT e autenticação, é uma operação que
+                                altera estado do sistema, operação que altera estado é naturalmente POST.
+                            </p>
+
+                            <p>
+                                <strong>POST não é idempotente:</strong> Cada chamada deve gerar um
+                                <strong>novo</strong> token JWT, com um novo <strong>tempo de expiração</strong>, logo,
+                                essa não é uma operação idempotente. GET e PUT são métodos http utilizados em operações
+                                idempotente.
+                            </p>
+
+                            <p>
+                                <strong>Não reinvente a roda:</strong> Protocolos bem consolidados como
+                                <strong>OIDC</strong> e <strong>OAuth 2.0</strong> , já pensaram muito nessa questão, e
+                                chegaram na conclusão de utilizar POST em suas endpoint de emissão de token e
+                                autenticação: <code>/token</code> ou <code>/connect/token</code>. (Falarei dos
+                                protocolos mais tarde).
+                            </p>
+
+                            <p>Ainda explicando sobre o exemplo do request: Perceba</p>
                         </div>
 
                         <div id="errors-responses" class="blog-text">
