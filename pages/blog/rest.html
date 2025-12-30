@@ -2996,6 +2996,135 @@ Formatos e utilitários
 
 RFC 7159 / 8259 – JSON
 RFC 3986 – URI / URL</code></pre>
+
+                            <p>
+                                Existem tipos de RFCs, existem diversos termos e nomeclaturas especificas para os
+                                artigos. Enfim, caso queira se aprofundar em leitura de RFC, recomendo da uma olhada no
+                                <a href="https://www.ietf.org/process/rfcs/" target="_blank" class="blog-link"
+                                    >site da IETF</a
+                                >.
+                            </p>
+
+                            <p>
+                                Voltando ao tópico central, a maneira mais moderna e segura para realizar autenticação
+                                de client em uma comunicação web, é via OAuth 2.0 com
+                                <strong>client credentials</strong>.
+                            </p>
+
+                            <p>
+                                Aqui já começa uma <strong>estranheza</strong> que muitos se confundem: O protocolo o
+                                OAuth 2.0 é um protocolo de <strong>autorização</strong>, mas em um cenário especifico
+                                de comunicação máquina-to-máquina (sem usuário humano envolvido), ele também oferece uma
+                                forma de <strong>autenticação</strong>. É uma autenticação baseada em
+                                <strong>autorização por identidade.</strong>. Entenda: OAuth 2.0 é sempre
+                                <strong>autorização </strong>, nunca <strong>autenticação de usuário</strong>.
+                            </p>
+
+                            <p>
+                                No caso do client credentials, o client envia uma espécide de <code>user</code> e
+                                <code>password</code>, que são nomeados de <code>client_id</code> e
+                                <code>client_secret</code> em formato de <strong>base64</strong> no header
+                                <code>authorization</code>. Para entender melhor veja esse exemplo de requisição
+                                realizando autenticação:
+                            </p>
+
+                            <pre><code>
+POST /oauth/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic base64(client_id:client_secret)
+&scope=orders.read orders.write
+
+grant_type=client_credentials
+
+RESPONSE:
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "orders.read orders.write"
+}
+
+</code></pre>
+                            <br />
+
+                            <p>
+                                <code>Basic</code> é a palavra chave utilizada para envio das credenciais em formato
+                                <code>base64</code>, o content-type padrão é
+                                <code>application/x-www-form-urlencoded</code>, e também possui o header obrigatório
+                                <code>grant_type=client_credentials</code>.
+                            </p>
+
+                            <p>
+                                Após autenticar, o <code>access_token</code> obtido deve ser utilizado no header das
+                                próximas requisições (da mesma forma como mencionado no processo de API KEY com OAuth),
+                                exemplo:
+                            </p>
+                            <pre><code>
+GET /orders
+Authorization: Bearer &lt;access_token&gt;
+
+</code></pre>
+
+                            <p>
+                                Agora vou explicar cada item do <code>response</code> e também me concentrar no
+                                <code>acess_token</code>— É necessário entender tokens para entender OAuth 2.0
+                                completamente.
+                            </p>
+
+                            <p>Temos o seguinte response de exemplo:</p>
+                            <pre>
+    <code>
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "orders.read orders.write"
+}</code>
+</pre>
+
+                            <br />
+
+                            <p>
+                                <strong>access_token</strong>: Token de autorização para acessar o recurso protegido,
+                                esse token não diz "quem você é", esse token diz "o que você pode fazer". Segue o padrão
+                                JWT.
+                            </p>
+
+                            <p>
+                                <strong>token_type</strong>: Indica como o token deve ser usado. Na prática
+                                <code>Bearer</code> significa: “Quem possui o token tem acesso”, não há outro fator, sem
+                                senha sem assinatura por request sem challenge, apenas acess_token. — Por isso HTTPS é
+                                obrigatório, se o token vazar, qualquer um tem acesso. Existem outros
+                                <code>token_type</code> além do BEARER, mas são pouco utilizados e não recomendados.
+                            </p>
+
+                            <p>
+                                <strong>expires_in</strong>: Tempo de vida do token em <strong>segundos</strong>. Nesse
+                                exemplo: 3600 segundos = 1 hora. Após o token expirar, a API passa a rejeitar as
+                                requisições (401) e o client precisa pedir um novo token. Em Client Credentials
+                                normalmente não existe
+                                <strong>refresh token</strong>
+                                (atualização automática de access_token, falarei disso mais adiante).
+                            </p>
+
+                            <p>
+                                <strong>scope</strong>: Lista de permissões concedidas ao token. Perceba que o
+                                <code>scope</code> foi usado no body do request POST. Portanto, é o client que solicita
+                                os tipos de permissões, mas a API pode retornar um conjunto diferente de permissão,
+                                exemplo: client pede permissão de <strong>leitura</strong> e <strong>escrita</strong>,
+                                mas o servidor permitiu apenas <strong>leitura</strong>, tudo isso é definido na
+                                propriedade <code>scope</code>. Os principais scopes são:
+                            </p>
+
+                            <pre><code>
+O servidor do OAuth sempre vai checar os scopes por endpoint, exemplo:
+
+GET /orders        → exige orders.read
+POST /orders       → exige orders.write
+DELETE /orders/:id → exige orders.admin
+
+Também é possivel retornar 403, caso o servidor não permita algum scope para o client.
+</code></pre>
                         </div>
 
                         <div id="errors-responses" class="blog-text">
