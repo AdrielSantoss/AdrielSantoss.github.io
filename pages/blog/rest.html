@@ -2711,7 +2711,7 @@ Autorização: Verifica as permissões do usuário logado.
 
                             <p>
                                 Para <strong>autenticação de usuário</strong>, é utilizado principalmente uma estratégia
-                                que é bem consolidada e segura: OPEN ID CONNECT (OIDC) + OAuth 2.0.
+                                que é bem consolidada e segura: OPENID CONNECT (OIDC) + OAuth 2.0.
                             </p>
 
                             <h1 class="h4 portfolio-title">Autenticação e Autorização - API KEY e JWT</h1>
@@ -3257,8 +3257,105 @@ HEADER.PAYLOAD.SIGNATURE</code>
                                 <strong>bibliotecas consolidadas</strong>. Evite implementar manualmente procedimentos
                                 como verificação de assinatura, validação de expiração, audience, issuer e demais regras
                                 de segurança. Erros ou omissões nesses pontos são comuns e podem comprometer seriamente
-                                a segurança da API. <strong>Não reinvente a roda</strong>.
+                                a segurança da API. Atualmente existe uma plataforma muito popular para autenticação que
+                                implementa os padrões Oauth e OIDC é o
+                                <a href="https://auth0.com/docs" target="_blank" class="blog-link">auth0</a>, além disso
+                                possui uma ótima documentação para compreender os protocolos de autenticação e
+                                autorização.
                             </p>
+
+                            <h1 class="h4 portfolio-title">Autenticação e Autorização - OAuth 2.0 e OIDC</h1>
+
+                            <p>
+                                Agora sim, chegamos ao tópico que descreve o protocolo responsável pela
+                                <strong>autenticação de usuários humanos</strong>: o
+                                <strong>OpenID Connect (OIDC)</strong>.
+                            </p>
+
+                            <p>
+                                É importante entender que o OIDC <strong>não substitui</strong> o OAuth 2.0. Na prática,
+                                eles são usados <strong>em conjunto</strong>, cada um resolvendo um problema diferente.
+                            </p>
+
+                            <p>
+                                O <strong>OpenID Connect (OIDC)</strong> é uma camada de
+                                <strong>identidade</strong> construída sobre o OAuth 2.0. Ele define como um usuário é
+                                autenticado e como sua identidade é representada de forma padronizada.
+                            </p>
+
+                            <p>
+                                OIDC surgiu como uma <strong>extensão</strong> do OAuth 2.0 para permitir que aplicações
+                                possam autenticar usuários humanos de forma padronizada, aproveitando os fluxos e
+                                mensagens do OAuth 2.0 para trazer também a identidade do usuário.
+                            </p>
+
+                            <p>
+                                O desenvolvimento do OpenID Connect foi liderado pela
+                                <a href="https://openid.net/foundation/" target="_blank" class="blog-link"
+                                    >OpenID Foundation</a
+                                >, uma organização aberta focada em padrões de identidade digital. A especificação foi
+                                criada por um grupo de trabalho formado por nomes como Nat Sakimura, Mike Jones e John
+                                Bradley, com contribuições de grandes empresas de tecnologia. O protocolo foi
+                                oficialmente lançado em <strong>2014</strong>.
+                            </p>
+
+                            <p>
+                                Sendo prático, OpenID Connect reutiliza 90% do OAuth internamente, só adiciona coisas
+                                <strong></strong>complementares como: <code>id_token</code>,
+                                <code>scopes (openid, profile, email)</code>, <code>userinfo</code> e algumas regras
+                                extras. o fato do OIDC ser quase todo baseado no OAuth 2.0, é um dos principais motivos
+                                do porque não virou uma <strong>RFC</strong>.
+                            </p>
+
+                            <p>
+                                OIDC é focado em processo de <strong>autenticação</strong>, a pergunta que o OIDC
+                                responde é:
+                                <em>“Quem é o usuário autenticado?”</em>
+                            </p>
+
+                            <p>
+                                Quando OAuth 2.0 e OIDC são utilizados juntos (o cenário mais comum hoje), o fluxo
+                                geralmente usa o <strong>Authorization Code</strong> e retorna
+                                <strong>dois tipos principais de token</strong>: <code>access_token</code> e
+                                <code>id_token</code>
+                            </p>
+
+                            <p>
+                                O fluxo completo do processo de autenticação e autorização, seria algo assim:
+                            </p>
+
+<pre><code>
+(1) Client → Authorization Server
+    GET /authorize
+    response_type=code
+    scope=openid profile email
+
+(2) Authorization Server
+    Autentica o usuário
+    Retorna authorization_code
+
+(3) Client → Authorization Server
+    POST /oauth/token
+    authorization_code + client_id (+ secret ou PKCE)
+
+(4) Authorization Server
+    Emite:
+      - access_token
+      - id_token (JWT)
+
+(5) Client
+    Usa o id_token para identificar o usuário
+    (login / sessão)
+
+(6) Client → Resource Server
+    Authorization: Bearer <access_token>
+
+(7) Resource Server
+    Valida o access_token
+    Retorna o recurso protegido  
+</code></pre>                            
+
+
                         </div>
 
                         <div id="errors-responses" class="blog-text">
