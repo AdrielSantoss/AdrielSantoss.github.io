@@ -2922,7 +2922,7 @@ RESPONSE: 401 Unauthorized.
                                 autenticar e autorizar clients, essa estratégia é baseada 100% no protocolo OAuth 2.0.
                             </p>
 
-                            <h1 class="h4 portfolio-title">Autenticação e Autorização - OAuth 2.0</h1>
+                            <h1 class="h4 portfolio-title">Autenticação e Autorização - OAuth 2.0 e JWT</h1>
 
                             <p>
                                 O
@@ -3125,6 +3125,140 @@ DELETE /orders/:id → exige orders.admin
 
 Também é possivel retornar 403, caso o servidor não permita algum scope para o client.
 </code></pre>
+                            <p>
+                                O <code>access_token</code> é um token JWT. Um JWT é composto por três partes:
+                                <strong>HEADER</strong>, <strong>PAYLOAD</strong> e <strong>SIGNATURE</strong>. Dentro
+                                do <strong>PAYLOAD</strong>, estão presentes informações chamadas de
+                                <strong>claims</strong>.
+                            </p>
+
+                            <p>Mas vamos por partes, segue uma breve descrição de cada parte do JWT:</p>
+
+                            <p>
+                                <strong>HEADER:</strong> Essa parte contém <strong>metadados de segurança</strong>. Aqui
+                                existem informações que indicam como o token foi assinado, qual o algoritmo utilizado e
+                                o tipo do token. Normalmente, o programador não interage diretamente com essa parte,
+                                pois ela é definida e validada automaticamente pelo servidor OAuth 2.0.
+                            </p>
+
+                            <p>Exemplo de <strong>HEADER</strong> (JSON antes de ser codificado em Base64URL):</p>
+
+                            <pre><code>
+{
+  "alg": "RS256",
+  "typ": "JWT"
+}</code>
+</pre>
+
+                            <p>
+                                <strong>PAYLOAD:</strong> Contém as <strong>claims</strong>, que são informações sobre o
+                                usuário, o cliente e o próprio token. Essas informações são usadas pela API para
+                                autorizar ou negar acesso a recursos. É aqui que o programador pode armazenar
+                                informações do usuário (como email, username e etc).
+                            </p>
+
+                            <p>Exemplo de <strong>PAYLOAD</strong>:</p>
+
+                            <pre>
+                                <code>
+{
+  "iss": "https://auth.exemplo.com",
+  "sub": "123456",
+  "aud": "api-pedidos",
+  "exp": 1735586400,
+  "iat": 1735582800,
+  "scope": "orders.read orders.write",
+  "client_id": "frontend-app"
+}</code>
+</pre>
+
+                            <p>Algumas claims comuns:</p>
+
+                            <ul>
+                                <li><strong>iss</strong> (issuer): quem emitiu o token</li>
+                                <li><strong>sub</strong> (subject): identificador do usuário ou entidade</li>
+                                <li><strong>aud</strong> (audience): quem pode aceitar esse token</li>
+                                <li><strong>exp</strong> (expiration): data/hora de expiração</li>
+                                <li><strong>iat</strong> (issued at): quando o token foi emitido</li>
+                                <li><strong>scope</strong>: permissões concedidas ao token</li>
+                            </ul>
+                            <br />
+
+                            <p>
+                                <strong>SIGNATURE:</strong> É a parte que garante a <strong>integridade</strong> e
+                                <strong>autenticidade</strong> do token. Ela é gerada a partir do
+                                <strong>HEADER</strong> e do <strong>PAYLOAD</strong>, utilizando uma chave secreta
+                                (HS256) ou uma chave privada (RS256).
+                            </p>
+
+                            <p>Exemplo conceitual de como a <strong>SIGNATURE</strong> é gerada:</p>
+
+                            <pre>
+                                <code>
+signature = sign(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  privateKey
+)</code>
+</pre>
+
+                            <p>
+                                A API valida essa assinatura usando a chave pública do servidor OAuth 2.0. Se qualquer
+                                parte do token for alterada, a assinatura se torna inválida e o token é rejeitado.
+                            </p>
+
+                            <p>No formato final, o JWT é transmitido como uma única string:</p>
+
+                            <pre><code>
+HEADER.PAYLOAD.SIGNATURE</code>
+</pre>
+
+                            <p>
+                                Em resumo, esse é o fluxo completo de uma autenticação seguida de um request de acesso a
+                                um recurso protegido utilizando OAuth 2.0 com
+                                <strong>Client Credentials</strong>:
+                            </p>
+
+                            <pre><code>
+(1) Client → Authorization Server
+    POST /oauth/token
+    client_id + client_secret
+
+(2) Authorization Server
+    Valida o client
+    Emite access_token (JWT)
+
+(3) Client → Resource Server
+    Authorization: Bearer &lt;access_token&gt;
+
+(4) Resource Server
+    Valida o token e os scopes
+    Retorna o recurso protegido
+</code></pre>
+
+                            <p>
+                                Por fim, tenha em mente que <code>client_credentials</code> é uma estratégia para
+                                autenticar e autorizar <strong>máquinas</strong>. É uma prática ruim ser utilizado para
+                                autenticar <strong>usuário.</strong>
+                            </p>
+
+                            <p>
+                                Outra prática ruim, é declarar um <code>access_token</code>, com tempo de expiração
+                                muito longo (dias, semanas e etc), o que aumenta o risco de vazamento do token
+                                consideravelmente.
+                            </p>
+
+                            <p>
+                                E obivamente, nunca declare <code>client_id</code> e <code>client_secret</code> no
+                                <strong>frontend</strong>. (Pelo mesmo motivo citado na estratégia de API KEY).
+                            </p>
+
+                            <p>
+                                A melhor recomendação ao implementar OAuth 2.0 e validação de JWT é utilizar
+                                <strong>bibliotecas consolidadas</strong>. Evite implementar manualmente procedimentos
+                                como verificação de assinatura, validação de expiração, audience, issuer e demais regras
+                                de segurança. Erros ou omissões nesses pontos são comuns e podem comprometer seriamente
+                                a segurança da API. <strong>Não reinvente a roda</strong>.
+                            </p>
                         </div>
 
                         <div id="errors-responses" class="blog-text">
