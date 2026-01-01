@@ -128,7 +128,7 @@ export function loadSideBarBlog(items = []) {
 
     sidebar.innerHTML = `
         <div class="sidebar-info">
-            <h3 style="color: white">Tabela de conteúdo</h3>
+            <h3 style="color: white">Conteúdo</h3>
             <button class="info_more-btn" data-sidebar-btn style="margin-top: 10px">
                 <span class="info_more_label">Exibir tabela</span>
                 <ion-icon name="chevron-down"></ion-icon>
