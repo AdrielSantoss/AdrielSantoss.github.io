@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Hello world</title>
+        <link rel="stylesheet" href="../../../assets/css/style.css" />
+        <link rel="stylesheet" href="../../../assets/css/changes.css" />
+        <link rel="shortcut icon" href="../../assets/images/logo.ico" type="image/x-icon" />
+    </head>
+    <body>
+        <main class="main-body">
+            <div class="main-content">
+                <article>
+                    <section>
+                        <h1 class="h4 portfolio-title">HTTP e REST na Prática: Autenticação e Boas Práticas</h1>
+
+                        <div>
+                            <small style="color: white">12/11/2025</small> -
+                            <a
+                                href="https://github.com/AdrielSantoss/API-Architectures"
+                                target="_blank"
+                                class="blog-link"
+                                >Projeto (Github)</a
+                            >
+                        </div>
+
+                        <div class="tags">
+                            <small class="tag">Node</small>
+                            <small class="tag">Typescript</small>
+                            <small class="tag">Arquitetura</small>
+                            <small class="tag">Rest</small>
+                            <small class="tag">Restful</small>
+                            <small class="tag">Fastify</small>
+                            <small class="tag">Prisma</small>
+                            <small class="tag">ORM</small>
+                        </div>
+                    </section>
+                    <br />
+
+                    <section class="portfolio-description">
+                        <div class="about-text"></div>
+                    </section>
+                    <section class="working-in-progress"></section>
+                </article>
+            </div>
+        </main>
+
+        <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+        <script type="module" src="../../../assets/js/index.js"></script>
+        <script type="module">
+            import { loadSideBarBlog } from '../../assets/js/elements/sidebar.js';
+
+            const sections = [
+                { id: 'intro', label: 'Introdução' },
+                { id: 'cors', label: 'OPTIONS e CORS' },
+                { id: 'auth', label: 'Autenticação e Autorização' },
+                { id: 'https', label: 'HTTPS e Limites' },
+                { id: 'errors-responses', label: 'Response e erros' },
+                { id: 'version-log', label: 'Versionamento e Monitoramento' },
+                { id: 'conclusion', label: 'Conclusão' },
+                { id: 'refs', label: 'Referências' }
+            ];
+
+            loadSideBarBlog(sections);
+        </script>
+    </body>
+</html>

@@ -6,15 +6,14 @@
         <title>Rest</title>
         <link rel="stylesheet" href="../../../assets/css/style.css" />
         <link rel="stylesheet" href="../../../assets/css/changes.css" />
+        <link rel="shortcut icon" href="../../assets/images/logo.ico" type="image/x-icon" />
     </head>
     <body>
         <main class="main-body">
             <div class="main-content">
                 <article>
                     <section>
-                        <h1 class="h4 portfolio-title">
-                            HTTP e REST na Prática: Conceitos, Boas Práticas e Casos Reais
-                        </h1>
+                        <h1 class="h4 portfolio-title">HTTP e REST na Prática: Conceitos e Métodos HTTP</h1>
 
                         <div>
                             <small style="color: white">10/11/2025</small> -
@@ -3320,11 +3319,9 @@ HEADER.PAYLOAD.SIGNATURE</code>
                                 <code>id_token</code>
                             </p>
 
-                            <p>
-                                O fluxo completo do processo de autenticação e autorização, seria algo assim:
-                            </p>
+                            <p>O fluxo completo do processo de autenticação e autorização, seria algo assim:</p>
 
-<pre><code>
+                            <pre><code>
 (1) Client → Authorization Server
     GET /authorize
     response_type=code
@@ -3348,14 +3345,14 @@ HEADER.PAYLOAD.SIGNATURE</code>
     (login / sessão)
 
 (6) Client → Resource Server
-    Authorization: Bearer <access_token>
+    Authorization: Bearer &lt;access_token&gt;
 
 (7) Resource Server
     Valida o access_token
     Retorna o recurso protegido  
-</code></pre>                            
+</code></pre>
 
-
+                            <p></p>
                         </div>
 
                         <div id="errors-responses" class="blog-text">
@@ -3522,11 +3519,6 @@ HEADER.PAYLOAD.SIGNATURE</code>
                 { id: 'get', label: 'GET' },
                 { id: 'post', label: 'POST' },
                 { id: 'put-patch-delete', label: 'PUT/PATCH/DELETE' },
-                { id: 'cors', label: 'OPTIONS e CORS' },
-                { id: 'auth', label: 'Autenticação e Autorização' },
-                { id: 'https', label: 'HTTPS e Limites' },
-                { id: 'errors-responses', label: 'Response e erros' },
-                { id: 'version-log', label: 'Versionamento e Monitoramento' },
                 { id: 'conclusion', label: 'Conclusão' },
                 { id: 'refs', label: 'Referências' }
             ];
