@@ -39,8 +39,1092 @@
                     <br />
 
                     <section class="portfolio-description">
-                        <div class="about-text"></div>
+                        <div id="errors-responses" class="blog-text">
+                            <h1 class="h4 portfolio-title">Responses e erros</h1>
+
+                            <p>
+                                Neste tópico vou abordar uma coisa que iniciantes costumam negligenciar: o
+                                <strong>response</strong>
+                                da API. A ideia aqui é discutir tanto os cenários de sucesso quanto os de erro, e como
+                                essas respostas devem ser estruturadas.
+                            </p>
+
+                            <p>
+                                Se eu tivesse que resumir este tópico em duas palavras, seriam:
+                                <strong>previsibilidade</strong> e <strong>segurança</strong>. É muito comum ver APIs
+                                ignorando completamente os códigos de status HTTP ou, pior ainda, implementando tabelas
+                                próprias de códigos de erro. Particularmente, não entendo quem faz isso, já que o
+                                protocolo HTTP já define de forma clara e padronizada os
+                                <a
+                                    href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status"
+                                    target="_blank"
+                                    class="blog-link"
+                                >
+                                    códigos de status de resposta HTTP </a
+                                >, amplamente conhecidos e suportados por qualquer cliente.
+                            </p>
+
+                            <p>
+                                Independentemente do endpoint, o formato do response deve ser
+                                <strong>previsível</strong>. Um padrão precisa ser definido e aplicado de forma
+                                consistente em toda a API, por exemplo:
+                            </p>
+
+                            <pre><code>
+{
+  "data": {...},
+  "meta": {...},
+  "errors": []
+}
+</code></pre>
+
+                            <p>
+                                Além disso, o código de status HTTP deve ser coerente com o payload retornado. Em
+                                cenários de sucesso, utilize a família <strong>2xx</strong> e não retorne erros. Para
+                                falhas causadas pelo cliente, utilize códigos <strong>4xx</strong> acompanhados de
+                                mensagens claras e objetivas, indicando exatamente o que está errado. Já em erros
+                                internos ou inesperados, utilize a família <strong>5xx</strong>, retornando uma mensagem
+                                genérica o suficiente para não comprometer a segurança da aplicação.
+                            </p>
+
+                            <p>De forma geral, os códigos de status mais comuns e utilizados são:</p>
+
+                            <pre><code>
+2xx – Sucesso
+
+    200 OK → resposta padrão
+
+    201 Created → recurso criado (normalmente com header Location)
+
+    204 No Content → sucesso sem body
+
+4xx – Erro do cliente
+
+    400 Bad Request → payload inválido
+
+    401 Unauthorized → não autenticado
+
+    403 Forbidden → autenticado, mas sem permissão
+
+    404 Not Found → recurso não encontrado
+
+    409 Conflict → conflito de estado (ex: duplicidade)
+
+    422 Unprocessable Entity → erro de validação semântica
+
+5xx – Erro do servidor
+
+    500 Internal Server Error
+
+    503 Service Unavailable 
+</code></pre>
+
+                            <p>
+                                Ao longo da minha trajetória no desenvolvimento web, percebi que muitas APIs em
+                                produção, em situações de erro <strong>500</strong>, acabam retornando para o cliente a
+                                <strong>stacktrace</strong> completa da exceção. Isso é considerado uma falha de
+                                segurança <strong>grave</strong>.
+                            </p>
+
+                            <p>
+                                A stacktrace expõe detalhes internos da aplicação, como nomes de classes, métodos,
+                                pacotes e, em alguns casos, até erros de SQL contendo nomes de tabelas e colunas. Esse
+                                tipo de informação é um verdadeiro prato cheio para um atacante, pois a API acaba
+                                entregando um “mapa” da sua estrutura interna. Stacktraces devem ser registradas apenas
+                                em <strong>logs internos</strong>, com acesso restrito à equipe responsável.
+                            </p>
+
+                            <p>
+                                Além disso, ao revelar nomes de arquivos e estruturas internas, muitas vezes é possível
+                                identificar o framework web utilizado e até mesmo sua versão. Com essa informação em
+                                mãos, um atacante pode pesquisar e explorar vulnerabilidades conhecidas associadas
+                                àquela versão específica do framework ou de bibliotecas utilizadas. Por isso,
+                                <strong>nunca</strong> retorne mensagens de erro internas para o cliente.
+                            </p>
+
+                            <p>
+                                Felizmente, muitos frameworks web já oferecem mecanismos padrão para evitar o retorno de
+                                stacktraces em ambientes de produção — o Fastify é um bom exemplo. No entanto, até onde
+                                sei, o Express não oferece essa proteção de forma nativa. Em caso de dúvida, implemente
+                                um <strong>error handler</strong> global e faça o mapeamento adequado dos erros da sua
+                                API, garantindo respostas seguras e padronizadas.
+                            </p>
+                            <p>
+                                Grande parte dos erros da família <strong>4xx</strong> ocorre durante a validação das
+                                <strong>DTOs</strong> enviadas pelo cliente. Em muitos casos, esses erros são tratados e
+                                retornados automaticamente pelo próprio framework, o que costuma ser uma excelente
+                                prática. Frameworks web maduros prezam por respostas de erro claras e padronizadas,
+                                informando exatamente <em>qual campo está inválido</em> e
+                                <em>qual regra de validação foi violada</em>, facilitando o tratamento do erro por quem
+                                consome a API. A seguir, veja um exemplo de resposta de erro gerada automaticamente pelo
+                                <strong>Fastify</strong> durante a validação de um payload:
+                            </p>
+
+                            <pre><code>
+{
+  "statusCode": 400,
+  "code": "FST_ERR_VALIDATION",
+  "error": "Bad Request",
+  "message": "body/email must match format \"email\""
+}    
+</code></pre>
+
+                            <p>
+                                Esse tipo de resposta torna o consumo da API mais previsível e reduz a necessidade de
+                                lógica adicional no backend para tratamento de validações simples, além de oferecer
+                                feedback imediato e preciso para o cliente.
+                            </p>
+
+                            <p>
+                                Em resumo, para tornar os responses da sua API REST previsivel, defina e utilize um
+                                padrão de response, utilize os códigos de status http para respostas de forma coerente.
+                                E para tornar sua API segura, crie hanglers para mapear os errps da api, evitando
+                                retorno de informação sensivel quando erros internos ocorrerem.
+                            </p>
+                        </div>
+                        <div class="about-text">
+                            <h1 class="h4 portfolio-title">OPTIONS e CORS</h1>
+
+                            <p>
+                                Existe um método HTTP que é amplamente utilizado pelos navegadores para a validação
+                                automática de <strong>CORS</strong>: o <code>OPTIONS</code>.
+                            </p>
+
+                            <p>
+                                Vamos por partes. O método <code>OPTIONS</code> tem como objetivo informar quais
+                                operações são permitidas para um determinado recurso. Em outras palavras, ele permite
+                                que o cliente verifique se uma determinada requisição HTTP pode ou não ser realizada.
+                            </p>
+
+                            <p>
+                                Por exemplo, antes de executar uma requisição
+                                <code>GET /users</code>, o navegador pode realizar previamente uma chamada
+                                <code>OPTIONS /users</code>. Se essa chamada retornar um status <strong>2xx</strong> e
+                                os cabeçalhos esperados, significa que a requisição real está autorizada a ser enviada.
+                            </p>
+
+                            <p>
+                                Na prática, o método <code>OPTIONS</code> raramente é implementado de forma explícita em
+                                APIs REST. Na maioria dos casos, ele é tratado automaticamente pelo servidor ou pelo
+                                framework web, existindo principalmente para dar suporte aos mecanismos de segurança do
+                                navegador.
+                            </p>
+
+                            <p>
+                                Já o <strong>CORS</strong> (Cross-Origin Resource Sharing) é uma política de segurança
+                                imposta pelos navegadores. Se você desenvolve aplicações web, é muito provável que já
+                                tenha se deparado com erros relacionados a CORS.
+                            </p>
+
+                            <p>
+                                Essa política é nativa dos navegadores e também está presente nos clientes HTTP
+                                utilizados por frameworks SPA, como Angular, React e Vue. É importante destacar que
+                                <strong>CORS não existe em comunicações backend-to-backend</strong>. Ou seja, uma API
+                                consumindo outra API não sofre qualquer restrição de CORS.
+                            </p>
+
+                            <p>
+                                O CORS existe para impedir que o JavaScript processe respostas de APIs que não foram
+                                explicitamente autorizadas pelo servidor, protegendo o usuário contra acessos indevidos
+                                a recursos de outras origens.
+                            </p>
+
+                            <p>
+                                Agora que ja definimos CORS e OPTIONS, precisamos definir
+                                <strong>ORIGIN</strong> (origem). Origin é o identificador de onde uma requisição web se
+                                origina, definido pela combinação de três elementos: protocolo + domínio + porta.
+                            </p>
+
+                            <p>Veja exemplo:</p>
+
+                            <pre><code>
+https://app.exemplo.com
+
+protocolo: https;
+domínio: app.exemplo.com;
+porta: 80 (porta padrão)
+
+Outro exemplo:
+http://app.exemplo.com:443
+
+Este é um origin diferente do primeiro. Vamos comparar com o primeiro:
+protocolo: http; (Sem o S, sem TLS)
+domínio: app.exemplo.com; (é o mesmo)
+porta: 443 (Não utiliza a porta padrão)</code></pre>
+
+                            <p>
+                                Não confunda <strong>ORIGIN</strong> com <strong>URL</strong> — Erro comum de iniciante.
+                                Uma URL, é composta por ORIGIN + PATH, incluindo coisas como query params, route params
+                                e etc. Veja:
+                            </p>
+
+                            <pre><code>
+https://api.exemplo.com:443/users/10?active=true
+└─────── origin ──────────┘└── path/endpoint ──┘</code></pre>
+
+                            <p>
+                                Dito isso, quando um navegador se comunica com outras aplicações, essa comunicação pode
+                                ocorrer de duas formas distintas, de acordo com a <strong>origin</strong> envolvida:
+                                <strong>Same-Origin</strong> ou <strong>Cross-Origin</strong>.
+                            </p>
+
+                            <p>
+                                <strong>Same-Origin:</strong> ocorre quando a requisição é feita para a
+                                <strong>mesma origin</strong> da aplicação que está sendo executada no navegador. Para
+                                que duas URLs sejam consideradas da mesma origin, elas devem possuir o mesmo
+                                <strong>protocolo</strong>, <strong>domínio</strong> e <strong>porta</strong>. Exemplo:
+                            </p>
+
+                            <p>
+                                A aplicação está rodando em
+                                <code>https://meusite.com</code> e realiza uma requisição para
+                                <code>https://meusite.com/api/users</code>.<br />
+                                Nesse caso, a comunicação é considerada <strong>Same-Origin</strong>, pois todos os
+                                componentes da origin são iguais.
+                            </p>
+
+                            <p>
+                                Vale ressaltar, que a imensa maioria das aplicações da WEB, atuam sobre a politica
+                                <strong>Same-Origin</strong>. Durante muitos anos (e ainda hoje em muitos casos), o
+                                frontend e backend eram servidos: do mesmo domínio e da mesma origin. Essa é a
+                                arquitetura clássica da web. Nesse cenário, não existe CORS (navegador entende que é uma
+                                comunicação segura), assim a comunicação http se torna mais direta e simples.
+                            </p>
+
+                            <p>
+                                <strong>Cross-Origin:</strong> ocorre quando a requisição é feita para uma
+                                <strong>origin diferente</strong> da aplicação que está rodando no navegador. Basta que
+                                um dos elementos da origin (protocolo, domínio ou porta) seja diferente para que a
+                                comunicação seja considerada cross-origin. Exemplo:
+                            </p>
+
+                            <p>
+                                <code>https://meusite.com</code> → <code>https://api.meusite.com/users</code> (domínio
+                                diferente)<br />
+                                <code>https://meusite.com</code> → <code>http://meusite.com/users</code> (protocolo
+                                diferente)<br />
+                                <code>https://meusite.com</code> → <code>https://meusite.com:8080/users</code>
+                                (porta diferente)
+                            </p>
+
+                            <p>
+                                Sempre que uma requisição é classificada como <strong>Cross-Origin</strong>, o navegador
+                                aplica as regras de <strong>CORS</strong> para decidir se a resposta pode ou não ser
+                                acessada pelo JavaScript da aplicação. Não existe CORS quando a politica é
+                                <strong>Same-Origin</strong>.
+                            </p>
+
+                            <p>
+                                Quando a comunicação é <strong>Cross-Origin</strong>, as validações de
+                                <strong>CORS</strong> entram em ação. Nesse cenário, o navegador (frontend) pode
+                                realizar automaticamente uma requisição chamada <strong>preflight</strong>.
+                            </p>
+
+                            <p>
+                                A requisição <strong>preflight</strong> é uma requisição HTTP do tipo
+                                <code>OPTIONS</code>, cujo objetivo é verificar se o navegador está autorizado a
+                                realizar a requisição real de acordo com as regras do CORS. É aqui que o méotdo
+                                <code>OPTIONS</code> comentado anteriormente, entra em ação.
+                            </p>
+
+                            <p>
+                                As regras de CORS são definidas nos <strong>headers da resposta</strong>
+                                retornada pela API. Esses cabeçalhos seguem o padrão
+                                <code>Access-Control-*</code>. Os mais comuns são:
+                            </p>
+
+                            <pre><code>
+Access-Control-Allow-Origin: https://meusite.com
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+Access-Control-Allow-Headers: Content-Type, Authorization
+Access-Control-Allow-Credentials: true
+</code></pre>
+
+                            <p>
+                                Exemplo prático: antes de realizar uma requisição
+                                <code>POST /users</code> a partir do frontend, o navegador pode disparar
+                                automaticamente:
+                            </p>
+
+                            <pre><code>
+OPTIONS /users
+Origin: https://meusite.com
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: Content-Type
+</code></pre>
+
+                            <p>
+                                Se a API responder permitindo essa origin, método e headers, o navegador então enviará a
+                                requisição real <code>POST /users</code>. É possivel observar tanto o request preflight
+                                (OPTIONS) quanto o request real, na aba "network" no console de desenvolvedor do
+                                navegador.
+                            </p>
+
+                            <p>
+                                Entendido o funcionamento do CORS e do PREFLIGHT do lado do frontend, chegamos à parte
+                                mais importante deste artigo: o papel da API nesse processo. É a API que define
+                                explicitamente quais <strong>origins</strong>, métodos HTTP e headers estão autorizados
+                                a acessar seus recursos.
+                            </p>
+
+                            <p>
+                                Essas permissões são configuradas por meio dos headers de resposta
+                                <code>Access-Control-*</code>, que informam ao navegador se a comunicação Cross-Origin é
+                                permitida ou não. O navegador apenas aplica essas regras — ele não decide por conta
+                                própria.
+                            </p>
+
+                            <p>
+                                CORS é tratado na camada HTTP da API, antes da lógica de negócio e das controllers.
+                                Normalmente o framework da API, já possui recursos prontos para lidar com CORS, não é
+                                necessário, e muito menos recomendado, criar handlers ou interceptors manuais. Sempre
+                                pesquise e utilize bibliotecas do seu framework para lidar com CORS.
+                            </p>
+
+                            <p>
+                                No meu caso, utilizei a biblioteca
+                                <a href="https://github.com/fastify/fastify-cors" target="_blank" class="blog-link">
+                                    fastify/cors </a
+                                >, que é considerada um <strong>CORE PLUGIN</strong> do framework Fastify. Veja esse
+                                exemplo simples de uso:
+                            </p>
+
+                            <pre><code>
+import cors from '@fastify/cors'
+
+fastify.register(cors, {
+  origin: 'https://meusite.com'
+});
+
+A partir desse momento, o Fastify passa a:
+
+1. Interceptar automaticamente requisições CORS
+2. Detecta Origin
+3. Detecta OPTIONS + Access-Control-Request-*
+4. Responder automaticamente o preflight </code></pre>
+
+                            <p>
+                                Todo novo origin que queira se comunicar a api, que seja diferente do origin do
+                                frontend, deve ser cadastrado manualmente na api. Uma péssima prática de
+                                iniciantes/amadores que deve ser evitada é liberar o CORS em uma API
+                                <strong>privada</strong> para <strong>qualquer origin</strong> , o famoso
+                                <strong>*</strong>, algo como:
+                            </p>
+
+                            <pre><code>
+// Péssima prática, NÃO FAZER EM API PRIVADA:                                
+fastify.register(require('@fastify/cors'), {
+  origin: '*'
+});</code></pre>
+
+                            <p>
+                                Nesse cenário o fastify retorna: <code>Access-Control-Allow-Origin: *</code>, qualquer
+                                origin é aceito (Na prática, está removendo a camada de segurança do navegador). Somente
+                                é aceitável fazer isso em APIs publicas, sem dados sensíveis.
+                            </p>
+
+                            <p>
+                                Em suma, CORS é uma politica de segurança que tenta garantir que o frontend se comunique
+                                com uma API reconhecida. Tentei apenas resumir o básico que todo programador WEB deve
+                                saber sobre CORS, mas para detalhar cenários e exemplos de vulnerabilidades que ocorrem
+                                quando não há proteção do CORS, mereceria um artigo próprio para o assunto de segurança
+                                da WEB.
+                            </p>
+                        </div>
+
+                        <div id="auth" class="blog-text">
+                            <h1 class="h4 portfolio-title">Autenticação e Autorização</h1>
+
+                            <p>
+                                Este é um tópico cabeludo e cheio de detalhes, mas aqui vou resumir o
+                                <strong>básico</strong> que você precisa entender. Talvez, no futuro, eu escreva um
+                                artigo completo dedicado apenas a isso.
+                            </p>
+
+                            <p>
+                                Antes de tudo, é importante diferenciar <strong>autenticação</strong> e
+                                <strong>autorização</strong>. Uma forma simples de pensar nisso é:
+                            </p>
+
+                            <pre><code>
+Autenticação: Quem é você?
+Autorização: O que você pode fazer?
+
+Explicando:
+Autenticação: Confirma a identidade do usuário e permite o login.
+Autorização: Verifica as permissões do usuário logado.
+</code></pre>
+
+                            <p>Existem dois tipos principais de autenticação em APIs:</p>
+
+                            <p>
+                                <strong>Autenticação de cliente (client authentication):</strong>
+                                Esse tipo de autenticação identifica uma <strong>aplicação</strong> ou
+                                <strong>serviço</strong>, e não um usuário humano específico. É utilizada principalmente
+                                em integrações entre sistemas (machine-to-machine), onde a API reconhece e valida a
+                                aplicação que está realizando a requisição.
+                            </p>
+
+                            <p>
+                                <strong>Autenticação de usuário (user authentication):</strong>
+                                Esse tipo de autenticação envolve um <strong>usuário humano</strong>, com validação de
+                                credenciais e mecanismos de login, permitindo associar as requisições à identidade e às
+                                permissões do usuário.
+                            </p>
+
+                            <p>
+                                Para a <strong>autenticação de cliente</strong>, normalmente é utilizado duas
+                                estratégias: API KEY e OAuth 2.0.
+                            </p>
+
+                            <p>
+                                Para <strong>autenticação de usuário</strong>, é utilizado principalmente uma estratégia
+                                que é bem consolidada e segura: OPENID CONNECT (OIDC) + OAuth 2.0.
+                            </p>
+
+                            <h1 class="h4 portfolio-title">Autenticação e Autorização - API KEY e JWT</h1>
+
+                            <p>
+                                Vou começar desenvolvendo esse tópico pelo o assunto de API KEY. Esta é uma estratégia
+                                simples de
+                                <strong>autenticação</strong> de cliente, é reconhecida por sua praticidade e facilidade
+                                de implementação, por outro lado, não é tão segura quanto a estratégia baseada em
+                                <strong>OAuth 2.0</strong>.
+                            </p>
+
+                            <p>
+                                A estratégia de api key, consiste em gerar uma chave identificadora por cliente, e esta
+                                chave será utilizada para a autenticação. A ideia é bem simples: Se enviou a chave
+                                correta será autenticado, se a chave é inválida, retorna
+                                <strong>401</strong> (Unauthorized).
+                            </p>
+
+                            <p>
+                                O problema disso é que se a chave vazar, qualquer um pode realizar autenticação na api.
+                                Por isso, essa estratégia é comumente adotada em <strong>apis internas</strong> e com
+                                baixo risco de vazamento de dados. Essa não é uma estratégia recomendada para apis que
+                                protegem recursos criticos e importantes.
+                            </p>
+
+                            <p>
+                                Essas chaves costumam ser hashes, como: GUID, UUID v4, bytes aleatórios, etc. Elas são
+                                enviadas no <strong>header</strong> da requisição. Veja um exemplo:
+                            </p>
+
+                            <pre><code>POST /api/auth/token
+Host: api.exemplo.com
+X-API-Key: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
+</code></pre>
+
+                            <p>
+                                Perceba que foi definido o método <code>POST</code> para endpoint de autenticação. E
+                                isso não foi atoa. O método POST é considerado uma boa prática amplamente aceita quando
+                                o contexto é gerar o token de acesso (falarei sobre tokens mais a frente) no processo
+                                autenticação.
+                            </p>
+
+                            <p>
+                                Mas você deve estar se perguntando:
+                                <i>
+                                    "Mas o body do request está vazio, e além disso, o objetivo dessa endpoint é OBTER o
+                                    token de acesso, portanto, parece fazer muito mais sentido ser um GET invés de
+                                    POST."</i
+                                >. Abaixo vou listar alguns motivos do porque a comunidade adotou POST invés de GET:
+                            </p>
+
+                            <p>
+                                <strong>Segurança:</strong> GET pode ir para logs, histórico de navegador e pode ser
+                                cacheado. — Não queremos associar uma endpoint sensivel a um método HTTP que pode ser
+                                cacheado e registrado em LOG.
+                            </p>
+
+                            <p>
+                                <strong>Semântica HTTP:</strong> Emissão de token JWT e autenticação, é uma operação que
+                                altera estado do sistema, operação que altera estado é naturalmente POST.
+                            </p>
+
+                            <p>
+                                <strong>POST não é idempotente:</strong> Cada chamada deve gerar um
+                                <strong>novo</strong> token JWT, com um novo <strong>tempo de expiração</strong>, logo,
+                                essa não é uma operação idempotente. GET e PUT são métodos http utilizados em operações
+                                idempotente.
+                            </p>
+
+                            <p>
+                                <strong>Não reinvente a roda:</strong> Protocolos bem consolidados como
+                                <strong>OIDC</strong> e <strong>OAuth 2.0</strong> , já pensaram muito nessa questão, e
+                                chegaram na conclusão de utilizar POST em suas endpoint de emissão de token e
+                                autenticação: <code>/token</code> ou <code>/connect/token</code>. (Falarei dos
+                                protocolos mais tarde).
+                            </p>
+
+                            <p>
+                                Perceba que a API KEY foi enviada sobre uma propriedade no headers nomeada de
+                                <strong>X-API-KEY</strong>. O prefixo "X-" é uma boa prática adotada para indicar algo
+                                que é <strong>non-standard</strong> (não padronizado). Esse prefixo é utilizado em
+                                propriedades que não fazem parte do padrão oficial do HTTP, ou seja, é algo customizado
+                                e personalizado da aplicação. Segue alguns exemplos clássicos de headers customizados:
+                            </p>
+
+                            <pre><code>X-API-Key
+X-Request-Id
+X-Correlation-Id
+X-Forwarded-For
+X-Powered-By</code></pre>
+
+                            <p>
+                                caso a autenticação seja bem sucedida, a API retorna um TOKEN JWT no response da chamada
+                                da endpoint
+                                <code>/api/auth/token</code>.
+                            </p>
+
+                            <p>
+                                Este token JWT (JSON Web Token) é um token assinado digitalmente que carrega informações
+                                (claims) relacionadas ao acesso à API — por isso, é comumente utilizado como access
+                                token. Na prática, esse token é enviado no header das requisições HTTP, geralmente por
+                                meio do cabeçalho <code>Authorization: Bearer</code>, com o objetivo de permitir que a
+                                API autorize a execução da operação solicitada. Dessa forma, o fluxo completo de
+                                comunicação ocorre da seguinte maneira:
+                            </p>
+
+                            <pre><code>
+AUTENTICAÇÃO:
+POST /api/auth/token
+Host: api.exemplo.com
+X-API-Key: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
+RESPONSE: abc123abc
+
+AUTORIZAÇÃO:
+GET /api/users/12
+Host: api.exemplo.com
+Authorization: abc123abc
+RESPONSE: UserObject
+
+GET /api/orders/15
+Host: api.exemplo.com
+Authorization: abc123abc
+RESPONSE: orderObject
+
+EXPLICAÇÃO:
+1. O primeiro passo de uma comunicação com uma api protegida, é sempre a autenticação. Nesse processo é gerado o access_token.
+2. Em seguida, para obter acesso aos recursos (user, products, orders e etc) é necessário enviar o token de AUTORIZAÇÃO (token JWT/acess_token).</code></pre>
+                            <br />
+                            <p>
+                                O JWT, foi criado em 2011/2012 por Michele Allen, Nat Sakimura e John Bradley. Em 2015,
+                                o JWT foi oficialmente padronizado como <strong>RFC 7519</strong>, pela IETF (Internet
+                                Engineering Task Force). O JWT surgiu para atender essa necessidade de um hash para
+                                autorização em api stateless. O conceito do JWT é muito simples:
+                                <i
+                                    >O token carrega as informações de autorização, e o servidor apenas valida a
+                                    assinatura.</i
+                                >
+                            </p>
+
+                            <p>
+                                Caso seja usado algum hash aleatório como token de autorização, por exemplo um Guid, a
+                                api necessitará <strong>consultar</strong> as permissões, tempo de expiração e demais
+                                informações atreladas a esse token em um banco de dados (além de custar um processamento
+                                e armazenamento desnecessário, isso vai contra o conceito de stateless). Com o JWT, não
+                                é necessário consultar informações em um banco de dados, pois o próprio JWT carrega as
+                                informações necessárias para a autorização.
+                            </p>
+
+                            <p>
+                                Existem outras formas de implementar essa estratégia de autenticação com API KEY, mas
+                                sendo sincero, essa é a melhor delas. Eu já me deparei com uma implementações super
+                                tosca, que consiste em SEMPRE enviar a api key, para ser autorizado nas endpoints. Mas
+                                essa estratégia é muito menos segura do que a solução com JWT. Em suma, nessa estratégia
+                                simplificada, se o client enviou a API KEY, ele possui passe livre na API. Nesse
+                                cenário, a API KEY está sendo enviada sempre em todo request, as chances da api key
+                                vazar aumentam significativamente.
+                            </p>
+
+                            <p>
+                                Nessa estratégia ruim de api key, não é necessário uma endpoint de autenticação como
+                                <code>/api/auth/token</code>, basta enviar a api key no headers
+                                <code>Authorization</code> e pronto, você possui acesso ao recurso.
+                            </p>
+
+                            <pre><code>
+// SOLUÇÃO NÃO RECOMENDADA
+
+GET /api/users/12
+Host: api.exemplo.com
+Authorization: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
+RESPONSE: UserObject
+
+GET /api/orders/15
+Host: api.exemplo.com
+Authorization: 3f6c2a9e-8b4f-4c1a-9c7e-1a2f9e0b6d3a
+RESPONSE: orderObject
+
+GET /api/orders/16
+Host: api.exemplo.com
+Authorization: abc
+RESPONSE: 401 Unauthorized.
+</code></pre>
+
+                            <p>
+                                Outra prática ruim, é enviar a api key e ou token JWT no BODY da requisição. O header é
+                                o <strong>local semântico correto</strong> para metadados de autenticação e autorização
+                                no HTTP. Body representa dados do recurso (payload), autenticação e autorização não
+                                fazem parte do recurso em si, mas do contexto de acesso a esse recurso, portanto, deve
+                                SEMPRE estar presente no HEADERS da requisição.
+                            </p>
+
+                            <p>
+                                E por fim, mais uma prática ruim e insegura: Declarar api key no frontend. Como dito
+                                acima, api key é uma estratégia para uso interno e restrito, e
+                                <strong>nunca</strong> deve ser inserido no javascript ou em qualquer lugar que o
+                                usuário tenha acesso. Entenda: <strong>frontend é terra do usuário</strong>.
+                            </p>
+
+                            <p>
+                                Api key e OAtuh com client credentials, só fazem sentido quando a comunicação é
+                                <strong>api-to-api</strong>, se o seu frontend precisa requisitar uma api, utilize
+                                estratégia como OIDC + OAuth 2.0. (explicarei sobre essa estratégia mais adiante).
+                            </p>
+
+                            <p>
+                                Mas, além de api key, existe uma outra forma mais segura (e mais recomendada) para
+                                autenticar e autorizar clients, essa estratégia é baseada 100% no protocolo OAuth 2.0.
+                            </p>
+
+                            <h1 class="h4 portfolio-title">Autenticação e Autorização - OAuth 2.0 e JWT</h1>
+
+                            <p>
+                                O
+                                <a
+                                    href="https://auth0.com/intro-to-iam/what-is-oauth-2"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >OAuth 2.0</a
+                                >, é um protocolo de <strong>autorização</strong> que define os padrões de proteção e
+                                acesso de um recurso protegido. Esse protocolo tem como alvo as aplicações web.
+                            </p>
+
+                            <p>
+                                Versão 2.0 do OAuth, surgiu como uma <strong>grande melhoria</strong> em relação a
+                                versão 1.0, praticamente um <strong>redesign</strong> completo do protocolo. Em resumo,
+                                a versão 1.0 apresentava uma criptografia forte, ao custo de muita complexidade, o que
+                                tornou o seu uso impraticável. Já a versão 2.0 é pragmaticamente
+                                <strong>seguro</strong> e <strong>escalável</strong>.
+                            </p>
+
+                            <p>
+                                A versão 2.0 começou a ser desenvolvida em meados de <strong>2010</strong> com a
+                                colaboração de empresas como Microsoft, Yahoo e Google. Em 2012 foi lançada e ainda
+                                nesse mesmo ano foi publicada como uma
+                                <a
+                                    href="https://datatracker.ietf.org/doc/html/rfc6749"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >RFC (6749)</a
+                                >.
+                            </p>
+
+                            <p>
+                                Quando falamos de padrões e protocolos da web, é impossivel não falar de
+                                <strong>RFC</strong>. RFC (Request for comment) é um documento técnico oficial publicado
+                                pela <strong>IETF</strong> (Internet Engineering Task Force) que descreve protocolos,
+                                formatos, práticas e padrões da Internet. Em outras palavras RFCs são a base técnica da
+                                Internet. Diversas empresas e pesquisadores colaboram para a criação de uma RFC — OAuth
+                                2.0 é um bom exemplo.
+                            </p>
+
+                            <p>
+                                Recomendo fortemente ler alguns RFCs, principalmente os mais "populares" que abordam
+                                padrões que programadores da WEB lidam diariamente, Segue exemplos dos que eu considero
+                                mais importante:
+                            </p>
+
+                            <pre><code>
+Web / HTTP
+
+RFC 9110 – HTTP Semantics (HTTP/1.1 moderno)
+RFC 9112 – HTTP/1.1
+RFC 9113 – HTTP/2
+
+Segurança / Autenticação
+
+RFC 6749 – OAuth 2.0
+RFC 6750 – Bearer Tokens
+RFC 7519 – JWT (JSON Web Token)
+RFC 7636 – PKCE
+RFC 8446 – TLS 1.3
+
+Internet / Rede
+
+RFC 791 – IPv4
+RFC 793 – TCP
+RFC 768 – UDP
+RFC 1034 / 1035 – DNS
+
+Formatos e utilitários
+
+RFC 7159 / 8259 – JSON
+RFC 3986 – URI / URL</code></pre>
+
+                            <p>
+                                Existem tipos de RFCs, existem diversos termos e nomeclaturas especificas para os
+                                artigos. Enfim, caso queira se aprofundar em leitura de RFC, recomendo da uma olhada no
+                                <a href="https://www.ietf.org/process/rfcs/" target="_blank" class="blog-link"
+                                    >site da IETF</a
+                                >.
+                            </p>
+
+                            <p>
+                                Voltando ao tópico central, a maneira mais moderna e segura para realizar autenticação
+                                de client em uma comunicação web, é via OAuth 2.0 com
+                                <strong>client credentials</strong>.
+                            </p>
+
+                            <p>
+                                Aqui já começa uma <strong>estranheza</strong> que muitos se confundem: O protocolo o
+                                OAuth 2.0 é um protocolo de <strong>autorização</strong>, mas em um cenário especifico
+                                de comunicação máquina-to-máquina (sem usuário humano envolvido), ele também oferece uma
+                                forma de <strong>autenticação</strong>. É uma autenticação baseada em
+                                <strong>autorização por identidade.</strong>. Entenda: OAuth 2.0 é sempre
+                                <strong>autorização </strong>, nunca <strong>autenticação de usuário</strong>.
+                            </p>
+
+                            <p>
+                                No caso do client credentials, o client envia uma espécide de <code>user</code> e
+                                <code>password</code>, que são nomeados de <code>client_id</code> e
+                                <code>client_secret</code> em formato de <strong>base64</strong> no header
+                                <code>authorization</code>. Para entender melhor veja esse exemplo de requisição
+                                realizando autenticação:
+                            </p>
+
+                            <pre><code>
+POST /oauth/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic base64(client_id:client_secret)
+&scope=orders.read orders.write
+
+grant_type=client_credentials
+
+RESPONSE:
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "orders.read orders.write"
+}
+
+</code></pre>
+                            <br />
+
+                            <p>
+                                <code>Basic</code> é a palavra chave utilizada para envio das credenciais em formato
+                                <code>base64</code>, o content-type padrão é
+                                <code>application/x-www-form-urlencoded</code>, e também possui o header obrigatório
+                                <code>grant_type=client_credentials</code>.
+                            </p>
+
+                            <p>
+                                Após autenticar, o <code>access_token</code> obtido deve ser utilizado no header das
+                                próximas requisições (da mesma forma como mencionado no processo de API KEY com OAuth),
+                                exemplo:
+                            </p>
+                            <pre><code>
+GET /orders
+Authorization: Bearer &lt;access_token&gt;
+
+</code></pre>
+
+                            <p>
+                                Agora vou explicar cada item do <code>response</code> e também me concentrar no
+                                <code>acess_token</code>— É necessário entender tokens para entender OAuth 2.0
+                                completamente.
+                            </p>
+
+                            <p>Temos o seguinte response de exemplo:</p>
+                            <pre>
+    <code>
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "orders.read orders.write"
+}</code>
+</pre>
+
+                            <br />
+
+                            <p>
+                                <strong>access_token</strong>: Token de autorização para acessar o recurso protegido,
+                                esse token não diz "quem você é", esse token diz "o que você pode fazer". Segue o padrão
+                                JWT.
+                            </p>
+
+                            <p>
+                                <strong>token_type</strong>: Indica como o token deve ser usado. Na prática
+                                <code>Bearer</code> significa: “Quem possui o token tem acesso”, não há outro fator, sem
+                                senha sem assinatura por request sem challenge, apenas acess_token. — Por isso HTTPS é
+                                obrigatório, se o token vazar, qualquer um tem acesso. Existem outros
+                                <code>token_type</code> além do BEARER, mas são pouco utilizados e não recomendados.
+                            </p>
+
+                            <p>
+                                <strong>expires_in</strong>: Tempo de vida do token em <strong>segundos</strong>. Nesse
+                                exemplo: 3600 segundos = 1 hora. Após o token expirar, a API passa a rejeitar as
+                                requisições (401) e o client precisa pedir um novo token. Em Client Credentials
+                                normalmente não existe
+                                <strong>refresh token</strong>
+                                (atualização automática de access_token, falarei disso mais adiante).
+                            </p>
+
+                            <p>
+                                <strong>scope</strong>: Lista de permissões concedidas ao token. Perceba que o
+                                <code>scope</code> foi usado no body do request POST. Portanto, é o client que solicita
+                                os tipos de permissões, mas a API pode retornar um conjunto diferente de permissão,
+                                exemplo: client pede permissão de <strong>leitura</strong> e <strong>escrita</strong>,
+                                mas o servidor permitiu apenas <strong>leitura</strong>, tudo isso é definido na
+                                propriedade <code>scope</code>. Os principais scopes são:
+                            </p>
+
+                            <pre><code>
+O servidor do OAuth sempre vai checar os scopes por endpoint, exemplo:
+
+GET /orders        → exige orders.read
+POST /orders       → exige orders.write
+DELETE /orders/:id → exige orders.admin
+
+Também é possivel retornar 403, caso o servidor não permita algum scope para o client.
+</code></pre>
+                            <p>
+                                O <code>access_token</code> é um token JWT. Um JWT é composto por três partes:
+                                <strong>HEADER</strong>, <strong>PAYLOAD</strong> e <strong>SIGNATURE</strong>. Dentro
+                                do <strong>PAYLOAD</strong>, estão presentes informações chamadas de
+                                <strong>claims</strong>.
+                            </p>
+
+                            <p>Mas vamos por partes, segue uma breve descrição de cada parte do JWT:</p>
+
+                            <p>
+                                <strong>HEADER:</strong> Essa parte contém <strong>metadados de segurança</strong>. Aqui
+                                existem informações que indicam como o token foi assinado, qual o algoritmo utilizado e
+                                o tipo do token. Normalmente, o programador não interage diretamente com essa parte,
+                                pois ela é definida e validada automaticamente pelo servidor OAuth 2.0.
+                            </p>
+
+                            <p>Exemplo de <strong>HEADER</strong> (JSON antes de ser codificado em Base64URL):</p>
+
+                            <pre><code>
+{
+  "alg": "RS256",
+  "typ": "JWT"
+}</code>
+</pre>
+
+                            <p>
+                                <strong>PAYLOAD:</strong> Contém as <strong>claims</strong>, que são informações sobre o
+                                usuário, o cliente e o próprio token. Essas informações são usadas pela API para
+                                autorizar ou negar acesso a recursos. É aqui que o programador pode armazenar
+                                informações do usuário (como email, username e etc).
+                            </p>
+
+                            <p>Exemplo de <strong>PAYLOAD</strong>:</p>
+
+                            <pre>
+                                <code>
+{
+  "iss": "https://auth.exemplo.com",
+  "sub": "123456",
+  "aud": "api-pedidos",
+  "exp": 1735586400,
+  "iat": 1735582800,
+  "scope": "orders.read orders.write",
+  "client_id": "frontend-app"
+}</code>
+</pre>
+
+                            <p>Algumas claims comuns:</p>
+
+                            <ul>
+                                <li><strong>iss</strong> (issuer): quem emitiu o token</li>
+                                <li><strong>sub</strong> (subject): identificador do usuário ou entidade</li>
+                                <li><strong>aud</strong> (audience): quem pode aceitar esse token</li>
+                                <li><strong>exp</strong> (expiration): data/hora de expiração</li>
+                                <li><strong>iat</strong> (issued at): quando o token foi emitido</li>
+                                <li><strong>scope</strong>: permissões concedidas ao token</li>
+                            </ul>
+                            <br />
+
+                            <p>
+                                <strong>SIGNATURE:</strong> É a parte que garante a <strong>integridade</strong> e
+                                <strong>autenticidade</strong> do token. Ela é gerada a partir do
+                                <strong>HEADER</strong> e do <strong>PAYLOAD</strong>, utilizando uma chave secreta
+                                (HS256) ou uma chave privada (RS256).
+                            </p>
+
+                            <p>Exemplo conceitual de como a <strong>SIGNATURE</strong> é gerada:</p>
+
+                            <pre>
+                                <code>
+signature = sign(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  privateKey
+)</code>
+</pre>
+
+                            <p>
+                                A API valida essa assinatura usando a chave pública do servidor OAuth 2.0. Se qualquer
+                                parte do token for alterada, a assinatura se torna inválida e o token é rejeitado.
+                            </p>
+
+                            <p>No formato final, o JWT é transmitido como uma única string:</p>
+
+                            <pre><code>
+HEADER.PAYLOAD.SIGNATURE</code>
+</pre>
+
+                            <p>
+                                Em resumo, esse é o fluxo completo de uma autenticação seguida de um request de acesso a
+                                um recurso protegido utilizando OAuth 2.0 com
+                                <strong>Client Credentials</strong>:
+                            </p>
+
+                            <pre><code>
+(1) Client → Authorization Server
+    POST /oauth/token
+    client_id + client_secret
+
+(2) Authorization Server
+    Valida o client
+    Emite access_token (JWT)
+
+(3) Client → Resource Server
+    Authorization: Bearer &lt;access_token&gt;
+
+(4) Resource Server
+    Valida o token e os scopes
+    Retorna o recurso protegido
+</code></pre>
+
+                            <p>
+                                Por fim, tenha em mente que <code>client_credentials</code> é uma estratégia para
+                                autenticar e autorizar <strong>máquinas</strong>. É uma prática ruim ser utilizado para
+                                autenticar <strong>usuário.</strong>
+                            </p>
+
+                            <p>
+                                Outra prática ruim, é declarar um <code>access_token</code>, com tempo de expiração
+                                muito longo (dias, semanas e etc), o que aumenta o risco de vazamento do token
+                                consideravelmente.
+                            </p>
+
+                            <p>
+                                E obivamente, nunca declare <code>client_id</code> e <code>client_secret</code> no
+                                <strong>frontend</strong>. (Pelo mesmo motivo citado na estratégia de API KEY).
+                            </p>
+
+                            <p>
+                                A melhor recomendação ao implementar OAuth 2.0 e validação de JWT é utilizar
+                                <strong>bibliotecas consolidadas</strong>. Evite implementar manualmente procedimentos
+                                como verificação de assinatura, validação de expiração, audience, issuer e demais regras
+                                de segurança. Erros ou omissões nesses pontos são comuns e podem comprometer seriamente
+                                a segurança da API. Atualmente existe uma plataforma muito popular para autenticação que
+                                implementa os padrões Oauth e OIDC é o
+                                <a href="https://auth0.com/docs" target="_blank" class="blog-link">auth0</a>, além disso
+                                possui uma ótima documentação para compreender os protocolos de autenticação e
+                                autorização.
+                            </p>
+
+                            <h1 class="h4 portfolio-title">Autenticação e Autorização - OAuth 2.0 e OIDC</h1>
+
+                            <p>
+                                Agora sim, chegamos ao tópico que descreve o protocolo responsável pela
+                                <strong>autenticação de usuários humanos</strong>: o
+                                <strong>OpenID Connect (OIDC)</strong>.
+                            </p>
+
+                            <p>
+                                É importante entender que o OIDC <strong>não substitui</strong> o OAuth 2.0. Na prática,
+                                eles são usados <strong>em conjunto</strong>, cada um resolvendo um problema diferente.
+                            </p>
+
+                            <p>
+                                O <strong>OpenID Connect (OIDC)</strong> é uma camada de
+                                <strong>identidade</strong> construída sobre o OAuth 2.0. Ele define como um usuário é
+                                autenticado e como sua identidade é representada de forma padronizada.
+                            </p>
+
+                            <p>
+                                OIDC surgiu como uma <strong>extensão</strong> do OAuth 2.0 para permitir que aplicações
+                                possam autenticar usuários humanos de forma padronizada, aproveitando os fluxos e
+                                mensagens do OAuth 2.0 para trazer também a identidade do usuário.
+                            </p>
+
+                            <p>
+                                O desenvolvimento do OpenID Connect foi liderado pela
+                                <a href="https://openid.net/foundation/" target="_blank" class="blog-link"
+                                    >OpenID Foundation</a
+                                >, uma organização aberta focada em padrões de identidade digital. A especificação foi
+                                criada por um grupo de trabalho formado por nomes como Nat Sakimura, Mike Jones e John
+                                Bradley, com contribuições de grandes empresas de tecnologia. O protocolo foi
+                                oficialmente lançado em <strong>2014</strong>.
+                            </p>
+
+                            <p>
+                                Sendo prático, OpenID Connect reutiliza 90% do OAuth internamente, só adiciona coisas
+                                <strong></strong>complementares como: <code>id_token</code>,
+                                <code>scopes (openid, profile, email)</code>, <code>userinfo</code> e algumas regras
+                                extras. o fato do OIDC ser quase todo baseado no OAuth 2.0, é um dos principais motivos
+                                do porque não virou uma <strong>RFC</strong>.
+                            </p>
+
+                            <p>
+                                OIDC é focado em processo de <strong>autenticação</strong>, a pergunta que o OIDC
+                                responde é:
+                                <em>“Quem é o usuário autenticado?”</em>
+                            </p>
+
+                            <p>
+                                Quando OAuth 2.0 e OIDC são utilizados juntos (o cenário mais comum hoje), o fluxo
+                                geralmente usa o <strong>Authorization Code</strong> e retorna
+                                <strong>dois tipos principais de token</strong>: <code>access_token</code> e
+                                <code>id_token</code>
+                            </p>
+
+                            <p>O fluxo completo do processo de autenticação e autorização, seria algo assim:</p>
+
+                            <pre><code>
+(1) Client → Authorization Server
+    GET /authorize
+    response_type=code
+    scope=openid profile email
+
+(2) Authorization Server
+    Autentica o usuário
+    Retorna authorization_code
+
+(3) Client → Authorization Server
+    POST /oauth/token
+    authorization_code + client_id (+ secret ou PKCE)
+
+(4) Authorization Server
+    Emite:
+      - access_token
+      - id_token (JWT)
+
+(5) Client
+    Usa o id_token para identificar o usuário
+    (login / sessão)
+
+(6) Client → Resource Server
+    Authorization: Bearer &lt;access_token&gt;
+
+(7) Resource Server
+    Valida o access_token
+    Retorna o recurso protegido  
+</code></pre>
+
+                            <p></p>
+                        </div>
                     </section>
+
                     <section class="working-in-progress"></section>
                 </article>
             </div>
