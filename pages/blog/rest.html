@@ -254,13 +254,52 @@
                             </p>
 
                             <p>
-                                No final da década de 1990, <strong>Roy Fielding</strong> fazia parte do grupo
-                                responsável por padronizar o protocolo <strong>HTTP</strong> e projetar a arquitetura da
-                                Web. Ele foi um dos principais autores da versão 1.1 do HTTP. Essa época representava o
-                                início da Web moderna, e a comunicação entre sistemas na internet ainda era
-                                inconsistente — cada aplicação tinha seu próprio estilo de API. Fielding percebeu que,
-                                para a Web continuar evoluindo, seria necessário definir princípios arquiteturais claros
-                                e universais.
+                                O estilo arquitetural REST é definido por um conjunto de princípios (ou restrições) que
+                                orientam a forma como sistemas distribuídos devem se comunicar. Esses princípios são:
+                                <strong>cliente-servidor</strong>, que promove a separação de responsabilidades;
+                                <strong>stateless</strong>, onde cada requisição deve conter todas as informações
+                                necessárias para seu processamento; <strong>cacheável</strong>, permitindo que respostas
+                                sejam armazenadas para melhorar desempenho; <strong>interface uniforme</strong>, que
+                                padroniza a comunicação entre cliente e servidor; <strong>sistema em camadas</strong>,
+                                possibilitando a intermediação por proxies e gateways; e, opcionalmente,
+                                <strong>code on demand</strong>, no qual o servidor pode estender o comportamento do
+                                cliente através de código executável. Quanto mais dessas restrições uma aplicação
+                                respeita. Já o termo <strong>RESTful</strong> é utilizado para descrever sistemas ou
+                                APIs que aplicam, de forma consistente, os princípios do REST em seu design e
+                                implementação.
+                            </p>
+
+                            <pre><code>
+REST - Princípios (Restrições)
+
+[ Cliente ]  <---- Interface Uniforme ---->  [ Servidor ]
+     |                                             |
+     |                Stateless                    |
+     |   (cada requisição contém todo o contexto)  |
+     |                                             |
+     +------------ Cacheável ----------------------+
+     |                                             |
+     +------ Sistema em Camadas (proxies) ---------+
+
+Restrições:
+- Cliente-Servidor
+- Stateless
+- Cacheável
+- Interface Uniforme
+- Sistema em Camadas
+- Code on Demand (opcional)
+</code></pre>
+
+                            <p></p>
+
+                            <p>
+                                Para entender melhor para que serve REST, temos que estudar sua história. No final da
+                                década de 1990, <strong>Roy Fielding</strong> fazia parte do grupo responsável por
+                                padronizar o protocolo <strong>HTTP</strong> e projetar a arquitetura da Web. Ele foi um
+                                dos principais autores da versão 1.1 do HTTP. Essa época representava o início da Web
+                                moderna, e a comunicação entre sistemas na internet ainda era inconsistente — cada
+                                aplicação tinha seu próprio estilo de API. Fielding percebeu que, para a Web continuar
+                                evoluindo, seria necessário definir princípios arquiteturais claros e universais.
                             </p>
 
                             <p>
@@ -2411,7 +2450,7 @@ async getBoardgameIdempotencyKey(key: string): Promise&gt;string | null&lt; {
                                 armazenado na base de dados, mas indisponível para uso normal da API.
                             </p>
                         </div>
-                        <div id="put-patch-delete" class="blog-text">
+                        <div id="conclusion" class="blog-text">
                             <h1 class="h4 portfolio-title">Conclusão</h1>
 
                             <p>
