@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Hello world</title>
+        <title>Autenticação e Boas Práticas</title>
         <link rel="stylesheet" href="../../../assets/css/style.css" />
         <link rel="stylesheet" href="../../../assets/css/changes.css" />
         <link rel="shortcut icon" href="../../assets/images/logo.ico" type="image/x-icon" />
@@ -492,7 +492,7 @@ RESPONSE: orderObject
 
 EXPLICAÇÃO:
 1. O primeiro passo de uma comunicação com uma api protegida, é sempre a autenticação. Nesse processo é gerado o access_token.
-2. Em seguida, para obter acesso aos recursos (user, products, orders e etc) é necessário enviar o token de AUTORIZAÇÃO (token JWT/acess_token).</code></pre>
+2. Em seguida, para obter acesso aos recursos (user, products, orders e etc) é necessário enviar o token de AUTORIZAÇÃO (token JWT/access_token).</code></pre>
                             <br />
                             <p>
                                 O JWT, foi criado em 2011/2012 por Michele Allen, Nat Sakimura e John Bradley. Em 2015,
@@ -720,7 +720,7 @@ Authorization: Bearer &lt;access_token&gt;
 
                             <p>
                                 Agora vou explicar cada item do <code>response</code> e também me concentrar no
-                                <code>acess_token</code>— É necessário entender tokens para entender OAuth 2.0
+                                <code>access_token</code>— É necessário entender tokens para entender OAuth 2.0
                                 completamente.
                             </p>
 
@@ -746,7 +746,7 @@ Authorization: Bearer &lt;access_token&gt;
                             <p>
                                 <strong>token_type</strong>: Indica como o token deve ser usado. Na prática
                                 <code>Bearer</code> significa: “Quem possui o token tem acesso”, não há outro fator, sem
-                                senha sem assinatura por request sem challenge, apenas acess_token. — Por isso HTTPS é
+                                senha sem assinatura por request sem challenge, apenas access_token. — Por isso HTTPS é
                                 obrigatório, se o token vazar, qualquer um tem acesso. Existem outros
                                 <code>token_type</code> além do BEARER, mas são pouco utilizados e não recomendados.
                             </p>
@@ -862,7 +862,21 @@ signature = sign(
                             <p>No formato final, o JWT é transmitido como uma única string:</p>
 
                             <pre><code>
-HEADER.PAYLOAD.SIGNATURE</code>
+Estrutura:
+HEADER.PAYLOAD.SIGNATURE
+
+Token JWT real:
+<label style="color: green;">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</label><label style="color: palevioletred;">.</label>eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI
+6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0<label style="color: palevioletred;">.</label><label style="color: red;">KMUFsIDTnFmyG3nMiGM6H9F
+NFUROf3wh7SmqJp-QV30</label>
+
+Explicação:
+<small style="color: green;">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</small>: HEADER
+<small style="color: palevioletred;">.</small>: Separador
+<small>eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI...</small>: PAYLOAD
+<small style="color: red;">KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30</small>: SIGNATURE
+
+</code>
 </pre>
 
                             <p>
@@ -887,6 +901,7 @@ HEADER.PAYLOAD.SIGNATURE</code>
     Valida o token e os scopes
     Retorna o recurso protegido
 </code></pre>
+                            <!-- Explicar aqui authorization server -->
 
                             <p>
                                 Por fim, tenha em mente que <code>client_credentials</code> é uma estratégia para
@@ -954,7 +969,7 @@ HEADER.PAYLOAD.SIGNATURE</code>
 
                             <p>
                                 Sendo prático, OpenID Connect reutiliza 90% do OAuth internamente, só adiciona coisas
-                                <strong></strong>complementares como: <code>id_token</code>,
+                                <strong>complementares</strong> como: <code>id_token</code>,
                                 <code>scopes (openid, profile, email)</code>, <code>userinfo</code> e algumas regras
                                 extras. o fato do OIDC ser quase todo baseado no OAuth 2.0, é um dos principais motivos
                                 do porque não virou uma <strong>RFC</strong>.
