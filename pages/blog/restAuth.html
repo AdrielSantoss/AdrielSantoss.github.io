@@ -901,7 +901,49 @@ Explicação:
     Valida o token e os scopes
     Retorna o recurso protegido
 </code></pre>
-                            <!-- Explicar aqui authorization server -->
+
+                            <p>
+                                No fluxo acima, é mencionado o <code>Authorization Server</code>, vamos esclarecer o que
+                                é isso.
+                            </p>
+
+                            <p>No OAuth 2.0, existem <strong>papéis</strong> bem definidos:</p>
+
+                            <pre><code>
+Resource Owner → o usuário
+
+Client → a aplicação que quer acessar algo
+
+Resource Server → a API que protege recursos
+
+Authorization Server → quem:
+
+    1. autentica o usuário (ou o client)
+
+    2. valida permissões
+
+    3. emite tokens
+
+O padrão define esses papéis separados para deixar claro quem faz o quê.</code></pre>
+
+                            <p>
+                                O termo "authorization server" é meramente <strong>conceitual</strong>, é uma
+                                nomeclatura dada a parte do projeto que autentica e emite tokens de acordo com as regras
+                                do padrão OAuth 2.0. Um authorization server pode ser:
+                            </p>
+
+                            <ul>
+                                <li></li>
+                                <li>1. Outro microserviço.</li>
+                                <li>2. Outro módulo.</li>
+                                <li>3. Outro projeto.</li>
+                                <li>
+                                    4. Ou até a mesma aplicação, mas com responsabilidades separadas. (Mais comum no
+                                    mercado)
+                                </li>
+                            </ul>
+
+                            <br />
 
                             <p>
                                 Por fim, tenha em mente que <code>client_credentials</code> é uma estratégia para
@@ -921,15 +963,10 @@ Explicação:
                             </p>
 
                             <p>
-                                A melhor recomendação ao implementar OAuth 2.0 e validação de JWT é utilizar
-                                <strong>bibliotecas consolidadas</strong>. Evite implementar manualmente procedimentos
-                                como verificação de assinatura, validação de expiração, audience, issuer e demais regras
-                                de segurança. Erros ou omissões nesses pontos são comuns e podem comprometer seriamente
-                                a segurança da API. Atualmente existe uma plataforma muito popular para autenticação que
-                                implementa os padrões Oauth e OIDC é o
-                                <a href="https://auth0.com/docs" target="_blank" class="blog-link">auth0</a>, além disso
-                                possui uma ótima documentação para compreender os protocolos de autenticação e
-                                autorização.
+                                Client Credentials é a estratégia mais simples do OAuth 2.0, é fácil de implementar
+                                manualmente sem correr riscos de segurança. O máximo que você precisará é de uma
+                                biblioteca de emissão e validação de token JWT — também é possivel implementar no
+                                "braço", mas não recomendo.
                             </p>
 
                             <h1 class="h4 portfolio-title">Autenticação e Autorização - OAuth 2.0 e OIDC</h1>
