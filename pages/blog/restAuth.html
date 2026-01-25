@@ -1025,38 +1025,311 @@ O padrão define esses papéis separados para deixar claro quem faz o quê.</cod
                                 <code>id_token</code>
                             </p>
 
-                            <p>O fluxo completo do processo de autenticação e autorização, seria algo assim:</p>
+                            <p>O fluxo completo do processo de autenticação e autorização, utilizando OPENID CONNECT com authorization code flow, seria algo assim:</p>
 
                             <pre><code>
 (1) Client → Authorization Server
     GET /authorize
     response_type=code
     scope=openid profile email
+    client_id
+    redirect_uri
+    state
+    (code_challenge, se PKCE)
 
 (2) Authorization Server
     Autentica o usuário
-    Retorna authorization_code
+    Obtém consentimento (se aplicável)
+    Redireciona o user-agent para o Client com:
+      - authorization_code
+      - state
 
 (3) Client → Authorization Server
     POST /oauth/token
-    authorization_code + client_id (+ secret ou PKCE)
+    grant_type=authorization_code
+    code
+    redirect_uri
+    client_id
+    (client_secret OU code_verifier – PKCE)
 
 (4) Authorization Server
+    Valida o authorization_code
     Emite:
       - access_token
       - id_token (JWT)
+      - (opcional) refresh_token
 
 (5) Client
+    Valida o id_token:
+      - assinatura
+      - issuer (iss)
+      - audience (aud)
+      - exp / iat / nonce
+      - armazena access_token
     Usa o id_token para identificar o usuário
-    (login / sessão)
+    (login / criação de sessão)
 
 (6) Client → Resource Server
-    Authorization: Bearer &lt;access_token&gt;
+    Authorization: Bearer <access_token>
 
 (7) Resource Server
     Valida o access_token
-    Retorna o recurso protegido  
+    Retorna o recurso protegido
+
 </code></pre>
+
+<p>
+    Vamos entender cada etapa:
+</p>
+
+<h4>(1) Client → Authorization Server</h4>
+<p></p>
+
+<p> O endpoint <code>/authorize</code> é responsável por iniciar o fluxo de autenticação.
+    Ele normalmente é acessado via <strong>GET</strong> e ocorre através do navegador
+    do usuário (redirect no navegador para /authorize).
+</p>
+
+<p>
+    Um exemplo de requisição para o <code>/authorize</code> seria:
+</p>
+
+<pre><code>
+GET /authorize?
+    response_type=code
+    &client_id=spa-client
+    &redirect_uri=https://app.exemplo.com/callback
+    &scope=openid profile email
+    &state=af0ifjsldkj
+    &nonce=n-0S6_WzA2Mj
+    &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+    &code_challenge_method=S256
+</code></pre>
+
+<p>
+    A seguir, o significado de cada parâmetro:
+</p>
+
+<ul>
+    <li>
+        <code>response_type</code>:
+        Indica o tipo de resposta esperada. estamos utilizando o Authorization Code Flow,
+        então o valor tem que ser  <code>code</code>.
+    </li>
+<br>
+    <li>
+        <code>client_id</code>:
+        Identifica qual aplicação cliente está solicitando a autenticação.
+        Esse valor é configurado previamente no Authorization Server. Não é possivel autenticar clients não reconhecidos pelo Authorization Server.
+    </li>
+<br>
+    <li>
+        <code>redirect_uri</code>:
+        URL para a qual o Authorization Server irá redirecionar o usuário após
+        a autenticação. Deve coincidir exatamente com a URI cadastrada para o client.
+    </li>
+<br>
+    <li>
+        <code>scope</code>:
+        Define os escopos solicitados. O escopo <code>openid</code> é obrigatório
+        para que o fluxo seja considerado OpenID Connect. Os demais escopos
+        (<code>profile</code>, <code>email</code>) indicam quais informações do usuário
+        o client deseja acessar.
+    </li>
+<br>
+    <li>
+        <code>state</code>:
+        Valor gerado pelo client para manter o estado da requisição.
+        É usado principalmente para proteção contra ataques de CSRF.
+    </li>
+<br>
+    <li>
+        <code>nonce</code>:
+        Valor aleatório usado para associar o <code>id_token</code> à requisição
+        original, ajudando a prevenir ataques de replay.
+    </li>
+<br>
+    <li>
+        <code>code_challenge</code>:
+        Parte do mecanismo PKCE. Representa um hash derivado do
+        <code>code_verifier</code>, que será enviado posteriormente no endpoint
+        <code>/token</code>. (Explicarei melhor mais a frente).
+    </li>
+<br>
+    <li>
+        <code>code_challenge_method</code>:
+        Indica o método usado para gerar o <code>code_challenge</code>.
+        O valor recomendado e mais seguro é <code>S256</code>.
+    </li>
+</ul>
+<p></p>
+<h4>
+    (2) Authorization Server: Autentica o usuário
+</h4>
+<p></p>
+
+<p>
+    Nessa etapa, o Authorization Server redireciona o usuário para a página de login.
+    No OpenID Connect, essa página é inteiramente controlada pelo Authorization Server, ou seja, trata-se de uma página server-side.
+    O frontend nunca deve ter acesso às credenciais do usuário. Por esse motivo, a implementação da tela de login não deve fazer parte do código do client (SPA, por exemplo).
+    Quanto mais isolado estiver o processo de autenticação do código do client, menor a superfície de ataque e menores as chances de vulnerabilidades em bibliotecas de terceiros comprometerem a segurança do usuário.
+</p>
+
+<p>
+    Após o usuário realizar login com suas credenciais, vem a etapa de
+    <strong>consentimento</strong>.
+    O consentimento é o momento em que o usuário autoriza o
+    <strong>Client</strong> a acessar determinados dados e/ou recursos
+    protegidos em seu nome.
+</p>
+
+<p>
+    No contexto do OpenID Connect, o consentimento está diretamente ligado
+    aos <code>scopes</code> solicitados na requisição de autorização
+    (por exemplo: <code>openid</code>, <code>profile</code>, <code>email</code>).
+</p>
+
+<p>
+    Existem dois tipos principais de consentimento:
+</p>
+
+<ul>
+    <li>
+        <strong>Consentimento explícito</strong>:
+        Ocorre quando o Authorization Server exibe uma tela informando
+        claramente quais dados o Client está solicitando, e o usuário
+        precisa confirmar manualmente essa autorização.
+        Esse modelo é comum quando o client solicita dados sensíveis,
+        novos escopos ou quando o usuário acessa a aplicação pela primeira vez.
+    </li>
+<br>
+    <li>
+        <strong>Consentimento implícito</strong>:
+        O Authorization Server não exibe uma tela de consentimento ao usuário.
+        Isso pode acontecer quando o consentimento já foi concedido
+        anteriormente, quando o client é considerado confiável
+        (first-party) ou quando a política de segurança do servidor
+        permite a aprovação automática dos escopos solicitados.
+    </li>
+</ul>
+<br>
+<p>
+    Independentemente do tipo, o consentimento é sempre uma decisão
+    controlada pelo <strong>Authorization Server</strong>,
+    e o Client apenas declara quais permissões deseja por meio dos
+    <code>scopes</code>. Consentimento não é algo obrigatório, e na maioria das vezes, não é implementado (mesmo quando deveria).
+</p> 
+
+<p>
+    Em regra geral, aplique consentimento quando envolve compartilhar acesso de <strong>informações sensiveis</strong>.
+</p>
+
+<p>
+    Após todo o processo de autenticação com participação do usuário (LOGIN + CONSENTIMENTO), o authorization server redireciona o usuário para
+    <code>redirect_uri</code> com dois <strong>query params:</strong>
+</p>
+
+<p>  
+    1. <code>authorization_code:</code> Um código temporário, cujo o propósito é o Client trocar esse código, de forma segura, por tokens
+    (<code>access_token</code> e <code>id_token</code>). O Authorization Server gera o <code>authorization_code</code> para
+    evitar que tokens sensíveis sejam expostos no navegador ou na URL.
+    Dessa forma, mesmo que o código seja interceptado, ele só pode ser
+    utilizado pelo Client legítimo, pois sua troca exige autenticação
+    do client (PKCE).
+</p>
+    
+<p>
+    2. <code>state:</code> Já o parâmetro <code>state</code> é um valor criado pelo Client no
+    início do fluxo e devolvido exatamente como foi recebido.
+    Ele é utilizado para correlacionar a resposta com a requisição
+    original e proteger o fluxo contra ataques de CSRF.
+</p>
+
+<p></p>
+<h4>
+    (3) Client → Authorization Server: POST /oauth/token
+</h4>
+<p></p>
+
+<p>
+    Essa é a etapa em que o Client extrai o <code>authorization_code</code> da URL
+    e envia uma requisição <strong>POST</strong> para o endpoint <code>/token</code>,
+    com o objetivo de trocar esse código pelos tokens de acesso.
+</p>
+
+<p>
+    Diferente do endpoint <code>/authorize</code>, essa chamada ocorre
+    diretamente entre o Client e o Authorization Server, sem a participação
+    do navegador do usuário.
+</p>
+
+<p>
+    Este é um exemplo de requisição para o endpoint <code>/token</code>:
+</p>
+
+<pre><code>
+POST /oauth/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code
+&code=SplxlOBeZQQYbYS6WxSbIA
+&redirect_uri=https://app.exemplo.com/callback
+&client_id=spa-client
+&code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+</code></pre>
+
+<p>
+    A seguir, o significado de cada parâmetro enviado:
+</p>
+
+<ul>
+    <li>
+        <code>grant_type</code>:
+        Indica o tipo de concessão utilizada. Para o Authorization Code Flow,
+        o valor deve ser <code>authorization_code</code>.
+    </li>
+    <br/>
+
+    <li>
+        <code>code</code>:
+        O <code>authorization_code</code> recebido no redirect anterior.
+        Esse código é de uso único e possui tempo de vida curto.
+    </li>
+<br/>
+    <li>
+        <code>redirect_uri</code>:
+        Deve ser o mesmo valor utilizado na requisição ao endpoint
+        <code>/authorize</code>. É usado pelo Authorization Server
+        para validar a integridade do fluxo.
+    </li>
+<br/>
+    <li>
+        <code>client_id</code>:
+        Identifica o Client que está solicitando a troca do
+        <code>authorization_code</code> por tokens.
+    </li>
+<br/>
+    <li>
+        <code>code_verifier</code>:
+        Parâmetro utilizado no PKCE. É o valor original que foi usado
+        para gerar o <code>code_challenge</code> enviado no
+        endpoint <code>/authorize</code>. Ele prova que o Client que
+        iniciou o fluxo é o mesmo que está trocando o código.
+    </li>
+</ul>
+
+<p>
+    Em clients confidenciais, o <code>code_verifier</code> pode ser omitido,
+    sendo substituído pela autenticação do client via
+    <code>client_secret</code>.
+</p>
+
+<p>
+    Após validar todos esses dados, o Authorization Server emite
+    o <code>access_token</code>, o <code>id_token</code> e,
+    opcionalmente, um <code>refresh_token</code>.
+</p>
+
                         </div>
                         <div id="errors-responses" class="blog-text">
                             <h1 class="h4 portfolio-title">Responses e erros</h1>
@@ -1220,7 +1493,7 @@ O padrão define esses papéis separados para deixar claro quem faz o quê.</cod
                 { id: 'auth', label: 'Autenticação e Autorização' },
                 { id: 'https', label: 'HTTPS e Limites' },
                 { id: 'errors-responses', label: 'Response e erros' },
-                { id: 'version-log', label: 'Versionamento e Monitoramento' },
+                { id: 'version-log', label: 'Versionamento' },
                 { id: 'conclusion', label: 'Conclusão' },
                 { id: 'refs', label: 'Referências' }
             ];
