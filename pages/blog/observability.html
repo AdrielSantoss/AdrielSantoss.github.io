@@ -49,6 +49,80 @@
                                 juntos!
                             </p>
                         </div>
+
+                        <div class="about-text">
+                            <h1 class="h4 portfolio-title">Observabilidade vs Monitoramento</h1>
+
+                            <p>
+                                Podemos entender o que é observabilidade comparando com monitoramento, este é o tipo de
+                                confusão mais comum quando trata-se de entender observabilidade. Além disso, é
+                                necessário saber sobre o conceito de telemetria.
+                            </p>
+
+                            <p>
+                                Começando pelo monitoramento. De forma resumida, monitoramento é a prática de acompanhar
+                                os sinais de um sistema e definir alertas para situações conhecidas. Na prática, o
+                                desenvolvedor estabelece limites ou condições específicas e quando o sistema atinge
+                                esses critérios, um alerta é acionado.
+                            </p>
+                            <p>
+                                O monitoramento normalmente depende da <strong>telemetria</strong>, responsável pela
+                                coleta de dados do sistema. Essas informações refletem o estado atual da aplicação e
+                                podem ser registradas em bancos de dados, sistemas de logs ou até mesmo em arquivos
+                                simples.
+                            </p>
+
+                            <p>
+                                Para entender melhor, vamos visualizar e analisar alguns exemplos na prática, começando
+                                por este:
+                            </p>
+
+                            <pre><code>using System;
+using Serilog;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Configuração do Serilog para salvar em arquivo
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        try
+        {
+            // Simulando um erro
+            MetodoComErro();
+        }
+        catch (Exception ex)
+        {
+            // Registrando erro com stacktrace
+            Log.Error(ex, "Ocorreu um erro durante a execução");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
+    }
+
+    static void MetodoComErro()
+    {
+        throw new InvalidOperationException("Erro de teste");
+    }
+}</code></pre>
+
+                            <p>
+                                Esse é um exemplo clássico de telemetria com Serilog (biblioteca de logging do C#). Isso
+                                <strong>não é monitoramento</strong>, isso é <strong>telemetria</strong> simples, o
+                                sistema não está <strong>reagindo</strong> ao erro, ele está apenas
+                                <strong>registrando</strong> o erro.
+                            </p>
+                            <p>
+                                Entenda que todo monitoramento é um processo de <strong>detecção e reação</strong>, o
+                                sistema reage a uma condição, normalmente emitindo alertas/avisos. O exemplo acima não
+                                possui nada disso.
+                            </p>
+                        </div>
                     </section>
                 </article>
             </div>
