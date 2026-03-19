@@ -55,8 +55,8 @@
 
                             <p>
                                 Podemos entender o que é observabilidade comparando com monitoramento, este é o tipo de
-                                confusão mais comum quando trata-se de entender observabilidade. Além disso, é
-                                necessário saber sobre o conceito de telemetria.
+                                confusão mais comum quando trata-se de entender observabilidade. A observabilidade
+                                utiliza o monitoramento como base, mas eles são conceitos distintos.
                             </p>
 
                             <p>
@@ -66,61 +66,49 @@
                                 esses critérios, um alerta é acionado.
                             </p>
                             <p>
-                                O monitoramento normalmente depende da <strong>telemetria</strong>, responsável pela
-                                coleta de dados do sistema. Essas informações refletem o estado atual da aplicação e
-                                podem ser registradas em bancos de dados, sistemas de logs ou até mesmo em arquivos
-                                simples.
+                                Basicamente, monitoramento responde uma pergunta simples como:
+                                <strong>"O sistema está saudável?"</strong>. Para responder essa pergunta é configurado
+                                alertas para quando algumas métricas <strong>conhecidas</strong> saem do normal. Na
+                                prática, no monitoramento o sistema já "conhece" o que pode dar errado, por isso ele
+                                fica monitorando esses pontos e emitindo alerta.
                             </p>
 
                             <p>
-                                Para entender melhor, vamos visualizar e analisar alguns exemplos na prática, começando
-                                por este:
+                                Já a observabilidade tenta responder o
+                                <strong>"Por que isso está acontecendo?"</strong>, analisando os dados (logs, métricas e
+                                traces), o sistema tenta achar uma resposta para um problema totalmente
+                                <strong>desconhecido.</strong>
                             </p>
 
-                            <pre><code>using System;
-using Serilog;
+                            <p>Para entender com clareza, imaginamos o seguinte cenário:</p>
 
-class Program
-{
-    static void Main(string[] args)
-    {
-        // Configuração do Serilog para salvar em arquivo
-        Log.Logger = new LoggerConfiguration()
-            .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
-            .CreateLogger();
+                            <pre><code>
+1. Usuário Osvaldo, abre o sistema de PDV e tenta efetuar uma venda no PIX.
+2. Mas ao tentar gerar o QRCODE do PIX, ocorre um TIMEOUT na comunicação com o gateway de pagamento.
 
-        try
-        {
-            // Simulando um erro
-            MetodoComErro();
-        }
-        catch (Exception ex)
-        {
-            // Registrando erro com stacktrace
-            Log.Error(ex, "Ocorreu um erro durante a execução");
-        }
-        finally
-        {
-            Log.CloseAndFlush();
-        }
-    }
+Nesse cenário, o monitoramento emitirá um alerta do tipo:
+"Erro na comunicação com o gateway de pagamento: tempo de resposta excedido."
 
-    static void MetodoComErro()
-    {
-        throw new InvalidOperationException("Erro de teste");
-    }
-}</code></pre>
+Perceba que nesse exemplo, o dashboard de monitoramento não consegue responder algumas perguntas como:
+1. O problema é no meu código ou no provedor? 
+    (O Trace mostraria exatamente em qual milissegundo a requisição saiu da sua rede e "morreu" na rede do gateway).
+
+2. É um problema geral ou específico? 
+    (O erro só acontece com o Osvaldo porque ele está usando uma versão antiga do PDV ou um modelo específico de maquininha?)
+
+3. Qual foi a jornada desse erro? 
+    (A requisição passou pelo serviço de Vendas, depois pelo serviço de Pagamentos, mas travou no serviço de Autenticação?)
+Etc...</code></pre>
 
                             <p>
-                                Esse é um exemplo clássico de telemetria com Serilog (biblioteca de logging do C#). Isso
-                                <strong>não é monitoramento</strong>, isso é <strong>telemetria</strong> simples, o
-                                sistema não está <strong>reagindo</strong> ao erro, ele está apenas
-                                <strong>registrando</strong> o erro.
-                            </p>
-                            <p>
-                                Entenda que todo monitoramento é um processo de <strong>detecção e reação</strong>, o
-                                sistema reage a uma condição, normalmente emitindo alertas/avisos. O exemplo acima não
-                                possui nada disso.
+                                Um dashboard de monitoramento exibe gráficos da saúde e desempenho do sistema, isso até
+                                pode transmitir uma sensação de "segurança", mas quando um problema complexo ocorre em
+                                produção, esse dashboard não vai te responder perguntas
+                                <strong>cruciais</strong>
+                                para entender o problema. Com as indicações do gráfico e alertas de monitoramento, já
+                                sabemos
+                                <strong>o que</strong> aconteceu (erro na comunicação com o gateway), mas sem os pilares
+                                da observabilidade vai ser dificil entender o <strong>porquê</strong> aconteceu.
                             </p>
                         </div>
                     </section>
