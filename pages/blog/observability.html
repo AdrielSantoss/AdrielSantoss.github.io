@@ -141,6 +141,7 @@ Etc...</code></pre>
                                 <li>4. feedback: usar a saída medida para corrigir o comportamento</li>
                                 <li>4. estabilidade: garantir que ele não “fuja do controle”.</li>
                             </ul>
+                            <br />
 
                             <p>
                                 Os engenheiros entenderam que <strong>observando</strong> a <strong>saída</strong> do
@@ -177,17 +178,42 @@ Etc...</code></pre>
                                 <li>3. permanecerestável.</li>
                                 <li>4. Corrijir perturbações ou erros automaticamente.</li>
                             </ul>
+                            <br />
 
                             <p>
                                 Obviamente, quando esses conceitos de observabilidade e controle surgiram, eles eram
-                                muito rudimentares, focando apenas em <strong>monitoramento</strong>, a enorme maioria
+                                muito rudimentares, focando apenas em <strong>monitoramento</strong>. A enorme maioria
                                 dos sistemas nem tinham monitoramento, e quando tinham só geravam logs simples, emitiam
                                 alertas e faziam analises de métricas, nada muito além disso.
                             </p>
 
                             <p>
                                 Por muitos anos a coisa se manteve assim, e só começou a mudar por volta de
-                                <strong>2010</strong>
+                                <strong>2010</strong>, quando sistemas distribuidos com infraestruturas complexas já
+                                eram realidade. Nesse contexto logs e métricas ja se tornavam ineficientes para explicar
+                                comportamentos inesperados. Um marco importante foi o
+                                <a
+                                    href="https://static.googleusercontent.com/media/research.google.com/pt-BR//archive/papers/dapper-2010-1.pdf"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >Dapper</a
+                                >
+                                do Google, publicado em 2010, embora o sistema já estivesse em uso antes disso. O Dapper
+                                descreve uma infraestrutura de <strong>distributed tracing</strong> em larga escala e
+                                mostra como seguir uma requisição através de muitos serviços diferentes. Na prática, ele
+                                virou uma das bases técnicas da observabilidade moderna.
+                            </p>
+
+                            <p>
+                                Após o dapper algumas soluções open source surgiram, como o <strong>Zipkin</strong> do
+                                Twitter, o <strong>Jaeger</strong> e etc. Esses projetos implementavam técnicas de
+                                tracing eficientes, o que já auxiliava bastante na detecção de problemas complexos em
+                                produção.
+                            </p>
+
+                            <p>
+                                Enquanto tudo isso acontecia, o assunto de "Observabilidade" começou a se popularizar, e
+                                um nome importante desse tema é a <strong>Charity Majors</strong>
                             </p>
                         </div>
                     </section>
