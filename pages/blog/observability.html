@@ -116,55 +116,59 @@ Etc...</code></pre>
                             <h1 class="h4 portfolio-title">Estudar o passado é compreender o presente</h1>
 
                             <p>
-                                Agora que entendemos um pouco sobre o que é observabilidade e monitoramento. Podemos
-                                falar sobre como surgiu, e principalmente, o porque surgiu. Entender o motivo de
-                                existência das coisas é que difere um programador de um usuário de bibliotecas.
+                                Agora que entendemos um pouco sobre o que é observabilidade e monitoramento, podemos
+                                falar sobre como surgiu e, principalmente, o porquê surgiu. Entender o motivo de
+                                existência das coisas é o que difere um programador de um usuário de bibliotecas.
                             </p>
 
                             <p>
                                 Não é de hoje que o ser humano deseja <strong>controlar</strong> e
                                 <strong>observar</strong> o comportamento de uma máquina/sistema com o objetivo de
-                                garantir o seu funcionamento correto ao longo do tempo. Para isso alguns matemáticos e
-                                engenheiros pensaram em como "controlar" um sistema, e com isso formularam
-                                <a href="https://en.wikipedia.org/wiki/Control_theory" target="_blank" class="blog-link"
-                                    >A teoria do controle</a
-                                >, e em meado de 1960 surgiu a <strong>teoria do controle moderna</strong>, foi aqui que
-                                os termos "controlabilidade" e "observabilidade" surgiram.
+                                garantir o seu funcionamento correto ao longo do tempo. Para isso, alguns matemáticos e
+                                engenheiros pensaram em como "controlar" um sistema e, com isso, formularam
+                                <a
+                                    href="https://en.wikipedia.org/wiki/Control_theory"
+                                    target="_blank"
+                                    class="blog-link"
+                                >
+                                    A teoria do controle </a
+                                >, e em meados de 1960 surgiu a <strong>teoria do controle moderna</strong>. Foi aqui
+                                que os termos "controlabilidade" e "observabilidade" surgiram.
                             </p>
 
                             <p>Os principais conceitos da teoria do controle são:</p>
 
                             <ul>
                                 <li>1. estado do sistema: como o sistema está internamente naquele momento</li>
-                                <li>2. entrada: Os famosos parâmetros.</li>
+                                <li>2. entrada: os famosos parâmetros.</li>
                                 <li>3. saída: o que ele mostra ou produz</li>
                                 <li>4. feedback: usar a saída medida para corrigir o comportamento</li>
-                                <li>4. estabilidade: garantir que ele não “fuja do controle”.</li>
+                                <li>5. estabilidade: garantir que ele não “fuja do controle”.</li>
                             </ul>
                             <br />
 
                             <p>
                                 Os engenheiros entenderam que <strong>observando</strong> a <strong>saída</strong> do
-                                sistema é possivel compreender o seu estado interno e aplicar correções se necessário
-                                com o objetivo de garantir a estabilidade. Por isso a observabilidade é uma peça
+                                sistema é possível compreender o seu estado interno e aplicar correções, se necessário,
+                                com o objetivo de garantir a estabilidade. Por isso, a observabilidade é uma peça
                                 fundamental na controlabilidade.
                             </p>
 
                             <p>
-                                A teoria do controle clásica e moderna são aplicadas na <strong>prática</strong> no
-                                campo do
+                                A teoria do controle clássica e moderna são aplicadas na <strong>prática</strong> no
+                                campo da
                                 <a
                                     href="https://en.wikipedia.org/wiki/Control_engineering"
                                     target="_blank"
                                     class="blog-link"
-                                    >controle da engenharia</a
-                                >, esse conceitos são absurdamente explorados e implementados em diversas áreas, com
-                                destaque para a aeronautica/aeroespacial, afinal, quanto mais controlabilidade e
-                                observabilidade mais cuidado com a segurança do funcionamento em sistemas críticos que
+                                    >engenharia de controle</a
+                                >, esses conceitos são absurdamente explorados e implementados em diversas áreas, com
+                                destaque para a aeronáutica/aeroespacial. Afinal, quanto mais controlabilidade e
+                                observabilidade, mais cuidado com a segurança do funcionamento em sistemas críticos que
                                 não podem simplesmente "parar de funcionar repentinamente".
                             </p>
 
-                            <p>Para entender o básico da teoria do controle imagine o seguinte cenário:</p>
+                            <p>Para entender o básico da teoria do controle, imagine o seguinte cenário:</p>
 
                             <p>
                                 Um ar-condicionado mede a temperatura do ambiente, compara com a temperatura desejada e
@@ -174,24 +178,24 @@ Etc...</code></pre>
 
                             <ul>
                                 <li>1. Manter uma variável em um valor desejado.</li>
-                                <li>2. responder bem a mudanças.</li>
-                                <li>3. permanecerestável.</li>
-                                <li>4. Corrijir perturbações ou erros automaticamente.</li>
+                                <li>2. Responder bem a mudanças.</li>
+                                <li>3. Permanecer estável.</li>
+                                <li>4. Corrigir perturbações ou erros automaticamente.</li>
                             </ul>
                             <br />
 
                             <p>
                                 Obviamente, quando esses conceitos de observabilidade e controle surgiram, eles eram
                                 muito rudimentares, focando apenas em <strong>monitoramento</strong>. A enorme maioria
-                                dos sistemas nem tinham monitoramento, e quando tinham só geravam logs simples, emitiam
-                                alertas e faziam analises de métricas, nada muito além disso.
+                                dos sistemas nem tinha monitoramento e, quando tinha, só gerava logs simples, emitia
+                                alertas e fazia análises de métricas, nada muito além disso.
                             </p>
 
                             <p>
-                                Por muitos anos a coisa se manteve assim, e só começou a mudar por volta de
-                                <strong>2010</strong>, quando sistemas distribuidos com infraestruturas complexas já
-                                eram realidade. Nesse contexto logs e métricas ja se tornavam ineficientes para explicar
-                                comportamentos inesperados. Um marco importante foi o
+                                Por muitos anos a coisa se manteve assim e só começou a mudar por volta de
+                                <strong>2010</strong>, quando sistemas distribuídos com infraestruturas complexas já
+                                eram realidade. Nesse contexto, logs e métricas já se tornavam ineficientes para
+                                explicar comportamentos inesperados. Um marco importante foi o
                                 <a
                                     href="https://static.googleusercontent.com/media/research.google.com/pt-BR//archive/papers/dapper-2010-1.pdf"
                                     target="_blank"
@@ -205,15 +209,67 @@ Etc...</code></pre>
                             </p>
 
                             <p>
-                                Após o dapper algumas soluções open source surgiram, como o <strong>Zipkin</strong> do
+                                Após o Dapper, algumas soluções open source surgiram, como o <strong>Zipkin</strong> do
                                 Twitter, o <strong>Jaeger</strong> e etc. Esses projetos implementavam técnicas de
                                 tracing eficientes, o que já auxiliava bastante na detecção de problemas complexos em
                                 produção.
                             </p>
 
                             <p>
-                                Enquanto tudo isso acontecia, o assunto de "Observabilidade" começou a se popularizar, e
-                                um nome importante desse tema é a <strong>Charity Majors</strong>
+                                Enquanto tudo isso acontecia, o assunto de "observabilidade" começou a se popularizar, e
+                                um nome importante desse tema é a <strong>Charity Majors</strong>. A Charity Majors é
+                                uma engenheira de software americana, cofundadora e CTO da <strong>Honeycomb</strong> e
+                                uma das principais vozes modernas sobre observabilidade em sistemas distribuídos.
+                            </p>
+
+                            <p>
+                                Foi muito comum diversos desenvolvedores e empresas definirem observabilidade de formas
+                                diferentes. Por exemplo, a equipe de monitoramento do Twitter, em 2013, definia a
+                                observabilidade como sinônimo de telemetria. A realidade é que ninguém sabia definir
+                                observabilidade e, pior ainda, diferenciá-la de monitoramento. E é aqui que o trabalho
+                                de
+                                <strong>Charity Majors</strong> brilha: seus artigos e palestras ajudaram a popularizar
+                                e <strong>explicar</strong> o que é, de fato, observabilidade.
+                            </p>
+
+                            <p>
+                                A <strong>Charity Majors</strong> explica muito melhor essas confusões em seus artigos
+                                de retrospectiva:
+                                <a
+                                    href="https://www.honeycomb.io/blog/observability-5-year-retrospective"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >Observability: The 3-Year Retrospective (2019)</a
+                                >
+                                e também o
+                                <a
+                                    href="https://www.honeycomb.io/blog/observability-5-year-retrospective"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >Observability: The 5-Year Retrospective (2021)</a
+                                >, recomendo muito a leitura desses artigos para entender 100% toda a história da
+                                observabilidade.
+                            </p>
+
+                            <p>
+                                Por volta e 2016 se popularizou a expressão dos “três pilares”:
+                                <strong>metrics, logs e traces.</strong>
+                                Isso foi útil didaticamente, mas vale notar que essa formulação é mais uma simplificação
+                                de mercado do que a origem do conceito. Hoje muita gente da área considera que os “três
+                                pilares” ajudaram a ensinar, mas é uma definição limitada, porque observabilidade na
+                                prática depende menos de três tipos fixos de dados e mais de conseguir correlacionar
+                                sinais ricos o suficiente para investigar o desconhecido.
+                            </p>
+
+                            <p>
+                                E por fim, chegamos na <strong>atualidade</strong>. Houve uma fase importante de
+                                fragmentação e depois convergência. Surgiram dois esforços relevantes:
+                                <strong>OpenTracing</strong>
+                                muito ligado à ideia de padronizar a API de tracing, e <strong>OpenCensus</strong>, com
+                                origem no Google, mais focado em coleta de traces e stats. Em <strong>2019</strong>, os
+                                dois projetos foram fundidos para criar o <strong>OpenTelemetry</strong>, sob a CNCF.
+                                Esse foi um ponto decisivo na história recente, porque consolidou um padrão comum de
+                                instrumentação, SDKs, collectors e exportação para métricas, traces e, depois, logs.
                             </p>
                         </div>
                     </section>
