@@ -170,19 +170,16 @@ Etc...</code></pre>
 
                             <p>Para entender o básico da teoria do controle, imagine o seguinte cenário:</p>
 
-                            <p>
-                                Um ar-condicionado mede a temperatura do ambiente, compara com a temperatura desejada e
-                                liga ou desliga para corrigir. Um ar-condicionado ligado aplica diversos conceitos da
-                                teoria do controle, pois ele precisa fazer coisas como:
-                            </p>
+                            <pre><code>
+Um ar-condicionado mede a temperatura do ambiente, compara com a temperatura desejada e
+liga ou desliga para corrigir. Um ar-condicionado ligado aplica diversos conceitos da
+teoria do controle, pois ele precisa fazer coisas como:
 
-                            <ul>
-                                <li>1. Manter uma variável em um valor desejado.</li>
-                                <li>2. Responder bem a mudanças.</li>
-                                <li>3. Permanecer estável.</li>
-                                <li>4. Corrigir perturbações ou erros automaticamente.</li>
-                            </ul>
-                            <br />
+1. Manter uma variável em um valor desejado.
+2. Responder bem a mudanças.
+3. Permanecer estável.
+4. Corrigir perturbações ou erros automaticamente.
+</code></pre>
 
                             <p>
                                 Obviamente, quando esses conceitos de observabilidade e controle surgiram, eles eram
@@ -272,6 +269,37 @@ Etc...</code></pre>
                                 instrumentação, SDKs, collectors e exportação para métricas, traces e, depois, logs.
                             </p>
                         </div>
+
+                        <div class="about-text">
+                            <h1 class="h4 portfolio-title">Telemetria e OpenTelemetry</h1>
+
+                            <p>
+                                Agora entramos no campo da <strong>telemetria </strong>. A telemetria são dados que o
+                                sistema emite sobre o seu comportamento. Esses dados são representados em três
+                                principais formas: <strong>Traces</strong>, <strong>Métrics</strong> e
+                                <strong>Logs.</strong>
+                            </p>
+
+                            <p>
+                                O
+                                <a
+                                    href="https://opentelemetry.io/docs/what-is-opentelemetry/"
+                                    target="_blank"
+                                    class="blog-link"
+                                    >OpenTelemetry</a
+                                >
+                                é um <strong>framework/ecossistema</strong> de observabilidade e telemetria. Ele inclui
+                                especificação, APIs, SDKs, convenções semânticas, instrumentações automáticas e o
+                                Collector para gerar, coletar e exportar traces, métricas e logs.
+                            </p>
+
+                            <p>
+                                Não é possivel tornar a aplicação observavel somente com O OpenTelemetry. Os dados
+                                coletados pelo OpenTelemetry devem ser enviados para uma plataforma de observabilidade
+                                (observability backend), por exemplo o
+                                <a href="https://grafana.com" target="_blank" class="blog-link">Grafana</a>, é nessa
+                                plataforma que faremos a observabilidade do sistema.
+                            </p>
                     </section>
                 </article>
             </div>
