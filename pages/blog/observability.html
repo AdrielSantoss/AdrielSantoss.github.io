@@ -15,18 +15,18 @@
                     <section>
                         <h1 class="h4 portfolio-title">Entendendo Observabilidade</h1>
 
+                        <div><small style="color: white">18/03/2026</small></div>
                         <div class="tags">
                             <small class="tag">Observabilidade</small>
                             <small class="tag">OpenTelemetry</small>
                             <small class="tag">.NET</small>
                             <small class="tag">C#</small>
                         </div>
-                        <div><small style="color: white">18/03/2026</small></div>
                     </section>
                     <br />
 
                     <section class="portfolio-description">
-                        <div class="about-text">
+                        <div id="intro" class="blog-text">
                             <p>
                                 Nesse artigo, vou registrar meus estudos e conhecimentos sobre o assunto de
                                 <strong>observabilidade</strong>. Nesse exato momento em que escrevo esse artigo, a
@@ -35,22 +35,18 @@
                                 importante.
                             </p>
                             <p>
-                                Sou um dos principais programadores web da equipe, portanto, também sou uma das peças
-                                centrais desse processo de modernização, sendo assim, além de me aprofundar nesse
-                                conhecimento estarei colaborando na vida real para colocar todos os conceitos escrito
-                                aqui na prática, em um projeto profissional.
+                                Sou um dos programadores web da equipe, portanto, e também sou uma das peças centrais
+                                desse processo de modernização, sendo assim, além de me aprofundar nesse conhecimento
+                                estarei colaborando na vida real para colocar todos os conceitos escrito aqui na
+                                prática, em um projeto profissional.
                             </p>
                             <p>
                                 Obviamente, não vou falar coisas pessoais sobre o trabalho ou sobre o projeto da
                                 empresa, nesse artigo constará apenas os meus aprendizados.
                             </p>
-                            <p>
-                                Então, sem enrolação, bora colocar a mão na massa e aprender sobre observabilidade
-                                juntos!
-                            </p>
                         </div>
 
-                        <div class="about-text">
+                        <div id="obs-vs-mon" class="blog-text">
                             <h1 class="h4 portfolio-title">Observabilidade vs Monitoramento</h1>
 
                             <p>
@@ -112,7 +108,7 @@ Etc...</code></pre>
                             </p>
                         </div>
 
-                        <div class="about-text">
+                        <div id="history" class="blog-text">
                             <h1 class="h4 portfolio-title">Estudar o passado é compreender o presente</h1>
 
                             <p>
@@ -270,7 +266,7 @@ teoria do controle, pois ele precisa fazer coisas como:
                             </p>
                         </div>
 
-                        <div class="about-text">
+                        <div id="telemetry" class="blog-text">
                             <h1 class="h4 portfolio-title">Telemetria e OpenTelemetry</h1>
 
                             <p>
@@ -297,9 +293,214 @@ teoria do controle, pois ele precisa fazer coisas como:
                                 Não é possivel tornar a aplicação observavel somente com O OpenTelemetry. Os dados
                                 coletados pelo OpenTelemetry devem ser enviados para uma plataforma de observabilidade
                                 (observability backend), por exemplo o
-                                <a href="https://grafana.com" target="_blank" class="blog-link">Grafana</a>, é nessa
-                                plataforma que faremos a observabilidade do sistema.
+                                <strong>Signoz</strong>, ou até com o uso do <strong>Grafana</strong>.
                             </p>
+
+                            <p>
+                                Na prática, a arquitetura geralmente funciona assim: a aplicação gera telemetria com
+                                <strong>OpenTelemetry</strong>, essa telemetria pode passar por um
+                                <strong>Collector</strong> e, depois, é enviada para sistemas especializados em
+                                armazenamento e consulta. Por exemplo, métricas podem ir para o
+                                <strong>Prometheus</strong>, traces para o <strong>Tempo</strong> ou
+                                <strong>Jaeger</strong>, logs para o <strong>Loki</strong> ou outra solução equivalente.
+                                Depois, o Grafana se conecta nesses sistemas para consultar e exibir as informações.
+                            </p>
+
+                            <p>
+                                Dito isso, fica mais fácil entender o papel do OpenTelemetry no ecossistema moderno: ele
+                                não é a ferramenta final onde você investiga tudo, ele é a
+                                <strong>base padronizada de instrumentação e transporte</strong> da telemetria.
+                            </p>
+
+                            <p>
+                                Em outras palavras, o OpenTelemetry resolve um problema enorme: antes, cada ferramenta
+                                tinha sua própria forma de instrumentar aplicações. Isso gerava acoplamento, retrabalho
+                                e dificultava muito trocar de fornecedor ou evoluir a arquitetura. Com o OpenTelemetry,
+                                a aplicação passa a emitir sinais de forma padronizada, e isso dá muito mais liberdade
+                                para decidir para onde os dados serão enviados.
+                            </p>
+                            <p>
+                                Agora, para entender como isso funciona de forma prática, precisamos olhar para os
+                                sinais que a aplicação gera.
+                            </p>
+
+                            <p>
+                                As <strong>métricas</strong> representam valores numéricos agregados ao longo do tempo.
+                                Elas são excelentes para responder perguntas como: quantas requisições por segundo meu
+                                sistema está processando? Qual é o uso de CPU? Qual a taxa de erro? Qual é o tempo médio
+                                de resposta?
+                            </p>
+
+                            <p>
+                                Métricas são ótimas para dashboards e alertas porque são leves, objetivas e fáceis de
+                                agregar. Porém, elas têm uma limitação: normalmente mostram
+                                <strong>o comportamento geral</strong> do sistema, não o detalhe completo de um caso
+                                específico.
+                            </p>
+
+                            <p>
+                                Já os <strong>logs</strong> são registros textuais de eventos. São muito úteis porque
+                                permitem registrar mensagens detalhadas sobre o que aconteceu em determinado ponto da
+                                execução. Um log pode informar, por exemplo, que um usuário tentou autenticar, que uma
+                                integração externa devolveu erro 500, ou que determinada operação levou mais tempo do
+                                que o esperado.
+                            </p>
+
+                            <p>
+                                O problema é que logs sozinhos podem virar um caos. Em sistemas grandes, o volume de
+                                informação é gigantesco, e encontrar a linha certa no momento certo pode ser como
+                                procurar uma agulha no palheiro. Por isso, logs têm muito mais valor quando estão
+                                <strong>correlacionados</strong> com os outros sinais.
+                            </p>
+
+                            <p>
+                                E então chegamos nos <strong>traces</strong>, que são, na minha visão, uma das partes
+                                mais interessantes da observabilidade moderna.
+                            </p>
+
+                            <p>
+                                Um trace representa a jornada de uma operação através do sistema. Por exemplo: um
+                                usuário faz uma requisição no frontend, essa requisição chega na API, depois passa por
+                                uma regra de negócio, consulta o banco de dados, chama um serviço externo e retorna a
+                                resposta. Tudo isso pode ser representado dentro de um único trace.
+                            </p>
+
+                            <p>
+                                Dentro do trace existem os <strong>spans</strong>, que são como etapas ou blocos dessa
+                                jornada. Cada span representa uma unidade de trabalho, com início, fim, duração e
+                                metadados. Com isso, conseguimos enxergar com muito mais clareza onde está o gargalo,
+                                qual dependência ficou lenta, em que ponto houve falha e como a requisição percorreu o
+                                sistema.
+                            </p>
+
+                            <p>
+                                É aqui que a observabilidade realmente começa a mostrar sua força. Porque, quando
+                                conseguimos relacionar uma métrica estranha com um trace específico e, depois, abrir os
+                                logs daquele mesmo contexto, deixamos de olhar sinais isolados e passamos a investigar o
+                                comportamento real do sistema.
+                            </p>
+                            <p>
+                                Essa correlação é uma das ideias mais importantes da observabilidade. Métrica isolada
+                                ajuda. Log isolado ajuda. Trace isolado ajuda. Mas o verdadeiro ganho aparece quando
+                                esses sinais estão <strong>conectados.</strong>
+                            </p>
+                        </div>
+                        <div id="framework-vs-protocol" class="blog-text">
+                            <h1 class="h4 portfolio-title">OpenTelemetry Framework vs OpenTelemetry Protocol</h1>
+
+                            <p>
+                                É muito comum esbarrar com programadores confundindo esses dois conceitos durante seus
+                                estudos. Apesar de ambos estarem conectados, são peças diferentes com papeis diferentes
+                                dentro do contexto do OPEN TELEMETRY.
+                            </p>
+
+                            <p>
+                                O <strong>OpenTelemetry</strong> é o <strong>framework/ecossistema</strong>. Ou seja,
+                                ele reúne APIs, SDKs, convenções semânticas, bibliotecas de instrumentação,
+                                instrumentação automática e também o Collector. Em resumo, ele fornece a estrutura para
+                                gerar, coletar e exportar.
+                            </p>
+
+                            <p>
+                                Já o <strong>OTLP</strong>, que significa <strong>OpenTelemetry Protocol</strong>, é o
+                                <strong>protocolo</strong> usado para transportar essa telemetria entre as partes do
+                                sistema, como por exemplo da aplicação para o Collector, ou do Collector para um backend
+                                de observabilidade.
+                            </p>
+
+                            <p>
+                                Em outras palavras: o OpenTelemetry é o
+                                <strong>conjunto de ferramentas e padrões</strong>, enquanto o OTLP é a
+                                <strong>linguagem de transporte</strong> usada para enviar os dados.
+                            </p>
+
+                            <p>
+                                O OTLP define como os dados de telemetria são codificados e transmitidos, incluindo
+                                suporte a transportes como <strong>gRPC</strong> e <strong>HTTP</strong>, normalmente
+                                com payloads em <strong>Protocol Buffers</strong>.
+                            </p>
+                        </div>
+                        <div id="conclusion" class="blog-text">
+                            <h1 class="h4 portfolio-title">Conclusão</h1>
+
+                            <p>
+                                Depois de estudar esse tema, para mim ficou muito claro que observabilidade não é a
+                                mesma coisa que monitoramento. Observabilidade é a capacidade real de entender o
+                                comportamento interno de um sistema a partir dos sinais que ele emite.
+                            </p>
+                            <p>
+                                E isso faz toda a diferença no desenvolvimento de software moderno. Principalmente
+                                porque os sistemas que construímos hoje são muito mais complexos, distribuídos e
+                                dependentes de serviços externos do que eram anos atrás.
+                            </p>
+
+                            <p>
+                                Na empresa em que trabalho, instrumentamos a aplicação com Open Telemtry e exportamos
+                                para a plataforma
+                                <a href="https://github.com/SigNoz/signoz" target="_blank" class="blog-link">SIGNOZ</a>
+                                que é open source, e é uma solução "TUDO EM UM", é relativamente fácil de configurar e
+                                colocar em produção. Pro tipo de sistemas que temos hoje, com ZERO observabilidade, será
+                                bem útil.
+                            </p>
+
+                            <p>
+                                Com essa experiência e estudo consegui entender os conceitos, como funciona, como fazer,
+                                para que serve e os principais nomes associado ao tema.
+                            </p>
+                        </div>
+                        <div id="refs" class="blog-text">
+                            <h1 class="h4 portfolio-title">Referências</h1>
+                            <ul class="list-decimal list-inside space-y-1">
+                                <li>
+                                    <a
+                                        href="https://www.honeycomb.io/blog/observability-5-year-retrospective"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >Observability: The 5-Year Retrospective (2021) - Charity Majors</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://www.honeycomb.io/blog/observability-a-3-year-retrospective"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >Observability: The 3-Year Retrospective (2019) - Charity Majors</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://pt.wikipedia.org/wiki/Teoria_de_controle"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >Wikipédia - Teoria de controle</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://en.wikipedia.org/wiki/Control_engineering"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >Wikipedia - Control engineering</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://opentelemetry.io/docs/concepts/"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >OpenTelemetry Concepts</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://www.redhat.com/en/topics/devops/what-is-observability"
+                                        target="_blank"
+                                        class="blog-link"
+                                        >Red Hat - What is observability?</a
+                                    >
+                                </li>
+                            </ul>
+                        </div>
                     </section>
                 </article>
             </div>
@@ -308,5 +509,20 @@ teoria do controle, pois ele precisa fazer coisas como:
         <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
         <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
         <script type="module" src="../../../assets/js/index.js"></script>
+        <script type="module">
+            import { loadSideBarBlog } from '../../assets/js/elements/sidebar.js';
+
+            const sections = [
+                { id: 'intro', label: 'Introdução' },
+                { id: 'obs-vs-mon', label: 'Observabilidade vs Monitoramento' },
+                { id: 'history', label: 'História' },
+                { id: 'telemetry', label: 'Telemetria' },
+                { id: 'framework-vs-protocol', label: 'Framework vs Protocolo' },
+                { id: 'conclusion', label: 'Conclusão' },
+                { id: 'refs', label: 'Referências' }
+            ];
+
+            loadSideBarBlog(sections);
+        </script>
     </body>
 </html>
